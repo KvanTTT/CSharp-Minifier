@@ -19,9 +19,8 @@ namespace CSharpMinifier.GUI
 
         private void btnMinify_Click(object sender, EventArgs e)
         {
-            Minifier minifier = new Minifier();
-            tbOutput.Text = minifier.MinifyFromString(tbInput.Text,
-                cbCompressIdentifiers.Checked, cbRemoveSpaces.Checked, cbRemoveComments.Checked);
+            Minifier minifier = new Minifier(cbCompressIdentifiers.Checked, cbRemoveSpaces.Checked, cbRemoveSpaces.Checked, int.Parse(tbLineLength.Text));
+            tbOutput.Text = minifier.MinifyFromString(tbInput.Text);
         }
 
         private void btnCopyToClipboard_Click(object sender, EventArgs e)

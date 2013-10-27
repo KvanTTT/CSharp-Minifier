@@ -11,17 +11,50 @@ namespace CSharpMinifier
     {
         private static string[] NameKeys = new string[] { "Name", "LiteralValue", "Keyword" };
 
-        public string MinifyFromString(string cSharpCode, bool compressIdentifiers = true, bool removeSpaces = true, bool removeComments = true)
+		public bool IdentifiersCompressing
+		{
+			get;
+			private set;
+		}
+
+		public bool SpacesRemoving
+		{
+			get;
+			private set;
+		}
+
+		public bool CommentsRemoving
+		{
+			get;
+			private set;
+		}
+
+		public int LineLength
+		{
+			get;
+			private set;
+		}
+
+		public Minifier(bool compressIdentifiers = true, bool removeSpaces = true, bool removeComments = true,
+			int lineLength = 0)
+		{
+			IdentifiersCompressing = compressIdentifiers;
+			SpacesRemoving = removeSpaces;
+			CommentsRemoving = removeComments;
+			LineLength = lineLength;
+		}
+
+        public string MinifyFromString(string cSharpCode)
         {
             SyntaxTree syntaxTree = new CSharpParser().Parse(cSharpCode);
 
-            if (removeComments)
+			if (CommentsRemoving)
                 RemoveComments(syntaxTree);
 
-            if (compressIdentifiers)
+			if (IdentifiersCompressing)
                 CompressIdentifiers(syntaxTree);
 
-            string result = removeSpaces ? SyntaxTreeToStringWithoutSpaces(syntaxTree) : syntaxTree.GetText();
+			string result = SpacesRemoving ? SyntaxTreeToStringWithoutSpaces(syntaxTree, LineLength) : syntaxTree.GetText();
 
             return result;
         }
@@ -55,45 +88,64 @@ namespace CSharpMinifier
         #region Removing of spaces and line breaks
 
         AstNode _prevNode;
+		StringBuilder _line;
 
-        public string SyntaxTreeToStringWithoutSpaces(SyntaxTree syntaxTree)
+        public string SyntaxTreeToStringWithoutSpaces(SyntaxTree syntaxTree, int lineLength)
         {
             StringBuilder result = new StringBuilder();
+			_line = new StringBuilder(LineLength);
 
             _prevNode = null;
             foreach (var children in syntaxTree.Children)
                 TraverseChilds(children, result);
+			result.Append(_line);
 
             return result.ToString();
         }
 
         private void TraverseChilds(AstNode node, StringBuilder stringBuilder)
         {
-            if (node.Children.Count() == 0)
-            {
-                bool insertSpace = true;
-                char last = ' ';
-                if (stringBuilder.Length != 0)
-                    last = stringBuilder[stringBuilder.Length - 1];
-                if (last == ' ' || last == '\r' || last == '\n' || _prevNode == null || node == null)
-                    insertSpace = false;
-                else
-                {
-                    if ((_prevNode is CSharpTokenNode && _prevNode.Role.ToString().All(c => !char.IsLetterOrDigit(c))) ||
-                        (node is CSharpTokenNode && node.Role.ToString().All(c => !char.IsLetterOrDigit(c))))
-                        insertSpace = false;
-                }
-                stringBuilder.Append((insertSpace ? " " : "") + GetLeafNodeString(node));
-            }
-            else
-            {
-                foreach (AstNode child in node.Children)
-                {
-                    TraverseChilds(child, stringBuilder);
-                    if (child.Children.Count() <= 1)
-                        _prevNode = child;
-                }
-            }
+			if (node.Children.Count() == 0)
+			{
+				bool insertSpace = true;
+				char last = ' ';
+				if (_line.Length != 0)
+					last = _line[_line.Length - 1];
+				if (last == ' ' || last == '\r' || last == '\n' || _prevNode == null || node == null)
+					insertSpace = false;
+				else
+				{
+					if ((_prevNode is CSharpTokenNode && _prevNode.Role.ToString().All(c => !char.IsLetterOrDigit(c))) ||
+						(node is CSharpTokenNode && node.Role.ToString().All(c => !char.IsLetterOrDigit(c))))
+							insertSpace = false;
+				}
+
+				string newString = (insertSpace ? " " : "") + GetLeafNodeString(node);
+				if (LineLength == 0)
+					stringBuilder.Append(newString);
+				else
+				{
+					if (_line.Length + newString.Length > LineLength)
+					{
+						stringBuilder.AppendLine(_line.ToString());
+						_line.Clear();
+						_line.Append(newString.TrimStart());
+					}
+					else
+					{
+						_line.Append(newString);
+					}
+				}
+			}
+			else
+			{
+				foreach (AstNode child in node.Children)
+				{
+					TraverseChilds(child, stringBuilder);
+					if (child.Children.Count() <= 1)
+						_prevNode = child;
+				}
+			}
         }
 
         public static string GetLeafNodeString(AstNode node)
