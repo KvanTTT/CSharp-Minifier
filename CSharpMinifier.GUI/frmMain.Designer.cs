@@ -46,10 +46,16 @@
 			this.label3 = new System.Windows.Forms.Label();
 			this.ofdInputCodeFiles = new System.Windows.Forms.OpenFileDialog();
 			this.cbMinifyFiles = new System.Windows.Forms.CheckBox();
+			this.lblOutputCompilied = new System.Windows.Forms.Label();
+			this.pbOutputCompilied = new System.Windows.Forms.PictureBox();
+			this.lblInputCompilied = new System.Windows.Forms.Label();
+			this.pbInputCompilied = new System.Windows.Forms.PictureBox();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
 			this.splitContainer1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.pbOutputCompilied)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.pbInputCompilied)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// btnMinify
@@ -255,11 +261,55 @@
 			this.cbMinifyFiles.Text = "Files";
 			this.cbMinifyFiles.UseVisualStyleBackColor = true;
 			// 
+			// lblOutputCompilied
+			// 
+			this.lblOutputCompilied.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.lblOutputCompilied.AutoSize = true;
+			this.lblOutputCompilied.Location = new System.Drawing.Point(618, 654);
+			this.lblOutputCompilied.Name = "lblOutputCompilied";
+			this.lblOutputCompilied.Size = new System.Drawing.Size(0, 13);
+			this.lblOutputCompilied.TabIndex = 11;
+			// 
+			// pbOutputCompilied
+			// 
+			this.pbOutputCompilied.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.pbOutputCompilied.Location = new System.Drawing.Point(577, 644);
+			this.pbOutputCompilied.Name = "pbOutputCompilied";
+			this.pbOutputCompilied.Size = new System.Drawing.Size(35, 33);
+			this.pbOutputCompilied.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+			this.pbOutputCompilied.TabIndex = 10;
+			this.pbOutputCompilied.TabStop = false;
+			// 
+			// lblInputCompilied
+			// 
+			this.lblInputCompilied.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.lblInputCompilied.AutoSize = true;
+			this.lblInputCompilied.Location = new System.Drawing.Point(618, 615);
+			this.lblInputCompilied.Name = "lblInputCompilied";
+			this.lblInputCompilied.Size = new System.Drawing.Size(0, 13);
+			this.lblInputCompilied.TabIndex = 13;
+			this.lblInputCompilied.Visible = false;
+			// 
+			// pbInputCompilied
+			// 
+			this.pbInputCompilied.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.pbInputCompilied.Location = new System.Drawing.Point(577, 605);
+			this.pbInputCompilied.Name = "pbInputCompilied";
+			this.pbInputCompilied.Size = new System.Drawing.Size(35, 33);
+			this.pbInputCompilied.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+			this.pbInputCompilied.TabIndex = 12;
+			this.pbInputCompilied.TabStop = false;
+			this.pbInputCompilied.Visible = false;
+			// 
 			// frmMain
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(753, 721);
+			this.Controls.Add(this.lblInputCompilied);
+			this.Controls.Add(this.pbInputCompilied);
+			this.Controls.Add(this.lblOutputCompilied);
+			this.Controls.Add(this.pbOutputCompilied);
 			this.Controls.Add(this.cbMinifyFiles);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.tbLineLength);
@@ -278,6 +328,8 @@
 			this.splitContainer1.Panel2.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
 			this.splitContainer1.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.pbOutputCompilied)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.pbInputCompilied)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -302,6 +354,10 @@
 		private System.Windows.Forms.ListBox lbInputFiles;
 		private System.Windows.Forms.OpenFileDialog ofdInputCodeFiles;
 		private System.Windows.Forms.CheckBox cbMinifyFiles;
+		private System.Windows.Forms.PictureBox pbOutputCompilied;
+		private System.Windows.Forms.Label lblOutputCompilied;
+		private System.Windows.Forms.Label lblInputCompilied;
+		private System.Windows.Forms.PictureBox pbInputCompilied;
     }
 }
 

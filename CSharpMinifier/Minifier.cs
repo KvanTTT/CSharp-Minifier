@@ -1,11 +1,15 @@
-﻿using System;
-using System.Linq;
-using ICSharpCode.NRefactory;
+﻿using ICSharpCode.NRefactory;
 using ICSharpCode.NRefactory.CSharp;
-using System.Text;
-using System.Reflection;
-using System.Collections.Generic;
+using ICSharpCode.NRefactory.CSharp.Resolver;
+using ICSharpCode.NRefactory.CSharp.TypeSystem;
+using ICSharpCode.NRefactory.Semantics;
 using ICSharpCode.NRefactory.TypeSystem;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CSharpMinifier
@@ -14,28 +18,11 @@ namespace CSharpMinifier
 	{
 		private static string[] NameKeys = new string[] { "Name", "LiteralValue", "Keyword" };
 
-		private static string[] KnownTypesAndMethods = new string[] { 
-			"Console", "Write", "WriteLine", "Read", "ReadLine" };
-
-		Lazy<IList<IUnresolvedAssembly>> BuiltInLibs = new Lazy<IList<IUnresolvedAssembly>>(
-		delegate
-		{
-			Assembly[] assemblies = {
-						typeof(object).Assembly, // mscorlib
-						typeof(Uri).Assembly, // System.dll
-						typeof(Enumerable).Assembly, // System.Core.dll
-						typeof(ICSharpCode.NRefactory.TypeSystem.IProjectContent).Assembly,
-					};
-			IUnresolvedAssembly[] projectContents = new IUnresolvedAssembly[assemblies.Length];
-			Parallel.For(
-				0, assemblies.Length,
-				delegate(int i)
-				{
-					CecilLoader loader = new CecilLoader();
-					projectContents[i] = loader.LoadAssemblyFile(assemblies[i].Location);
-				});
-			return projectContents;
-		});
+		private SyntaxTree _syntaxTree;
+		private CSharpUnresolvedFile _unresolvedFile;
+		private IProjectContent _projectContent;
+		private ICompilation _compilation;
+		private CSharpAstResolver _resolver;
 
 		public bool IdentifiersCompressing
 		{
@@ -68,6 +55,25 @@ namespace CSharpMinifier
 			SpacesRemoving = removeSpaces;
 			CommentsRemoving = removeComments;
 			LineLength = lineLength;
+
+			_projectContent = new CSharpProjectContent();
+			var assemblies = new List<Assembly>
+			{
+				typeof(object).Assembly, // mscorlib
+				typeof(Uri).Assembly, // System.dll
+				typeof(Enumerable).Assembly, // System.Core.dll
+			};
+
+			var unresolvedAssemblies = new IUnresolvedAssembly[assemblies.Count];
+			Parallel.For(
+				0, assemblies.Count,
+				delegate(int i)
+				{
+					var loader = new CecilLoader();
+					var path = assemblies[i].Location;
+					unresolvedAssemblies[i] = loader.LoadAssemblyFile(assemblies[i].Location);
+				});
+			_projectContent = _projectContent.AddAssemblyReferences((IEnumerable<IUnresolvedAssembly>)unresolvedAssemblies);
 		}
 
 		public string MinifyFiles(string[] csFiles)
@@ -76,6 +82,7 @@ namespace CSharpMinifier
 			SyntaxTree[] trees = csFiles.Select(file => parser.Parse(file, file + "_temp.cs")).ToArray();
 
 			SyntaxTree globalTree = new SyntaxTree();
+			globalTree.FileName = "temp.cs";
 
 			var usings = new List<UsingDeclaration>();
 			var types = new List<TypeDeclaration>();
@@ -91,25 +98,36 @@ namespace CSharpMinifier
 			foreach (var t in types)
 				globalTree.AddChild(t.Clone(), new Role<AstNode>("TypeDeclaration"));
 
-			return Minify(globalTree);
+			_syntaxTree = globalTree;
+
+			return Minify();
 		}
 
 		public string MinifyFromString(string CSharpCode)
 		{
-			SyntaxTree syntaxTree = new CSharpParser().Parse(CSharpCode);
+			_syntaxTree = new CSharpParser().Parse(CSharpCode, "temp.cs");
 
-			return Minify(syntaxTree);
+			return Minify();
 		}
 
-		public string Minify(SyntaxTree syntaxTree)
+		public string Minify()
 		{
 			if (CommentsRemoving)
-				RemoveComments(syntaxTree);
+				RemoveComments();
+
+			_unresolvedFile = _syntaxTree.ToTypeSystem();
+			_projectContent = _projectContent.AddOrUpdateFiles(_unresolvedFile);
+			_compilation = _projectContent.CreateCompilation();
+			_resolver = new CSharpAstResolver(_compilation, _syntaxTree, _unresolvedFile);
 
 			if (IdentifiersCompressing)
-				CompressIdentifiers(syntaxTree);
+				CompressIdentifiers();
 
-			string result = SpacesRemoving ? SyntaxTreeToStringWithoutSpaces(syntaxTree, LineLength) : syntaxTree.GetText();
+			string result;
+			if (SpacesRemoving)
+				result = SyntaxTreeToStringWithoutSpaces(LineLength);
+			else
+				result = _syntaxTree.GetText();
 
 			return result;
 		}
@@ -153,14 +171,14 @@ namespace CSharpMinifier
 
 		#region Comments removing
 
-		public void RemoveComments(SyntaxTree syntaxTree)
+		public void RemoveComments()
 		{
-			foreach (var children in syntaxTree.Children)
+			foreach (var children in _syntaxTree.Children)
 			{
 				if (children.Role.ToString() == "Comment")
 				{
 					CommentType commentType = (CommentType)Enum.Parse(typeof(CommentType),
-						GetPropertyValue(children, "CommentType"));
+						NRefactoryUtils.GetPropertyValue(children, "CommentType"));
 					if (commentType != CommentType.InactiveCode)
 						children.Remove();
 				}
@@ -171,9 +189,43 @@ namespace CSharpMinifier
 
 		#region Compress Identifiers
 
-		public void CompressIdentifiers(SyntaxTree syntaxTree)
+		public void CompressIdentifiers()
 		{
-			//syntaxTree.AcceptVisitor(new MinifierAstVisitor());
+			var visitor = new MinifyLocalsAstVisitor();
+			_syntaxTree.AcceptVisitor(visitor);
+
+			var idGenerator = new MinIdGenerator();
+			var substitutor = new Substitutor(idGenerator);
+			var newSubstituton = substitutor.Generate(visitor.MethodsVars, visitor.AllIdNames);
+
+			foreach (var method in visitor.MethodsVars)
+			{
+				var method2 = newSubstituton[method.Key];
+				foreach (LocalVarDec v in method.Value)
+				{
+					RenameLocal(v.Node, method2[v.Name]);
+				}
+			}
+		}
+
+		public void RenameLocal(AstNode node, string newName)
+		{
+			LocalResolveResult lrr = _resolver.Resolve(node) as LocalResolveResult;
+
+			if (lrr != null)
+			{
+				FindReferences fr = new FindReferences();
+				FoundReferenceCallback callback = delegate(AstNode matchNode, ResolveResult result)
+				{
+					if (matchNode is ParameterDeclaration)
+						((ParameterDeclaration)matchNode).Name = newName;
+					else if (matchNode is VariableInitializer)
+						((VariableInitializer)matchNode).Name = newName;
+					else if (matchNode is IdentifierExpression)
+						((IdentifierExpression)matchNode).Identifier = newName;
+				};
+				fr.FindLocalReferences(lrr.Variable, _unresolvedFile, _syntaxTree, _compilation, callback, CancellationToken.None);
+			}
 		}
 
 		#endregion
@@ -183,13 +235,13 @@ namespace CSharpMinifier
 		AstNode _prevNode;
 		StringBuilder _line;
 
-		public string SyntaxTreeToStringWithoutSpaces(SyntaxTree syntaxTree, int lineLength)
+		public string SyntaxTreeToStringWithoutSpaces(int lineLength)
 		{
 			StringBuilder result = new StringBuilder();
 			_line = new StringBuilder(LineLength);
 
 			_prevNode = null;
-			foreach (var children in syntaxTree.Children)
+			foreach (var children in _syntaxTree.Children)
 				TraverseChilds(children, result);
 			result.Append(_line);
 
@@ -201,7 +253,7 @@ namespace CSharpMinifier
 			if (node.Children.Count() == 0)
 			{
 				bool insertSpace = true;
-				char last = ' ';
+				char last = (char)0;
 				if (_line.Length != 0)
 					last = _line[_line.Length - 1];
 				if (last == ' ' || last == '\r' || last == '\n' || _prevNode == null || node == null)
@@ -244,7 +296,7 @@ namespace CSharpMinifier
 		public static string GetLeafNodeString(AstNode node)
 		{
 			string nodeRole = node.Role.ToString();
-			var properties = GetProperties(node);
+			var properties = NRefactoryUtils.GetProperties(node);
 			if (nodeRole == "Comment")
 			{
 				string commentTypeString = properties
@@ -288,25 +340,6 @@ namespace CSharpMinifier
 
 			return properties
 				.Where(p => NameKeys.Contains(p.Name)).FirstOrDefault().GetValue(node, null).ToString();
-		}
-
-		#endregion
-
-		#region Utils
-
-		public static PropertyInfo[] GetProperties(AstNode node)
-		{
-			return node.GetType().GetProperties();
-		}
-
-		public static string GetPropertyValue(AstNode node, string propertyName)
-		{
-			return node.GetType()
-				   .GetProperties()
-				   .Where(p => p.Name == propertyName)
-				   .FirstOrDefault()
-				   .GetValue(node, null)
-				   .ToString();
 		}
 
 		#endregion

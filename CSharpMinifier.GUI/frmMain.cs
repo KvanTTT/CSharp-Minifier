@@ -76,7 +76,18 @@ namespace CSharpMinifier.GUI
         {
             Minifier minifier = new Minifier(cbCompressIdentifiers.Checked, cbRemoveSpaces.Checked, cbRemoveSpaces.Checked, int.Parse(tbLineLength.Text));
 			tbOutput.Text = !cbMinifyFiles.Checked ? minifier.MinifyFromString(tbInput.Text) : minifier.MinifyFiles(Sources.Select(source => source.Value).ToArray());
-        }
+        
+			if (CompileUtils.CanCompile(tbOutput.Text))
+			{
+				pbOutputCompilied.Image = Resources.Ok;
+				lblOutputCompilied.Text = "Compilied";
+			}
+			else
+			{
+				pbOutputCompilied.Image = Resources.Error;
+				lblOutputCompilied.Text = "Not compilied";
+			}
+		}
 
         private void btnCopyToClipboard_Click(object sender, EventArgs e)
         {
