@@ -68,6 +68,7 @@
     <Compile Include="NamesGenerator.cs" />
     <Compile Include="NRefactoryUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RandomIdGenerator.cs" />
     <Compile Include="Substitutor.cs" />
   </ItemGroup>
   <ItemGroup>

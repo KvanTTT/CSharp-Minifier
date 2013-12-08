@@ -11,7 +11,7 @@ namespace CSharpMinifier
 		public static string Chars0 = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
 		public static string CharsN = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
 
-		List<int> Indexes;
+		List<int> _indexes;
 
 		public MinIdGenerator()
 			: base()
@@ -21,37 +21,38 @@ namespace CSharpMinifier
 		public override void Reset()
 		{
 			base.Reset();
-			CurrentCombinationNumber = -1;
-			Indexes = new List<int>();
+			_indexes = new List<int>();
 		}
 
 		public override string Next()
 		{
-			int i = Indexes.Count - 1;
+			int i = _indexes.Count - 1;
 			bool inc;
 			do
 			{
 				if (i == -1)
 				{
-					Indexes.Add(0);
+					_indexes.Add(0);
 					break;
 				}
-				Indexes[i] = Indexes[i] + 1;
+				_indexes[i] = _indexes[i] + 1;
 				inc = false;
-				if ((i == 0 && Indexes[i] >= Chars0.Length) || Indexes[i] >= CharsN.Length)
+				if ((i == 0 && _indexes[i] >= Chars0.Length) || _indexes[i] >= CharsN.Length)
 				{
-					Indexes[i--] = 0;
+					_indexes[i--] = 0;
 					inc = true;
 				}
 			}
 			while (inc);
 
-			StringBuilder result = new StringBuilder();
-			for (int j = 0; j < Indexes.Count; j++)
-				result.Append(j == 0 ? Chars0[Indexes[j]] : CharsN[Indexes[j]]);
+			StringBuilder result = new StringBuilder(_indexes.Count);
+			for (int j = 0; j < _indexes.Count; j++)
+				result.Append(j == 0 ? Chars0[_indexes[j]] : CharsN[_indexes[j]]);
 
+			CurrentCombination = result.ToString();
 			CurrentCombinationNumber++;
-			return result.ToString();
+			
+			return CurrentCombination;
 		}
 	}
 }
