@@ -16,7 +16,7 @@ namespace CSharpMinifier.Tests
 		public void Init()
 		{
 			Samples = new Dictionary<string, string>();
-			var sampleFiles = Directory.GetFiles(@"..\..\..\Test Code");
+			var sampleFiles = Directory.GetFiles(@"..\..\Samples");
 			foreach (var file in sampleFiles)
 			{
 				var code = File.ReadAllText(file);
@@ -29,7 +29,15 @@ namespace CSharpMinifier.Tests
 		[Test]
 		public void RemoveSpaces()
 		{
-			var minifier = new Minifier(false, true, false);
+			var minifierOptions = new MinifierOptions
+			{
+				IdentifiersCompressing = false,
+				SpacesRemoving = true,
+				CommentsRemoving = false,
+				LineLength = 0,
+				RegionsRemoving = false
+			};
+			var minifier = new Minifier(minifierOptions);
 			foreach (var sample in Samples)
 			{
 				var minified = minifier.MinifyFromString(sample.Value);
@@ -38,9 +46,81 @@ namespace CSharpMinifier.Tests
 		}
 
 		[Test]
+		public void LineLengthConstraint()
+		{
+			var minifierOptions = new MinifierOptions
+			{
+				IdentifiersCompressing = false,
+				SpacesRemoving = true,
+				CommentsRemoving = true,
+				LineLength = 80,
+				RegionsRemoving = true
+			};
+			var minifier = new Minifier(minifierOptions);
+			foreach (var sample in Samples)
+			{
+				var minified = minifier.MinifyFromString(sample.Value);
+				Assert.IsTrue(CompileUtils.CanCompile(minified));
+			}
+		}
+
+		[Test]
+		public void RemoveComments()
+		{
+			var minifierOptions = new MinifierOptions
+			{
+				IdentifiersCompressing = false,
+				SpacesRemoving = true,
+				CommentsRemoving = true,
+				LineLength = 0,
+				RegionsRemoving = false
+			};
+			var minifier = new Minifier(minifierOptions);
+
+			var test = Samples["Test1"];
+			if (!test.Contains("//") || !test.Contains("/*") || !test.Contains("*/"))
+				Assert.Inconclusive("Invalid test sample for RemoveComments test");
+			var minified = minifier.MinifyFromString(test);
+			Assert.IsTrue(CompileUtils.CanCompile(minified));
+			Assert.IsFalse(minified.Contains("//"));
+			Assert.IsFalse(minified.Contains("/*"));
+			Assert.IsFalse(minified.Contains("*/"));
+		}
+		
+		[Test]
+		public void RemoveRegions()
+		{
+			var minifierOptions = new MinifierOptions
+			{
+				IdentifiersCompressing = false,
+				SpacesRemoving = true,
+				CommentsRemoving = false,
+				LineLength = 0,
+				RegionsRemoving = true
+			};
+			var minifier = new Minifier(minifierOptions);
+
+			var test = Samples["Test1"];
+			if (!test.Contains("#region") || !test.Contains("#endregion"))
+				Assert.Inconclusive("Invalid test sample for RemoveRegions test");
+			var minified = minifier.MinifyFromString(test);
+			Assert.IsTrue(CompileUtils.CanCompile(minified));
+			Assert.IsFalse(minified.Contains("#region"));
+			Assert.IsFalse(minified.Contains("#endregion"));
+		}
+
+		[Test]
 		public void CompressIdentifiers()
 		{
-			var minifier = new Minifier(true, false, false);
+			var minifierOptions = new MinifierOptions
+			{
+				IdentifiersCompressing = true,
+				SpacesRemoving = false,
+				CommentsRemoving = false,
+				LineLength = 0,
+				RegionsRemoving = false
+			};
+			var minifier = new Minifier(minifierOptions);
 			foreach (var sample in Samples)
 			{
 				var minified = minifier.MinifyFromString(sample.Value);

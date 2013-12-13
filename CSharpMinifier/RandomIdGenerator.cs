@@ -50,10 +50,24 @@ namespace CSharpMinifier
 				CurrentCombination = result.ToString();
 			}
 			while (_generatedIds.Contains(CurrentCombination));
+			_generatedIds.Add(CurrentCombination);
 
 			CurrentCombinationNumber++;
 
 			return result.ToString();
+		}
+
+		public override int CurrentCombinationNumber
+		{
+			get
+			{
+				return base.CurrentCombinationNumber;
+			}
+			set
+			{
+				CurrentCombination = CurrentCombinationNumber >= 0 && CurrentCombinationNumber < _generatedIds.Count ? _generatedIds[CurrentCombinationNumber] : "";
+				base.CurrentCombinationNumber = value;
+			}
 		}
 	}
 }

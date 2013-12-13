@@ -50,6 +50,7 @@
 			this.pbOutputCompilied = new System.Windows.Forms.PictureBox();
 			this.lblInputCompilied = new System.Windows.Forms.Label();
 			this.pbInputCompilied = new System.Windows.Forms.PictureBox();
+			this.cbRemoveRegions = new System.Windows.Forms.CheckBox();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -61,7 +62,7 @@
 			// btnMinify
 			// 
 			this.btnMinify.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnMinify.Location = new System.Drawing.Point(577, 155);
+			this.btnMinify.Location = new System.Drawing.Point(577, 157);
 			this.btnMinify.Name = "btnMinify";
 			this.btnMinify.Size = new System.Drawing.Size(164, 26);
 			this.btnMinify.TabIndex = 1;
@@ -181,7 +182,7 @@
 			this.cbRemoveSpaces.AutoSize = true;
 			this.cbRemoveSpaces.Checked = true;
 			this.cbRemoveSpaces.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbRemoveSpaces.Location = new System.Drawing.Point(577, 58);
+			this.cbRemoveSpaces.Location = new System.Drawing.Point(577, 81);
 			this.cbRemoveSpaces.Name = "cbRemoveSpaces";
 			this.cbRemoveSpaces.Size = new System.Drawing.Size(103, 17);
 			this.cbRemoveSpaces.TabIndex = 3;
@@ -194,7 +195,7 @@
 			this.cbCompressIdentifiers.AutoSize = true;
 			this.cbCompressIdentifiers.Checked = true;
 			this.cbCompressIdentifiers.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbCompressIdentifiers.Location = new System.Drawing.Point(577, 35);
+			this.cbCompressIdentifiers.Location = new System.Drawing.Point(577, 58);
 			this.cbCompressIdentifiers.Name = "cbCompressIdentifiers";
 			this.cbCompressIdentifiers.Size = new System.Drawing.Size(119, 17);
 			this.cbCompressIdentifiers.TabIndex = 4;
@@ -228,7 +229,7 @@
 			// tbLineLength
 			// 
 			this.tbLineLength.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbLineLength.Location = new System.Drawing.Point(657, 78);
+			this.tbLineLength.Location = new System.Drawing.Point(657, 104);
 			this.tbLineLength.Name = "tbLineLength";
 			this.tbLineLength.Size = new System.Drawing.Size(84, 20);
 			this.tbLineLength.TabIndex = 7;
@@ -239,7 +240,7 @@
 			// 
 			this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(577, 81);
+			this.label3.Location = new System.Drawing.Point(577, 107);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(63, 13);
 			this.label3.TabIndex = 8;
@@ -254,7 +255,7 @@
 			// 
 			this.cbMinifyFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.cbMinifyFiles.AutoSize = true;
-			this.cbMinifyFiles.Location = new System.Drawing.Point(580, 132);
+			this.cbMinifyFiles.Location = new System.Drawing.Point(580, 134);
 			this.cbMinifyFiles.Name = "cbMinifyFiles";
 			this.cbMinifyFiles.Size = new System.Drawing.Size(47, 17);
 			this.cbMinifyFiles.TabIndex = 9;
@@ -301,11 +302,25 @@
 			this.pbInputCompilied.TabStop = false;
 			this.pbInputCompilied.Visible = false;
 			// 
+			// cbRemoveRegions
+			// 
+			this.cbRemoveRegions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.cbRemoveRegions.AutoSize = true;
+			this.cbRemoveRegions.Checked = true;
+			this.cbRemoveRegions.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.cbRemoveRegions.Location = new System.Drawing.Point(577, 35);
+			this.cbRemoveRegions.Name = "cbRemoveRegions";
+			this.cbRemoveRegions.Size = new System.Drawing.Size(103, 17);
+			this.cbRemoveRegions.TabIndex = 14;
+			this.cbRemoveRegions.Text = "Remove regions";
+			this.cbRemoveRegions.UseVisualStyleBackColor = true;
+			// 
 			// frmMain
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(753, 721);
+			this.Controls.Add(this.cbRemoveRegions);
 			this.Controls.Add(this.lblInputCompilied);
 			this.Controls.Add(this.pbInputCompilied);
 			this.Controls.Add(this.lblOutputCompilied);
@@ -358,6 +373,7 @@
 		private System.Windows.Forms.Label lblOutputCompilied;
 		private System.Windows.Forms.Label lblInputCompilied;
 		private System.Windows.Forms.PictureBox pbInputCompilied;
+		private System.Windows.Forms.CheckBox cbRemoveRegions;
     }
 }
 

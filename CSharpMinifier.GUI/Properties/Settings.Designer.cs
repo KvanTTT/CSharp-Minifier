@@ -93,5 +93,17 @@ namespace CSharpMinifier.GUI.Properties {
                 this["FileList"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool RemoveRegions {
+            get {
+                return ((bool)(this["RemoveRegions"]));
+            }
+            set {
+                this["RemoveRegions"] = value;
+            }
+        }
     }
 }

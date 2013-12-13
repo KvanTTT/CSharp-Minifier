@@ -54,5 +54,17 @@ namespace CSharpMinifier
 			
 			return CurrentCombination;
 		}
+
+		public override int CurrentCombinationNumber
+		{
+			get
+			{
+				return base.CurrentCombinationNumber;
+			}
+			set
+			{
+				base.CurrentCombinationNumber = value;
+			}
+		}
 	}
 }

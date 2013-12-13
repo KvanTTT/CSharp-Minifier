@@ -24,37 +24,15 @@ namespace CSharpMinifier
 		private ICompilation _compilation;
 		private CSharpAstResolver _resolver;
 
-		public bool IdentifiersCompressing
+		public MinifierOptions Options
 		{
 			get;
 			private set;
 		}
 
-		public bool SpacesRemoving
+		public Minifier(MinifierOptions options)
 		{
-			get;
-			private set;
-		}
-
-		public bool CommentsRemoving
-		{
-			get;
-			private set;
-		}
-
-		public int LineLength
-		{
-			get;
-			private set;
-		}
-
-		public Minifier(bool compressIdentifiers = true, bool removeSpaces = true, bool removeComments = true,
-			int lineLength = 0)
-		{
-			IdentifiersCompressing = compressIdentifiers;
-			SpacesRemoving = removeSpaces;
-			CommentsRemoving = removeComments;
-			LineLength = lineLength;
+			Options = options;
 
 			_projectContent = new CSharpProjectContent();
 			var assemblies = new List<Assembly>
@@ -112,20 +90,20 @@ namespace CSharpMinifier
 
 		public string Minify()
 		{
-			if (CommentsRemoving)
-				RemoveComments();
+			if (Options.CommentsRemoving || Options.RegionsRemoving)
+				RemoveCommentsAndRegions();
 
 			_unresolvedFile = _syntaxTree.ToTypeSystem();
 			_projectContent = _projectContent.AddOrUpdateFiles(_unresolvedFile);
 			_compilation = _projectContent.CreateCompilation();
 			_resolver = new CSharpAstResolver(_compilation, _syntaxTree, _unresolvedFile);
 
-			if (IdentifiersCompressing)
+			if (Options.IdentifiersCompressing)
 				CompressIdentifiers();
 
 			string result;
-			if (SpacesRemoving)
-				result = SyntaxTreeToStringWithoutSpaces(LineLength);
+			if (Options.SpacesRemoving)
+				result = SyntaxTreeToStringWithoutSpaces(Options.LineLength);
 			else
 				result = _syntaxTree.GetText();
 
@@ -171,17 +149,36 @@ namespace CSharpMinifier
 
 		#region Comments removing
 
-		public void RemoveComments()
+		public void RemoveCommentsAndRegions()
 		{
 			foreach (var children in _syntaxTree.Children)
+				RemoveCommentsAndRegions(children);
+		}
+
+		private void RemoveCommentsAndRegions(AstNode node)
+		{
+			foreach (var children in node.Children)
 			{
-				if (children.Role.ToString() == "Comment")
+				if (Options.CommentsRemoving && children is Comment)
 				{
-					CommentType commentType = (CommentType)Enum.Parse(typeof(CommentType),
-						NRefactoryUtils.GetPropertyValue(children, "CommentType"));
+					var commentType = children.GetPropertyValueEnum<CommentType>("CommentType");
 					if (commentType != CommentType.InactiveCode)
 						children.Remove();
 				}
+				else if (Options.RegionsRemoving && children is PreProcessorDirective)
+				{
+					var type = children.GetPropertyValueEnum<PreProcessorDirectiveType>("Type");
+					switch (type)
+					{
+						case PreProcessorDirectiveType.Region:
+						case PreProcessorDirectiveType.Endregion:
+						case PreProcessorDirectiveType.Warning:
+							children.Remove();
+							break;
+					}
+				}
+				else
+					RemoveCommentsAndRegions(children);
 			}
 		}
 
@@ -238,7 +235,7 @@ namespace CSharpMinifier
 		public string SyntaxTreeToStringWithoutSpaces(int lineLength)
 		{
 			StringBuilder result = new StringBuilder();
-			_line = new StringBuilder(LineLength);
+			_line = new StringBuilder(Options.LineLength);
 
 			_prevNode = null;
 			foreach (var children in _syntaxTree.Children)
@@ -252,25 +249,39 @@ namespace CSharpMinifier
 		{
 			if (node.Children.Count() == 0)
 			{
-				bool insertSpace = true;
+				string beginSymbols = " ";
 				char last = (char)0;
 				if (_line.Length != 0)
 					last = _line[_line.Length - 1];
+
 				if (last == ' ' || last == '\r' || last == '\n' || _prevNode == null || node == null)
-					insertSpace = false;
+					beginSymbols = "";
 				else
 				{
-					if ((_prevNode is CSharpTokenNode && _prevNode.Role.ToString().All(c => !char.IsLetterOrDigit(c))) ||
-						(node is CSharpTokenNode && node.Role.ToString().All(c => !char.IsLetterOrDigit(c))))
-						insertSpace = false;
+					var prevComment = _prevNode as Comment;
+					if (prevComment != null)
+					{
+						if (prevComment.CommentType == CommentType.SingleLine || prevComment.CommentType == CommentType.Documentation)
+							beginSymbols = Environment.NewLine;
+						else
+							beginSymbols = "";
+					}
+					else if (node is PreProcessorDirective || _prevNode is PreProcessorDirective)
+						beginSymbols = Environment.NewLine;
+					else
+					{
+						if ((_prevNode is CSharpTokenNode && _prevNode.Role.ToString().All(c => !char.IsLetterOrDigit(c))) ||
+							(node is CSharpTokenNode && node.Role.ToString().All(c => !char.IsLetterOrDigit(c))))
+							beginSymbols = "";
+					}
 				}
 
-				string newString = (insertSpace ? " " : "") + GetLeafNodeString(node);
-				if (LineLength == 0)
+				string newString = beginSymbols + GetLeafNodeString(node);
+				if (Options.LineLength == 0)
 					stringBuilder.Append(newString);
 				else
 				{
-					if (_line.Length + newString.Length > LineLength)
+					if (_line.Length + newString.Length > Options.LineLength)
 					{
 						stringBuilder.AppendLine(_line.ToString());
 						_line.Clear();
@@ -299,20 +310,15 @@ namespace CSharpMinifier
 			var properties = NRefactoryUtils.GetProperties(node);
 			if (nodeRole == "Comment")
 			{
-				string commentTypeString = properties
-					.Where(p => p.Name == "CommentType").FirstOrDefault().GetValue(node, null).ToString();
-				CommentType commentType = (CommentType)Enum.Parse(typeof(CommentType), commentTypeString);
-
-				string content = properties.Where(p => p.Name == "Content")
-					.FirstOrDefault().GetValue(node, null).ToString();
-
+				CommentType commentType = properties.GetPropertyValueEnum<CommentType>(node, "CommentType");
+				string content = properties.GetPropertyValue(node, "Content");
 				switch (commentType)
 				{
 					default:
 					case CommentType.SingleLine:
-						return "//" + content + Environment.NewLine;
+						return "//" + content;
 					case CommentType.Documentation:
-						return "///" + content + Environment.NewLine;
+						return "///" + content;
 					case CommentType.MultiLine:
 						return "/*" + content + "*/";
 					case CommentType.InactiveCode:
@@ -323,8 +329,7 @@ namespace CSharpMinifier
 			}
 			else if (nodeRole == "Modifier")
 			{
-				return properties
-					.Where(p => p.Name == "Modifier").FirstOrDefault().GetValue(node, null).ToString().ToLower();
+				return properties.GetPropertyValue(node, "Modifier").ToLower();
 			}
 			else if (nodeRole == "Target" || nodeRole == "Right")
 			{
@@ -334,9 +339,18 @@ namespace CSharpMinifier
 				else if (typeName == "NullReferenceExpression")
 					return "null";
 			}
+			else if (nodeRole == "PreProcessorDirective")
+			{
+				var type = properties.GetPropertyValue(node, "Type").ToLower();
+				var argument = properties.GetPropertyValue(node, "Argument");
+				var result = "#" + type;
+				if (argument != string.Empty)
+					result += " " + argument;
+				return result;
+			}
 
 			if (node is CSharpTokenNode || node is CSharpModifierToken)
-				return node.Role.ToString();
+				return nodeRole;
 
 			return properties
 				.Where(p => NameKeys.Contains(p.Name)).FirstOrDefault().GetValue(node, null).ToString();

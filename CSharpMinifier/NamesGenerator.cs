@@ -21,10 +21,10 @@ namespace CSharpMinifier
 			CurrentCombination = string.Empty;
 		}
 
-		public int CurrentCombinationNumber
+		public virtual int CurrentCombinationNumber
 		{
 			get;
-			protected set;
+			set;
 		}
 
 		public string CurrentCombination

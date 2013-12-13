@@ -50,6 +50,7 @@ namespace CSharpMinifier.GUI
             InitializeComponent();
 
 			cbRemoveComments.Checked = Settings.Default.RemoveComments;
+			cbRemoveRegions.Checked = Settings.Default.RemoveRegions;
 			cbCompressIdentifiers.Checked = Settings.Default.CompressIdentifiers;
 			cbRemoveSpaces.Checked = Settings.Default.RemoveSpaces;
 			tbLineLength.Text = Settings.Default.LineLength.ToString();
@@ -61,6 +62,7 @@ namespace CSharpMinifier.GUI
 		private void frmMain_FormClosed(object sender, FormClosedEventArgs e)
 		{
 			Settings.Default.RemoveComments = cbRemoveComments.Checked;
+			Settings.Default.RemoveRegions = cbRemoveRegions.Checked;
 			Settings.Default.CompressIdentifiers = cbCompressIdentifiers.Checked;
 			Settings.Default.RemoveSpaces = cbRemoveSpaces.Checked;
 			Settings.Default.LineLength = int.Parse(tbLineLength.Text);
@@ -74,7 +76,15 @@ namespace CSharpMinifier.GUI
 
         private void btnMinify_Click(object sender, EventArgs e)
         {
-            Minifier minifier = new Minifier(cbCompressIdentifiers.Checked, cbRemoveSpaces.Checked, cbRemoveSpaces.Checked, int.Parse(tbLineLength.Text));
+			var minifierOptions = new MinifierOptions
+			{
+				IdentifiersCompressing = cbCompressIdentifiers.Checked,
+				SpacesRemoving = cbRemoveSpaces.Checked,
+				RegionsRemoving = cbRemoveRegions.Checked,
+				CommentsRemoving = cbRemoveComments.Checked,
+				LineLength = int.Parse(tbLineLength.Text),
+			};
+			Minifier minifier = new Minifier(minifierOptions);
 			tbOutput.Text = !cbMinifyFiles.Checked ? minifier.MinifyFromString(tbInput.Text) : minifier.MinifyFiles(Sources.Select(source => source.Value).ToArray());
         
 			if (CompileUtils.CanCompile(tbOutput.Text))

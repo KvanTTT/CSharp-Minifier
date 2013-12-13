@@ -64,6 +64,7 @@
     <Compile Include="CompileUtils.cs" />
     <Compile Include="MinIdGenerator.cs" />
     <Compile Include="Minifier.cs" />
+    <Compile Include="MinifierOptions.cs" />
     <Compile Include="MinifyLocalsAstVisitor.cs" />
     <Compile Include="NamesGenerator.cs" />
     <Compile Include="NRefactoryUtils.cs" />

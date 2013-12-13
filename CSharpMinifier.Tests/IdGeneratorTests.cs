@@ -29,6 +29,7 @@ namespace CSharpMinifier.Tests
 				generatedIds.Add(randomIdGenerator.Next());
 			
 			Assert.AreEqual(MinIdGenerator.Chars0.Length, generatedIds.Count);
+			Assert.AreEqual(MinIdGenerator.Chars0.Length - 1, randomIdGenerator.CurrentCombinationNumber);
 		}
 	}
 }
