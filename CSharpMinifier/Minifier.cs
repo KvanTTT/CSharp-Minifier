@@ -34,24 +34,27 @@ namespace CSharpMinifier
 		{
 			Options = options;
 
-			_projectContent = new CSharpProjectContent();
-			var assemblies = new List<Assembly>
+			if (Options.IdentifiersCompressing)
+			{
+				_projectContent = new CSharpProjectContent();
+				var assemblies = new List<Assembly>
 			{
 				typeof(object).Assembly, // mscorlib
 				typeof(Uri).Assembly, // System.dll
 				typeof(Enumerable).Assembly, // System.Core.dll
 			};
 
-			var unresolvedAssemblies = new IUnresolvedAssembly[assemblies.Count];
-			Parallel.For(
-				0, assemblies.Count,
-				delegate(int i)
-				{
-					var loader = new CecilLoader();
-					var path = assemblies[i].Location;
-					unresolvedAssemblies[i] = loader.LoadAssemblyFile(assemblies[i].Location);
-				});
-			_projectContent = _projectContent.AddAssemblyReferences((IEnumerable<IUnresolvedAssembly>)unresolvedAssemblies);
+				var unresolvedAssemblies = new IUnresolvedAssembly[assemblies.Count];
+				Parallel.For(
+					0, assemblies.Count,
+					delegate(int i)
+					{
+						var loader = new CecilLoader();
+						var path = assemblies[i].Location;
+						unresolvedAssemblies[i] = loader.LoadAssemblyFile(assemblies[i].Location);
+					});
+				_projectContent = _projectContent.AddAssemblyReferences((IEnumerable<IUnresolvedAssembly>)unresolvedAssemblies);
+			}
 		}
 
 		public string MinifyFiles(string[] csFiles)
@@ -93,13 +96,14 @@ namespace CSharpMinifier
 			if (Options.CommentsRemoving || Options.RegionsRemoving)
 				RemoveCommentsAndRegions();
 
-			_unresolvedFile = _syntaxTree.ToTypeSystem();
-			_projectContent = _projectContent.AddOrUpdateFiles(_unresolvedFile);
-			_compilation = _projectContent.CreateCompilation();
-			_resolver = new CSharpAstResolver(_compilation, _syntaxTree, _unresolvedFile);
-
 			if (Options.IdentifiersCompressing)
+			{
+				_unresolvedFile = _syntaxTree.ToTypeSystem();
+				_projectContent = _projectContent.AddOrUpdateFiles(_unresolvedFile);
+				_compilation = _projectContent.CreateCompilation();
+				_resolver = new CSharpAstResolver(_compilation, _syntaxTree, _unresolvedFile);
 				CompressIdentifiers();
+			}
 
 			string result;
 			if (Options.SpacesRemoving)

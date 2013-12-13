@@ -38,13 +38,15 @@ namespace CSharpMinifier
 			set;
 		}
 
-		public MinifierOptions()
+		public MinifierOptions(bool maxCompression = true)
 		{
-			IdentifiersCompressing = true;
-			SpacesRemoving = true;
-			CommentsRemoving = true;
-			LineLength = 0;
-			RegionsRemoving = true;
+			if (maxCompression)
+			{
+				IdentifiersCompressing = true;
+				SpacesRemoving = true;
+				CommentsRemoving = true;
+				RegionsRemoving = true;
+			}
 		}
 	}
 }
