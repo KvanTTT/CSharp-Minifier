@@ -13,8 +13,8 @@ using System.Windows.Forms;
 
 namespace CSharpMinifier.GUI
 {
-    public partial class frmMain : Form
-    {
+	public partial class frmMain : Form
+	{
 		class ListBoxItem
 		{
 			public string Key { get; set; }
@@ -43,11 +43,11 @@ namespace CSharpMinifier.GUI
 			}
 		}
 
-		Dictionary<string, string> Sources = new Dictionary<string,string>();
+		Dictionary<string, string> Sources = new Dictionary<string, string>();
 
-        public frmMain()
-        {
-            InitializeComponent();
+		public frmMain()
+		{
+			InitializeComponent();
 
 			cbRemoveComments.Checked = Settings.Default.RemoveComments;
 			cbRemoveRegions.Checked = Settings.Default.RemoveRegions;
@@ -57,7 +57,7 @@ namespace CSharpMinifier.GUI
 			cbMinifyFiles.Checked = Settings.Default.MinifyFiles;
 			if (Settings.Default.FileList != null)
 				FillList(Settings.Default.FileList.Cast<string>().ToArray());
-        }
+		}
 
 		private void frmMain_FormClosed(object sender, FormClosedEventArgs e)
 		{
@@ -74,8 +74,8 @@ namespace CSharpMinifier.GUI
 			Settings.Default.Save();
 		}
 
-        private void btnMinify_Click(object sender, EventArgs e)
-        {
+		private void btnMinify_Click(object sender, EventArgs e)
+		{
 			var minifierOptions = new MinifierOptions
 			{
 				IdentifiersCompressing = cbCompressIdentifiers.Checked,
@@ -86,7 +86,7 @@ namespace CSharpMinifier.GUI
 			};
 			Minifier minifier = new Minifier(minifierOptions);
 			tbOutput.Text = !cbMinifyFiles.Checked ? minifier.MinifyFromString(tbInput.Text) : minifier.MinifyFiles(Sources.Select(source => source.Value).ToArray());
-        
+
 			if (CompileUtils.CanCompile(tbOutput.Text))
 			{
 				pbOutputCompilied.Image = Resources.Ok;
@@ -99,11 +99,11 @@ namespace CSharpMinifier.GUI
 			}
 		}
 
-        private void btnCopyToClipboard_Click(object sender, EventArgs e)
-        {
-            if (!string.IsNullOrEmpty(tbOutput.Text))
-                Clipboard.SetText(tbOutput.Text);
-        }
+		private void btnCopyToClipboard_Click(object sender, EventArgs e)
+		{
+			if (!string.IsNullOrEmpty(tbOutput.Text))
+				Clipboard.SetText(tbOutput.Text);
+		}
 
 		private void btnOpenFiles_Click(object sender, EventArgs e)
 		{
@@ -126,14 +126,5 @@ namespace CSharpMinifier.GUI
 			{
 			}
 		}
-
-		private void tbInput_KeyDown(object sender, KeyEventArgs e)
-		{
-			if (e.Control && e.KeyCode == Keys.A)
-			{
-				((TextBox)sender).SelectAll();
-				e.SuppressKeyPress = true;
-			}
-		}
-    }
+	}
 }

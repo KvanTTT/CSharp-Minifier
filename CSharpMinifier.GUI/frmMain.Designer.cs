@@ -35,9 +35,7 @@
 			this.label4 = new System.Windows.Forms.Label();
 			this.lbInputFiles = new System.Windows.Forms.ListBox();
 			this.label1 = new System.Windows.Forms.Label();
-			this.tbInput = new System.Windows.Forms.TextBox();
 			this.label2 = new System.Windows.Forms.Label();
-			this.tbOutput = new System.Windows.Forms.TextBox();
 			this.cbRemoveSpaces = new System.Windows.Forms.CheckBox();
 			this.cbCompressIdentifiers = new System.Windows.Forms.CheckBox();
 			this.cbRemoveComments = new System.Windows.Forms.CheckBox();
@@ -51,6 +49,8 @@
 			this.lblInputCompilied = new System.Windows.Forms.Label();
 			this.pbInputCompilied = new System.Windows.Forms.PictureBox();
 			this.cbRemoveRegions = new System.Windows.Forms.CheckBox();
+			this.tbInput = new FastColoredTextBoxNS.FastColoredTextBox();
+			this.tbOutput = new FastColoredTextBoxNS.FastColoredTextBox();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -81,16 +81,16 @@
 			// 
 			// splitContainer1.Panel1
 			// 
+			this.splitContainer1.Panel1.Controls.Add(this.tbInput);
 			this.splitContainer1.Panel1.Controls.Add(this.btnOpenFiles);
 			this.splitContainer1.Panel1.Controls.Add(this.label4);
 			this.splitContainer1.Panel1.Controls.Add(this.lbInputFiles);
 			this.splitContainer1.Panel1.Controls.Add(this.label1);
-			this.splitContainer1.Panel1.Controls.Add(this.tbInput);
 			// 
 			// splitContainer1.Panel2
 			// 
-			this.splitContainer1.Panel2.Controls.Add(this.label2);
 			this.splitContainer1.Panel2.Controls.Add(this.tbOutput);
+			this.splitContainer1.Panel2.Controls.Add(this.label2);
 			this.splitContainer1.Size = new System.Drawing.Size(559, 697);
 			this.splitContainer1.SplitterDistance = 341;
 			this.splitContainer1.TabIndex = 2;
@@ -138,20 +138,6 @@
 			this.label1.TabIndex = 2;
 			this.label1.Text = "Input";
 			// 
-			// tbInput
-			// 
-			this.tbInput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbInput.Location = new System.Drawing.Point(3, 33);
-			this.tbInput.Multiline = true;
-			this.tbInput.Name = "tbInput";
-			this.tbInput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-			this.tbInput.Size = new System.Drawing.Size(425, 305);
-			this.tbInput.TabIndex = 1;
-			this.tbInput.Text = resources.GetString("tbInput.Text");
-			this.tbInput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tbInput_KeyDown);
-			// 
 			// label2
 			// 
 			this.label2.AutoSize = true;
@@ -161,20 +147,6 @@
 			this.label2.Size = new System.Drawing.Size(46, 16);
 			this.label2.TabIndex = 3;
 			this.label2.Text = "Output";
-			// 
-			// tbOutput
-			// 
-			this.tbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbOutput.Location = new System.Drawing.Point(3, 23);
-			this.tbOutput.Multiline = true;
-			this.tbOutput.Name = "tbOutput";
-			this.tbOutput.ReadOnly = true;
-			this.tbOutput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-			this.tbOutput.Size = new System.Drawing.Size(551, 326);
-			this.tbOutput.TabIndex = 2;
-			this.tbOutput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tbInput_KeyDown);
 			// 
 			// cbRemoveSpaces
 			// 
@@ -315,6 +287,44 @@
 			this.cbRemoveRegions.Text = "Remove regions";
 			this.cbRemoveRegions.UseVisualStyleBackColor = true;
 			// 
+			// tbInput
+			// 
+			this.tbInput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.tbInput.AutoScrollMinSize = new System.Drawing.Size(0, 1575);
+			this.tbInput.BackBrush = null;
+			this.tbInput.Cursor = System.Windows.Forms.Cursors.IBeam;
+			this.tbInput.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
+			this.tbInput.Language = FastColoredTextBoxNS.Language.CSharp;
+			this.tbInput.Location = new System.Drawing.Point(8, 33);
+			this.tbInput.Name = "tbInput";
+			this.tbInput.Paddings = new System.Windows.Forms.Padding(0);
+			this.tbInput.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
+			this.tbInput.Size = new System.Drawing.Size(420, 303);
+			this.tbInput.TabIndex = 10;
+			this.tbInput.Text = resources.GetString("tbInput.Text");
+			this.tbInput.WordWrap = true;
+			// 
+			// tbOutput
+			// 
+			this.tbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.tbOutput.AutoScrollMinSize = new System.Drawing.Size(0, 15);
+			this.tbOutput.BackBrush = null;
+			this.tbOutput.Cursor = System.Windows.Forms.Cursors.IBeam;
+			this.tbOutput.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
+			this.tbOutput.Language = FastColoredTextBoxNS.Language.CSharp;
+			this.tbOutput.Location = new System.Drawing.Point(8, 25);
+			this.tbOutput.Name = "tbOutput";
+			this.tbOutput.Paddings = new System.Windows.Forms.Padding(0);
+			this.tbOutput.ReadOnly = true;
+			this.tbOutput.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
+			this.tbOutput.Size = new System.Drawing.Size(546, 324);
+			this.tbOutput.TabIndex = 15;
+			this.tbOutput.WordWrap = true;
+			// 
 			// frmMain
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -354,10 +364,8 @@
 
         private System.Windows.Forms.Button btnMinify;
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox tbInput;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox tbOutput;
+		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.Label label2;
         private System.Windows.Forms.CheckBox cbRemoveSpaces;
         private System.Windows.Forms.CheckBox cbCompressIdentifiers;
         private System.Windows.Forms.CheckBox cbRemoveComments;
@@ -374,6 +382,8 @@
 		private System.Windows.Forms.Label lblInputCompilied;
 		private System.Windows.Forms.PictureBox pbInputCompilied;
 		private System.Windows.Forms.CheckBox cbRemoveRegions;
+		private FastColoredTextBoxNS.FastColoredTextBox tbInput;
+		private FastColoredTextBoxNS.FastColoredTextBox tbOutput;
     }
 }
 
