@@ -292,7 +292,7 @@
 			this.tbInput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbInput.AutoScrollMinSize = new System.Drawing.Size(0, 1575);
+			this.tbInput.AutoScrollMinSize = new System.Drawing.Size(543, 1365);
 			this.tbInput.BackBrush = null;
 			this.tbInput.Cursor = System.Windows.Forms.Cursors.IBeam;
 			this.tbInput.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
@@ -304,7 +304,6 @@
 			this.tbInput.Size = new System.Drawing.Size(420, 303);
 			this.tbInput.TabIndex = 10;
 			this.tbInput.Text = resources.GetString("tbInput.Text");
-			this.tbInput.WordWrap = true;
 			// 
 			// tbOutput
 			// 
