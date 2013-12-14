@@ -37,6 +37,8 @@ namespace A
 
 	internal class C
 	{
+		const int a = 0/*comment*/;
+
 		public C() : base()
 		{
 		}

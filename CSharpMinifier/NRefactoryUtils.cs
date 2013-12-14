@@ -10,7 +10,7 @@ namespace CSharpMinifier
 {
 	public static class NRefactoryUtils
 	{
-		public static PropertyInfo[] GetProperties(AstNode node)
+		public static PropertyInfo[] GetProperties(this AstNode node)
 		{
 			return node.GetType().GetProperties();
 		}

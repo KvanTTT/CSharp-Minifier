@@ -18,11 +18,16 @@ namespace CSharpMinifier
 	{
 		private static string[] NameKeys = new string[] { "Name", "LiteralValue", "Keyword" };
 
-		private SyntaxTree _syntaxTree;
 		private CSharpUnresolvedFile _unresolvedFile;
 		private IProjectContent _projectContent;
 		private ICompilation _compilation;
 		private CSharpAstResolver _resolver;
+
+		public SyntaxTree SyntaxTree
+		{
+			get;
+			private set;
+		}
 
 		public MinifierOptions Options
 		{
@@ -79,14 +84,14 @@ namespace CSharpMinifier
 			foreach (var t in types)
 				globalTree.AddChild(t.Clone(), new Role<AstNode>("TypeDeclaration"));
 
-			_syntaxTree = globalTree;
+			SyntaxTree = globalTree;
 
 			return Minify();
 		}
 
 		public string MinifyFromString(string CSharpCode)
 		{
-			_syntaxTree = new CSharpParser().Parse(CSharpCode, "temp.cs");
+			SyntaxTree = new CSharpParser().Parse(CSharpCode, "temp.cs");
 
 			return Minify();
 		}
@@ -98,10 +103,10 @@ namespace CSharpMinifier
 
 			if (Options.IdentifiersCompressing)
 			{
-				_unresolvedFile = _syntaxTree.ToTypeSystem();
+				_unresolvedFile = SyntaxTree.ToTypeSystem();
 				_projectContent = _projectContent.AddOrUpdateFiles(_unresolvedFile);
 				_compilation = _projectContent.CreateCompilation();
-				_resolver = new CSharpAstResolver(_compilation, _syntaxTree, _unresolvedFile);
+				_resolver = new CSharpAstResolver(_compilation, SyntaxTree, _unresolvedFile);
 				CompressIdentifiers();
 			}
 
@@ -109,7 +114,7 @@ namespace CSharpMinifier
 			if (Options.SpacesRemoving)
 				result = SyntaxTreeToStringWithoutSpaces(Options.LineLength);
 			else
-				result = _syntaxTree.GetText();
+				result = SyntaxTree.GetText();
 
 			return result;
 		}
@@ -155,7 +160,7 @@ namespace CSharpMinifier
 
 		public void RemoveCommentsAndRegions()
 		{
-			foreach (var children in _syntaxTree.Children)
+			foreach (var children in SyntaxTree.Children)
 				RemoveCommentsAndRegions(children);
 		}
 
@@ -193,7 +198,7 @@ namespace CSharpMinifier
 		public void CompressIdentifiers()
 		{
 			var visitor = new MinifyLocalsAstVisitor();
-			_syntaxTree.AcceptVisitor(visitor);
+			SyntaxTree.AcceptVisitor(visitor);
 
 			var idGenerator = new MinIdGenerator();
 			var substitutor = new Substitutor(idGenerator);
@@ -225,7 +230,7 @@ namespace CSharpMinifier
 					else if (matchNode is IdentifierExpression)
 						((IdentifierExpression)matchNode).Identifier = newName;
 				};
-				fr.FindLocalReferences(lrr.Variable, _unresolvedFile, _syntaxTree, _compilation, callback, CancellationToken.None);
+				fr.FindLocalReferences(lrr.Variable, _unresolvedFile, SyntaxTree, _compilation, callback, CancellationToken.None);
 			}
 		}
 
@@ -242,7 +247,7 @@ namespace CSharpMinifier
 			_line = new StringBuilder(Options.LineLength);
 
 			_prevNode = null;
-			foreach (var children in _syntaxTree.Children)
+			foreach (var children in SyntaxTree.Children)
 				TraverseChilds(children, result);
 			result.Append(_line);
 
@@ -275,8 +280,9 @@ namespace CSharpMinifier
 					else
 					{
 						if ((_prevNode is CSharpTokenNode && _prevNode.Role.ToString().All(c => !char.IsLetterOrDigit(c))) ||
-							(node is CSharpTokenNode && node.Role.ToString().All(c => !char.IsLetterOrDigit(c))))
-							beginSymbols = "";
+							(node is CSharpTokenNode && node.Role.ToString().All(c => !char.IsLetterOrDigit(c))) ||
+							node is Comment)
+								beginSymbols = "";
 					}
 				}
 
@@ -311,7 +317,7 @@ namespace CSharpMinifier
 		public static string GetLeafNodeString(AstNode node)
 		{
 			string nodeRole = node.Role.ToString();
-			var properties = NRefactoryUtils.GetProperties(node);
+			var properties = node.GetProperties();
 			if (nodeRole == "Comment")
 			{
 				CommentType commentType = properties.GetPropertyValueEnum<CommentType>(node, "CommentType");

@@ -29,19 +29,17 @@ namespace CSharpMinifier.Tests
 		[Test]
 		public void RemoveSpaces()
 		{
-			var minifierOptions = new MinifierOptions
+			var minifierOptions = new MinifierOptions(false)
 			{
-				IdentifiersCompressing = false,
-				SpacesRemoving = true,
-				CommentsRemoving = false,
-				LineLength = 0,
-				RegionsRemoving = false
+				SpacesRemoving = true
 			};
 			var minifier = new Minifier(minifierOptions);
 			foreach (var sample in Samples)
 			{
 				var minified = minifier.MinifyFromString(sample.Value);
 				Assert.IsTrue(CompileUtils.CanCompile(minified));
+				if (sample.Key == "Test1")
+					Assert.IsFalse(minified.Contains(" /*"));
 			}
 		}
 
@@ -67,7 +65,7 @@ namespace CSharpMinifier.Tests
 		[Test]
 		public void RemoveComments()
 		{
-			var minifierOptions = new MinifierOptions
+			var minifierOptions = new MinifierOptions()
 			{
 				IdentifiersCompressing = false,
 				SpacesRemoving = true,
@@ -112,13 +110,9 @@ namespace CSharpMinifier.Tests
 		[Test]
 		public void CompressIdentifiers()
 		{
-			var minifierOptions = new MinifierOptions
+			var minifierOptions = new MinifierOptions(false)
 			{
-				IdentifiersCompressing = true,
-				SpacesRemoving = false,
-				CommentsRemoving = false,
-				LineLength = 0,
-				RegionsRemoving = false
+				IdentifiersCompressing = true
 			};
 			var minifier = new Minifier(minifierOptions);
 			foreach (var sample in Samples)
