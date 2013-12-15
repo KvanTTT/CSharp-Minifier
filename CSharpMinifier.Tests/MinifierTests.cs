@@ -121,5 +121,21 @@ namespace CSharpMinifier.Tests
 				Assert.IsTrue(CompileUtils.CanCompile(minified));
 			}
 		}
+
+		[Test]
+		public void CompressMisc()
+		{
+			var minifierOptions = new MinifierOptions(false)
+			{
+				MiscCompressing = true
+			};
+			var minifier = new Minifier(minifierOptions);
+			var minified = minifier.MinifyFromString(Samples["MiscCompression"]);
+			Assert.IsTrue(minified.Contains("255"));
+			Assert.IsTrue(minified.Contains("0x7048860F9180"));
+			Assert.IsFalse(minified.Contains("private"));
+			Assert.AreEqual(2, minified.Count(c => c == '{'));
+			Assert.AreEqual(2, minified.Count(c => c == '}'));
+		}
 	}
 }

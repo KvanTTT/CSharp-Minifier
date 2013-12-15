@@ -110,6 +110,9 @@ namespace CSharpMinifier
 				CompressIdentifiers();
 			}
 
+			if (Options.MiscCompressing)
+				CompressMisc();
+
 			string result;
 			if (Options.SpacesRemoving)
 				result = SyntaxTreeToStringWithoutSpaces(Options.LineLength);
@@ -156,9 +159,54 @@ namespace CSharpMinifier
 			}
 		}
 
-		#region Comments removing
+		#region Misc Compression
 
-		public void RemoveCommentsAndRegions()
+		private void CompressMisc()
+		{
+			foreach (var children in SyntaxTree.Children)
+				CompressMisc(children);
+		}
+
+		private void CompressMisc(AstNode node)
+		{
+			foreach (var children in node.Children)
+			{
+				if (children is PrimitiveExpression)
+				{
+					var primitiveExpression = ((PrimitiveExpression)children);
+					var str = primitiveExpression.Value.ToString();
+					long number;
+					if (long.TryParse(str, out number))
+					{
+						string hex = "0x" + number.ToString("X");
+						primitiveExpression.LiteralValue = str.Length < hex.Length ? str : hex;
+					}
+				}
+				else if (children is CSharpModifierToken)
+				{
+					var modifier = ((CSharpModifierToken)children).Modifier;
+					if ((modifier & Modifiers.Private) == Modifiers.Private && (modifier & ~Modifiers.Private) == 0)
+						children.Remove();
+					else
+						modifier &= ~Modifiers.Private;
+				}
+				else
+				{
+					if (children is BlockStatement)
+					{
+						if (children.Children.Count() == 3)
+							children.ReplaceWith(children.Children.ElementAt(1));
+					}
+					CompressMisc(children);
+				}
+			}
+		}
+
+		#endregion
+
+		#region Comments Removing
+
+		private void RemoveCommentsAndRegions()
 		{
 			foreach (var children in SyntaxTree.Children)
 				RemoveCommentsAndRegions(children);
@@ -193,9 +241,9 @@ namespace CSharpMinifier
 
 		#endregion
 
-		#region Compress Identifiers
+		#region Identifiers Compressing
 
-		public void CompressIdentifiers()
+		private void CompressIdentifiers()
 		{
 			var visitor = new MinifyLocalsAstVisitor();
 			SyntaxTree.AcceptVisitor(visitor);
@@ -214,7 +262,7 @@ namespace CSharpMinifier
 			}
 		}
 
-		public void RenameLocal(AstNode node, string newName)
+		private void RenameLocal(AstNode node, string newName)
 		{
 			LocalResolveResult lrr = _resolver.Resolve(node) as LocalResolveResult;
 
@@ -241,7 +289,7 @@ namespace CSharpMinifier
 		AstNode _prevNode;
 		StringBuilder _line;
 
-		public string SyntaxTreeToStringWithoutSpaces(int lineLength)
+		private string SyntaxTreeToStringWithoutSpaces(int lineLength)
 		{
 			StringBuilder result = new StringBuilder();
 			_line = new StringBuilder(Options.LineLength);

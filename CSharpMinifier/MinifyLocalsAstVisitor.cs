@@ -68,10 +68,6 @@ namespace CSharpMinifier
 
 		public override void VisitMethodDeclaration(MethodDeclaration methodDeclaration)
 		{
-			foreach (var token in methodDeclaration.ModifierTokens)
-				if (token.Modifier == Modifiers.Private)
-					token.Remove();
-
 			StringBuilder methodKey = new StringBuilder();
 			methodKey.AppendFormat("{0}.{1}.{2}(", CurrentNamespace, CurrentType, methodDeclaration.Name);
 			foreach (var param in methodDeclaration.Parameters)

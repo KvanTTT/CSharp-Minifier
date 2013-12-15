@@ -38,6 +38,12 @@ namespace CSharpMinifier
 			set;
 		}
 
+		public bool MiscCompressing
+		{
+			get;
+			set;
+		}
+
 		public MinifierOptions(bool maxCompression = true)
 		{
 			if (maxCompression)
@@ -46,6 +52,7 @@ namespace CSharpMinifier
 				SpacesRemoving = true;
 				CommentsRemoving = true;
 				RegionsRemoving = true;
+				MiscCompressing = true;
 			}
 		}
 	}

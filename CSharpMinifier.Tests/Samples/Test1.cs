@@ -16,9 +16,22 @@ namespace A
 			int C = 4;
 			C = 7;
 			this.C = 28;
+			bool q = true;
 
 			Console.WriteLine(A);
-			Console.WriteLine(C);
+			if (q)
+				Console.WriteLine(0);
+			if (q == false)
+				Console.WriteLine(1);
+			if (C == 4)
+			{
+				Console.WriteLine(C);
+			}
+			if (C == 7)
+			{
+				Console.WriteLine(A);
+				Console.WriteLine(b);
+			}
 			Console.WriteLine(this.C);
 		}
 	}
@@ -38,8 +51,11 @@ namespace A
 	internal class C
 	{
 		const int a = 0/*comment*/;
+		const int b = 0xFF;
+		private const string s = "asdf";
 
-		public C() : base()
+		public C()
+			: base()
 		{
 		}
 	}
