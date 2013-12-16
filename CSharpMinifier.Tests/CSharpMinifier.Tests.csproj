@@ -46,6 +46,8 @@
     <Compile Include="IdGeneratorTests.cs" />
     <Compile Include="MinifierTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Samples\Minecraft19.cs" />
+    <Compile Include="Samples\Minecraft20.cs" />
     <Compile Include="Samples\MiscCompression.cs" />
     <Compile Include="Samples\RLE.cs" />
     <Compile Include="Samples\Test1.cs" />

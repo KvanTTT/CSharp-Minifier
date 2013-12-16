@@ -115,7 +115,7 @@ namespace CSharpMinifier
 
 			string result;
 			if (Options.SpacesRemoving)
-				result = SyntaxTreeToStringWithoutSpaces(Options.LineLength);
+				result = ToStringWithoutSpaces();
 			else
 				result = SyntaxTree.GetText();
 
@@ -174,12 +174,15 @@ namespace CSharpMinifier
 				if (children is PrimitiveExpression)
 				{
 					var primitiveExpression = ((PrimitiveExpression)children);
-					var str = primitiveExpression.Value.ToString();
-					long number;
-					if (long.TryParse(str, out number))
+					if (IsIntegerNumber(primitiveExpression.Value))
 					{
-						string hex = "0x" + number.ToString("X");
-						primitiveExpression.LiteralValue = str.Length < hex.Length ? str : hex;
+						var str = primitiveExpression.Value.ToString();
+						long number;
+						if (long.TryParse(str, out number))
+						{
+							string hex = "0x" + number.ToString("X");
+							primitiveExpression.LiteralValue = str.Length < hex.Length ? str : hex;
+						}
 					}
 				}
 				else if (children is CSharpModifierToken)
@@ -192,14 +195,29 @@ namespace CSharpMinifier
 				}
 				else
 				{
-					if (children is BlockStatement)
+					if (children is BlockStatement && children.Role.ToString() != "Body")
 					{
-						if (children.Children.Count() == 3)
+						var childrenCount = children.Children.Count();
+						if (childrenCount == 3)
 							children.ReplaceWith(children.Children.ElementAt(1));
+						else if (childrenCount < 3)
+							children.Remove();
 					}
 					CompressMisc(children);
 				}
 			}
+		}
+
+		public static bool IsIntegerNumber(object value)
+		{
+			return value is sbyte
+					|| value is byte
+					|| value is short
+					|| value is ushort
+					|| value is int
+					|| value is uint
+					|| value is long
+					|| value is ulong;
 		}
 
 		#endregion
@@ -208,8 +226,7 @@ namespace CSharpMinifier
 
 		private void RemoveCommentsAndRegions()
 		{
-			foreach (var children in SyntaxTree.Children)
-				RemoveCommentsAndRegions(children);
+			RemoveCommentsAndRegions(SyntaxTree);
 		}
 
 		private void RemoveCommentsAndRegions(AstNode node)
@@ -289,20 +306,24 @@ namespace CSharpMinifier
 		AstNode _prevNode;
 		StringBuilder _line;
 
-		private string SyntaxTreeToStringWithoutSpaces(int lineLength)
+		private string ToStringWithoutSpaces()
 		{
 			StringBuilder result = new StringBuilder();
 			_line = new StringBuilder(Options.LineLength);
 
 			_prevNode = null;
 			foreach (var children in SyntaxTree.Children)
-				TraverseChilds(children, result);
+			{
+				ToStringWithoutSpaces(children, result);
+				if (children.Children.Count() <= 1)
+					_prevNode = children;
+			}
 			result.Append(_line);
 
 			return result.ToString();
 		}
 
-		private void TraverseChilds(AstNode node, StringBuilder stringBuilder)
+		private void ToStringWithoutSpaces(AstNode node, StringBuilder stringBuilder)
 		{
 			if (node.Children.Count() == 0)
 			{
@@ -353,11 +374,11 @@ namespace CSharpMinifier
 			}
 			else
 			{
-				foreach (AstNode child in node.Children)
+				foreach (AstNode children in node.Children)
 				{
-					TraverseChilds(child, stringBuilder);
-					if (child.Children.Count() <= 1)
-						_prevNode = child;
+					ToStringWithoutSpaces(children, stringBuilder);
+					if (children.Children.Count() <= 1)
+						_prevNode = children;
 				}
 			}
 		}

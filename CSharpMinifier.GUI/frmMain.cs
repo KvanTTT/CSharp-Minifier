@@ -53,6 +53,7 @@ namespace CSharpMinifier.GUI
 			cbRemoveRegions.Checked = Settings.Default.RemoveRegions;
 			cbCompressIdentifiers.Checked = Settings.Default.CompressIdentifiers;
 			cbRemoveSpaces.Checked = Settings.Default.RemoveSpaces;
+			cbCompressMisc.Checked = Settings.Default.MiscCompressing;
 			tbLineLength.Text = Settings.Default.LineLength.ToString();
 			cbMinifyFiles.Checked = Settings.Default.MinifyFiles;
 			if (Settings.Default.FileList != null)
@@ -65,6 +66,7 @@ namespace CSharpMinifier.GUI
 			Settings.Default.RemoveRegions = cbRemoveRegions.Checked;
 			Settings.Default.CompressIdentifiers = cbCompressIdentifiers.Checked;
 			Settings.Default.RemoveSpaces = cbRemoveSpaces.Checked;
+			Settings.Default.MiscCompressing = cbCompressMisc.Checked;
 			Settings.Default.LineLength = int.Parse(tbLineLength.Text);
 			Settings.Default.MinifyFiles = cbMinifyFiles.Checked;
 			var stringCollection = new StringCollection();
@@ -82,6 +84,7 @@ namespace CSharpMinifier.GUI
 				SpacesRemoving = cbRemoveSpaces.Checked,
 				RegionsRemoving = cbRemoveRegions.Checked,
 				CommentsRemoving = cbRemoveComments.Checked,
+				MiscCompressing = cbCompressMisc.Checked,
 				LineLength = int.Parse(tbLineLength.Text),
 			};
 			Minifier minifier = new Minifier(minifierOptions);

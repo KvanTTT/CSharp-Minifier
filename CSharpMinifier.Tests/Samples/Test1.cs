@@ -1,3 +1,4 @@
+// Comment at the begin
 using System;
 namespace A
 {
@@ -32,7 +33,14 @@ namespace A
 				Console.WriteLine(A);
 				Console.WriteLine(b);
 			}
+			{
+			}
 			Console.WriteLine(this.C);
+		}
+
+		private void MethodWithOneStatement()
+		{
+			Console.WriteLine(true);
 		}
 	}
 
@@ -60,3 +68,4 @@ namespace A
 		}
 	}
 }
+// Comment at the end

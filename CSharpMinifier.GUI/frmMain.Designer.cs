@@ -31,10 +31,12 @@
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
 			this.btnMinify = new System.Windows.Forms.Button();
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+			this.tbInput = new FastColoredTextBoxNS.FastColoredTextBox();
 			this.btnOpenFiles = new System.Windows.Forms.Button();
 			this.label4 = new System.Windows.Forms.Label();
 			this.lbInputFiles = new System.Windows.Forms.ListBox();
 			this.label1 = new System.Windows.Forms.Label();
+			this.tbOutput = new FastColoredTextBoxNS.FastColoredTextBox();
 			this.label2 = new System.Windows.Forms.Label();
 			this.cbRemoveSpaces = new System.Windows.Forms.CheckBox();
 			this.cbCompressIdentifiers = new System.Windows.Forms.CheckBox();
@@ -49,8 +51,7 @@
 			this.lblInputCompilied = new System.Windows.Forms.Label();
 			this.pbInputCompilied = new System.Windows.Forms.PictureBox();
 			this.cbRemoveRegions = new System.Windows.Forms.CheckBox();
-			this.tbInput = new FastColoredTextBoxNS.FastColoredTextBox();
-			this.tbOutput = new FastColoredTextBoxNS.FastColoredTextBox();
+			this.cbCompressMisc = new System.Windows.Forms.CheckBox();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -62,7 +63,7 @@
 			// btnMinify
 			// 
 			this.btnMinify.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnMinify.Location = new System.Drawing.Point(577, 157);
+			this.btnMinify.Location = new System.Drawing.Point(577, 190);
 			this.btnMinify.Name = "btnMinify";
 			this.btnMinify.Size = new System.Drawing.Size(164, 26);
 			this.btnMinify.TabIndex = 1;
@@ -94,6 +95,26 @@
 			this.splitContainer1.Size = new System.Drawing.Size(559, 697);
 			this.splitContainer1.SplitterDistance = 341;
 			this.splitContainer1.TabIndex = 2;
+			// 
+			// tbInput
+			// 
+			this.tbInput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.tbInput.AutoScrollMinSize = new System.Drawing.Size(543, 1365);
+			this.tbInput.BackBrush = null;
+			this.tbInput.Cursor = System.Windows.Forms.Cursors.IBeam;
+			this.tbInput.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
+			this.tbInput.Language = FastColoredTextBoxNS.Language.CSharp;
+			this.tbInput.LeftBracket = '(';
+			this.tbInput.Location = new System.Drawing.Point(8, 33);
+			this.tbInput.Name = "tbInput";
+			this.tbInput.Paddings = new System.Windows.Forms.Padding(0);
+			this.tbInput.RightBracket = ')';
+			this.tbInput.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
+			this.tbInput.Size = new System.Drawing.Size(420, 303);
+			this.tbInput.TabIndex = 10;
+			this.tbInput.Text = resources.GetString("tbInput.Text");
 			// 
 			// btnOpenFiles
 			// 
@@ -137,6 +158,25 @@
 			this.label1.Size = new System.Drawing.Size(36, 16);
 			this.label1.TabIndex = 2;
 			this.label1.Text = "Input";
+			// 
+			// tbOutput
+			// 
+			this.tbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.tbOutput.AutoScrollMinSize = new System.Drawing.Size(0, 15);
+			this.tbOutput.BackBrush = null;
+			this.tbOutput.Cursor = System.Windows.Forms.Cursors.IBeam;
+			this.tbOutput.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
+			this.tbOutput.Language = FastColoredTextBoxNS.Language.CSharp;
+			this.tbOutput.Location = new System.Drawing.Point(8, 25);
+			this.tbOutput.Name = "tbOutput";
+			this.tbOutput.Paddings = new System.Windows.Forms.Padding(0);
+			this.tbOutput.ReadOnly = true;
+			this.tbOutput.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
+			this.tbOutput.Size = new System.Drawing.Size(546, 324);
+			this.tbOutput.TabIndex = 15;
+			this.tbOutput.WordWrap = true;
 			// 
 			// label2
 			// 
@@ -201,7 +241,7 @@
 			// tbLineLength
 			// 
 			this.tbLineLength.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbLineLength.Location = new System.Drawing.Point(657, 104);
+			this.tbLineLength.Location = new System.Drawing.Point(657, 137);
 			this.tbLineLength.Name = "tbLineLength";
 			this.tbLineLength.Size = new System.Drawing.Size(84, 20);
 			this.tbLineLength.TabIndex = 7;
@@ -212,7 +252,7 @@
 			// 
 			this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(577, 107);
+			this.label3.Location = new System.Drawing.Point(577, 140);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(63, 13);
 			this.label3.TabIndex = 8;
@@ -227,7 +267,7 @@
 			// 
 			this.cbMinifyFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.cbMinifyFiles.AutoSize = true;
-			this.cbMinifyFiles.Location = new System.Drawing.Point(580, 134);
+			this.cbMinifyFiles.Location = new System.Drawing.Point(580, 167);
 			this.cbMinifyFiles.Name = "cbMinifyFiles";
 			this.cbMinifyFiles.Size = new System.Drawing.Size(47, 17);
 			this.cbMinifyFiles.TabIndex = 9;
@@ -287,48 +327,25 @@
 			this.cbRemoveRegions.Text = "Remove regions";
 			this.cbRemoveRegions.UseVisualStyleBackColor = true;
 			// 
-			// tbInput
+			// cbCompressMisc
 			// 
-			this.tbInput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbInput.AutoScrollMinSize = new System.Drawing.Size(543, 1365);
-			this.tbInput.BackBrush = null;
-			this.tbInput.Cursor = System.Windows.Forms.Cursors.IBeam;
-			this.tbInput.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
-			this.tbInput.Language = FastColoredTextBoxNS.Language.CSharp;
-			this.tbInput.Location = new System.Drawing.Point(8, 33);
-			this.tbInput.Name = "tbInput";
-			this.tbInput.Paddings = new System.Windows.Forms.Padding(0);
-			this.tbInput.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
-			this.tbInput.Size = new System.Drawing.Size(420, 303);
-			this.tbInput.TabIndex = 10;
-			this.tbInput.Text = resources.GetString("tbInput.Text");
-			// 
-			// tbOutput
-			// 
-			this.tbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbOutput.AutoScrollMinSize = new System.Drawing.Size(0, 15);
-			this.tbOutput.BackBrush = null;
-			this.tbOutput.Cursor = System.Windows.Forms.Cursors.IBeam;
-			this.tbOutput.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
-			this.tbOutput.Language = FastColoredTextBoxNS.Language.CSharp;
-			this.tbOutput.Location = new System.Drawing.Point(8, 25);
-			this.tbOutput.Name = "tbOutput";
-			this.tbOutput.Paddings = new System.Windows.Forms.Padding(0);
-			this.tbOutput.ReadOnly = true;
-			this.tbOutput.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
-			this.tbOutput.Size = new System.Drawing.Size(546, 324);
-			this.tbOutput.TabIndex = 15;
-			this.tbOutput.WordWrap = true;
+			this.cbCompressMisc.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.cbCompressMisc.AutoSize = true;
+			this.cbCompressMisc.Checked = true;
+			this.cbCompressMisc.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.cbCompressMisc.Location = new System.Drawing.Point(577, 104);
+			this.cbCompressMisc.Name = "cbCompressMisc";
+			this.cbCompressMisc.Size = new System.Drawing.Size(97, 17);
+			this.cbCompressMisc.TabIndex = 15;
+			this.cbCompressMisc.Text = "Compress Misc";
+			this.cbCompressMisc.UseVisualStyleBackColor = true;
 			// 
 			// frmMain
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(753, 721);
+			this.Controls.Add(this.cbCompressMisc);
 			this.Controls.Add(this.cbRemoveRegions);
 			this.Controls.Add(this.lblInputCompilied);
 			this.Controls.Add(this.pbInputCompilied);
@@ -383,6 +400,7 @@
 		private System.Windows.Forms.CheckBox cbRemoveRegions;
 		private FastColoredTextBoxNS.FastColoredTextBox tbInput;
 		private FastColoredTextBoxNS.FastColoredTextBox tbOutput;
+		private System.Windows.Forms.CheckBox cbCompressMisc;
     }
 }
 
