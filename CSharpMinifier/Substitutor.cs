@@ -37,7 +37,7 @@ namespace CSharpMinifier
 					{
 						newName = Generator.Next();
 					}
-					while (excludedNames.Contains(newName));
+					while (excludedNames.Contains(newName) && NamesGenerator.CSharpKeywords.Contains(newName));
 					newNames[i] = newName;
 				}
 

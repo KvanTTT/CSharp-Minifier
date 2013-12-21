@@ -40,21 +40,25 @@ namespace CSharpMinifier
 		{
 			int length = _random.Next(MinLength, MaxLength + 1);
 
-			StringBuilder result = new StringBuilder(length);
-			do
+			if (CurrentCombinationNumber >= _generatedIds.Count)
 			{
-				result.Clear();
-				result.Append(MinIdGenerator.Chars0[_random.Next(MinIdGenerator.Chars0.Length)]);
-				for (int i = 1; i < length; i++)
-					result.Append(MinIdGenerator.CharsN[_random.Next(MinIdGenerator.CharsN.Length)]);
-				CurrentCombination = result.ToString();
+				StringBuilder result = new StringBuilder(length);
+				do
+				{
+					result.Clear();
+					result.Append(MinIdGenerator.Chars0[_random.Next(MinIdGenerator.Chars0.Length)]);
+					for (int i = 1; i < length; i++)
+						result.Append(MinIdGenerator.CharsN[_random.Next(MinIdGenerator.CharsN.Length)]);
+					CurrentCombination = result.ToString();
+				}
+				while (_generatedIds.Contains(CurrentCombination));
+				_generatedIds.Add(CurrentCombination);
 			}
-			while (_generatedIds.Contains(CurrentCombination));
-			_generatedIds.Add(CurrentCombination);
+			else
+				CurrentCombination = _generatedIds[CurrentCombinationNumber];
 
 			CurrentCombinationNumber++;
-
-			return result.ToString();
+			return CurrentCombination;
 		}
 
 		public override int CurrentCombinationNumber

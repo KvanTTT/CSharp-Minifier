@@ -17,6 +17,7 @@ namespace CSharpMinifier
 	public class Minifier
 	{
 		private static string[] NameKeys = new string[] { "Name", "LiteralValue", "Keyword" };
+		public static string ParserTempFileName = "temp.cs";
 
 		private CSharpUnresolvedFile _unresolvedFile;
 		private IProjectContent _projectContent;
@@ -65,10 +66,10 @@ namespace CSharpMinifier
 		public string MinifyFiles(string[] csFiles)
 		{
 			CSharpParser parser = new CSharpParser();
-			SyntaxTree[] trees = csFiles.Select(file => parser.Parse(file, file + "_temp.cs")).ToArray();
+			SyntaxTree[] trees = csFiles.Select(file => parser.Parse(file, file + "_" + ParserTempFileName)).ToArray();
 
 			SyntaxTree globalTree = new SyntaxTree();
-			globalTree.FileName = "temp.cs";
+			globalTree.FileName = ParserTempFileName;
 
 			var usings = new List<UsingDeclaration>();
 			var types = new List<TypeDeclaration>();
@@ -91,7 +92,7 @@ namespace CSharpMinifier
 
 		public string MinifyFromString(string CSharpCode)
 		{
-			SyntaxTree = new CSharpParser().Parse(CSharpCode, "temp.cs");
+			SyntaxTree = new CSharpParser().Parse(CSharpCode, ParserTempFileName);
 
 			return Minify();
 		}
@@ -210,14 +211,9 @@ namespace CSharpMinifier
 
 		public static bool IsIntegerNumber(object value)
 		{
-			return value is sbyte
-					|| value is byte
-					|| value is short
-					|| value is ushort
-					|| value is int
-					|| value is uint
-					|| value is long
-					|| value is ulong;
+			return value is sbyte || value is byte ||
+				value is short || value is ushort || value is int ||
+				value is uint || value is long || value is ulong;
 		}
 
 		#endregion
@@ -274,16 +270,16 @@ namespace CSharpMinifier
 				var method2 = newSubstituton[method.Key];
 				foreach (LocalVarDec v in method.Value)
 				{
-					RenameLocal(v.Node, method2[v.Name]);
+					RenameLocals(v.Node, method2[v.Name]);
 				}
 			}
 		}
 
-		private void RenameLocal(AstNode node, string newName)
+		private void RenameLocals(AstNode node, string newName)
 		{
-			LocalResolveResult lrr = _resolver.Resolve(node) as LocalResolveResult;
+			LocalResolveResult resolveResult = _resolver.Resolve(node) as LocalResolveResult;
 
-			if (lrr != null)
+			if (resolveResult != null)
 			{
 				FindReferences fr = new FindReferences();
 				FoundReferenceCallback callback = delegate(AstNode matchNode, ResolveResult result)
@@ -295,7 +291,7 @@ namespace CSharpMinifier
 					else if (matchNode is IdentifierExpression)
 						((IdentifierExpression)matchNode).Identifier = newName;
 				};
-				fr.FindLocalReferences(lrr.Variable, _unresolvedFile, SyntaxTree, _compilation, callback, CancellationToken.None);
+				fr.FindLocalReferences(resolveResult.Variable, _unresolvedFile, SyntaxTree, _compilation, callback, CancellationToken.None);
 			}
 		}
 
@@ -305,25 +301,26 @@ namespace CSharpMinifier
 
 		AstNode _prevNode;
 		StringBuilder _line;
+		StringBuilder _result;
 
 		private string ToStringWithoutSpaces()
 		{
-			StringBuilder result = new StringBuilder();
+			_result = new StringBuilder();
 			_line = new StringBuilder(Options.LineLength);
 
 			_prevNode = null;
 			foreach (var children in SyntaxTree.Children)
 			{
-				ToStringWithoutSpaces(children, result);
+				RemoveSpacesAndAppend(children);
 				if (children.Children.Count() <= 1)
 					_prevNode = children;
 			}
-			result.Append(_line);
+			_result.Append(_line);
 
-			return result.ToString();
+			return _result.ToString();
 		}
 
-		private void ToStringWithoutSpaces(AstNode node, StringBuilder stringBuilder)
+		private void RemoveSpacesAndAppend(AstNode node)
 		{
 			if (node.Children.Count() == 0)
 			{
@@ -357,12 +354,12 @@ namespace CSharpMinifier
 
 				string newString = beginSymbols + GetLeafNodeString(node);
 				if (Options.LineLength == 0)
-					stringBuilder.Append(newString);
+					_result.Append(newString);
 				else
 				{
 					if (_line.Length + newString.Length > Options.LineLength)
 					{
-						stringBuilder.AppendLine(_line.ToString());
+						_result.AppendLine(_line.ToString());
 						_line.Clear();
 						_line.Append(newString.TrimStart());
 					}
@@ -376,7 +373,7 @@ namespace CSharpMinifier
 			{
 				foreach (AstNode children in node.Children)
 				{
-					ToStringWithoutSpaces(children, stringBuilder);
+					RemoveSpacesAndAppend(children);
 					if (children.Children.Count() <= 1)
 						_prevNode = children;
 				}
@@ -428,6 +425,9 @@ namespace CSharpMinifier
 				return result;
 			}
 
+			if (node is NullReferenceExpression)
+				return "null";
+			else
 			if (node is CSharpTokenNode || node is CSharpModifierToken)
 				return nodeRole;
 

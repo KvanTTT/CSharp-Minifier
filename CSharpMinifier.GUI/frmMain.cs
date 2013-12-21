@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -49,6 +48,13 @@ namespace CSharpMinifier.GUI
 		{
 			InitializeComponent();
 
+			if (!Settings.Default.WindowLocation.IsEmpty)
+				Location = Settings.Default.WindowLocation;
+			if (!Settings.Default.WindowSize.IsEmpty)
+				Size = Settings.Default.WindowSize;
+			WindowState = (FormWindowState)Enum.Parse(typeof(FormWindowState), Settings.Default.WindowState);
+			if (Settings.Default.InputPanelHeight != 0)
+				splitContainer.SplitterDistance = Settings.Default.InputPanelHeight;
 			cbRemoveComments.Checked = Settings.Default.RemoveComments;
 			cbRemoveRegions.Checked = Settings.Default.RemoveRegions;
 			cbCompressIdentifiers.Checked = Settings.Default.CompressIdentifiers;
@@ -62,6 +68,10 @@ namespace CSharpMinifier.GUI
 
 		private void frmMain_FormClosed(object sender, FormClosedEventArgs e)
 		{
+			Settings.Default.WindowLocation = Location;
+			Settings.Default.WindowSize = Size;
+			Settings.Default.WindowState = WindowState.ToString();
+			Settings.Default.InputPanelHeight = splitContainer.Panel1.Height;
 			Settings.Default.RemoveComments = cbRemoveComments.Checked;
 			Settings.Default.RemoveRegions = cbRemoveRegions.Checked;
 			Settings.Default.CompressIdentifiers = cbCompressIdentifiers.Checked;
@@ -90,6 +100,9 @@ namespace CSharpMinifier.GUI
 			Minifier minifier = new Minifier(minifierOptions);
 			tbOutput.Text = !cbMinifyFiles.Checked ? minifier.MinifyFromString(tbInput.Text) : minifier.MinifyFiles(Sources.Select(source => source.Value).ToArray());
 
+			tbInputLength.Text = tbInput.Text.Length.ToString();
+			tbOutputLength.Text = tbOutput.Text.Length.ToString();
+			tbOutputInputRatio.Text = ((double)tbOutput.Text.Length / tbInput.Text.Length).ToString("0.000000");
 			if (CompileUtils.CanCompile(tbOutput.Text))
 			{
 				pbOutputCompilied.Image = Resources.Ok;
@@ -128,6 +141,11 @@ namespace CSharpMinifier.GUI
 			catch
 			{
 			}
+		}
+
+		private void tbInput_Load(object sender, EventArgs e)
+		{
+
 		}
 	}
 }

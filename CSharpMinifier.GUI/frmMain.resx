@@ -118,97 +118,77 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="tbInput.Text" xml:space="preserve">
-    <value>using System.Collections.Generic;
-
-namespace Asciimation
+    <value>// Comment at the begin
+using System;
+namespace A
 {
-    public class RLE
+    #region Test region
+
+    internal class A
     {
-        public byte[] Encode(byte[] bytes)
+        public int C = 22;
+
+        public void B()
         {
-            List&lt;byte&gt; result = new List&lt;byte&gt;();
+            int A = 10;
+            var b = new B();
+            b.A = 5;
 
-            int i = 0;
-            while (i &lt; bytes.Length)
+            int C = 4;
+            C = 7;
+            this.C = 28;
+            bool q = true;
+
+            Console.WriteLine(A);
+            if (q)
+                Console.WriteLine(0);
+            if (q == false)
+                Console.WriteLine(1);
+            if (C == 4)
             {
-                int j = i;
-                do
-                {
-                    j++;
-                }
-                while (j != bytes.Length &amp;&amp; bytes[j] == bytes[i]);
-
-                int repeatCount = j - i;
-                if (repeatCount &gt;= 2)
-                {
-                    int segmentCount = repeatCount / 129;
-                    int rest = repeatCount % 129;
-
-                    for (int k = 0; k &lt; segmentCount; k++)
-                    {
-                        result.Add(127);
-                        result.Add(bytes[i]);
-                    }
-                    result.Add((byte)(rest - 2));
-                    result.Add(bytes[i]);
-                    i = j;
-                }
-                else
-                {
-                    while (j != bytes.Length &amp;&amp; bytes[j] != bytes[j - 1])
-                        j++;
-
-                    int nonrepeatCount = j - i;
-                    if (j != bytes.Length)
-                        nonrepeatCount--;
-                    int segmentCount = nonrepeatCount / 128;
-                    int rest = nonrepeatCount % 128;
-
-                    for (int k = 0; k &lt; segmentCount; k++)
-                    {
-                        result.Add(0xFF);
-                        for (int l = 0; l &lt; 128; l++)
-                            result.Add(bytes[i + k * 128 + l]);
-                    }
-                    result.Add((byte)(0x80 | (rest - 1)));
-                    for (int l = 0; l &lt; rest; l++)
-                        result.Add(bytes[i + segmentCount * 128 + l]);
-                    i = j;
-                    if (j != bytes.Length)
-                        i--;
-                }
+                Console.WriteLine(C);
             }
-
-            return result.ToArray();
+            if (C == 7)
+            {
+                Console.WriteLine(A);
+                Console.WriteLine(b);
+            }
+            {
+            }
+            Console.WriteLine(this.C);
         }
 
-        public byte[] Decode(byte[] bytes)
+        private void MethodWithOneStatement()
         {
-            List&lt;byte&gt; result = new List&lt;byte&gt;();
-
-            int i = 0;
-            while (i &lt; bytes.Length)
-            {
-                if ((bytes[i] &amp; 0x80) == 0)
-                {
-                    int repeatCount = bytes[i] + 2;
-                    for (int j = 0; j &lt; repeatCount; j++)
-                        result.Add(bytes[i + 1]);
-                    i = i + 2;
-                }
-                else
-                {
-                    int repeatCount = (0x7F &amp; bytes[i]) + 1;
-                    for (int j = 0; j &lt; repeatCount; j++)
-                        result.Add(bytes[i + 1 + j]);
-                    i = i + 1 + repeatCount;
-                }
-            }
-
-            return result.ToArray();
+            Console.WriteLine(true);
         }
     }
-}</value>
+
+    #endregion
+
+    internal class B
+    {
+        /*
+         * Multiline comment
+         */
+        public int A;
+    }
+
+    // Single line comment
+
+    internal class C
+    {
+        const int a = 0/*comment*/;
+        const int b = 0xFF;
+        private const string s = "asdf";
+
+        public C()
+            : base()
+        {
+        }
+    }
+}
+// Comment at the end</value>
   </data>
   <metadata name="ofdInputCodeFiles.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>

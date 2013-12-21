@@ -4,8 +4,6 @@ namespace Asciimation
 {
 	public class RLE
 	{
-		#region Encode
-
 		public static byte[] Encode(byte[] bytes)
 		{
 			List<byte> result = new List<byte>();
@@ -63,8 +61,6 @@ namespace Asciimation
 
 			return result.ToArray();
 		}
-
-		#endregion
 
 		public static byte[] Decode(byte[] bytes)
 		{
