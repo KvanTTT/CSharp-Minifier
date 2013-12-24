@@ -19,7 +19,7 @@ namespace CSharpMinifier
 			Generator = generator;
 		}
 
-		public Dictionary<string, Dictionary<string, string>> Generate(Dictionary<string, List<LocalVarDec>> MethodsVars, HashSet<string> excludedNames)
+		public Dictionary<string, Dictionary<string, string>> Generate(Dictionary<string, List<LocalVarDec>> MethodsVars, IEnumerable<string> excludedNames)
 		{
 			var result = new Dictionary<string, Dictionary<string, string>>();
 

@@ -24,6 +24,7 @@ namespace CSharpMinifier
 		string CurrentNamespace;
 		string CurrentType;
 		List<LocalVarDec> CurrentMethodVars;
+		IEnumerable<string> IgnoredLocals;
 
 		public HashSet<string> AllIdNames
 		{
@@ -37,10 +38,11 @@ namespace CSharpMinifier
 			private set;
 		}
 
-		public MinifyLocalsAstVisitor()
+		public MinifyLocalsAstVisitor(IEnumerable<string> ignoredLocals = null)
 		{
 			AllIdNames = new HashSet<string>();
 			MethodsVars = new Dictionary<string, List<LocalVarDec>>();
+			IgnoredLocals = ignoredLocals ?? new List<string>();
 		}
 
 		public override void VisitNamespaceDeclaration(NamespaceDeclaration namespaceDeclaration)
@@ -83,7 +85,8 @@ namespace CSharpMinifier
 
 		public override void VisitParameterDeclaration(ParameterDeclaration parameterDeclaration)
 		{
-			CurrentMethodVars.Add(new LocalVarDec(parameterDeclaration.Name, parameterDeclaration));
+			if (!IgnoredLocals.Contains(parameterDeclaration.Name))
+				CurrentMethodVars.Add(new LocalVarDec(parameterDeclaration.Name, parameterDeclaration));
 			base.VisitParameterDeclaration(parameterDeclaration);
 		}
 
@@ -91,7 +94,8 @@ namespace CSharpMinifier
 		{
 			foreach (var varInitializer in variableDeclarationStatement.Variables)
 			{
-				CurrentMethodVars.Add(new LocalVarDec(varInitializer.Name, varInitializer));
+				if (!IgnoredLocals.Contains(varInitializer.Name))
+					CurrentMethodVars.Add(new LocalVarDec(varInitializer.Name, varInitializer));
 			}
 			base.VisitVariableDeclarationStatement(variableDeclarationStatement);
 		}

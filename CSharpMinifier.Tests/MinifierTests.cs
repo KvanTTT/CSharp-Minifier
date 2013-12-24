@@ -137,5 +137,18 @@ namespace CSharpMinifier.Tests
 			Assert.AreEqual(2, minified.Count(c => c == '{'));
 			Assert.AreEqual(2, minified.Count(c => c == '}'));
 		}
+
+		[Test]
+		public void IgnoredIdAndComments()
+		{
+			var minifier = new Minifier(null, new string[] { "unminifiedId" }, new string[] { "unremovableComment", "/*unremovableComment1*/" });
+			var test = Samples["Test1"];
+			if (!test.Contains("unminifiedId") || !test.Contains("unremovableComment") || !test.Contains("/*unremovableComment1*/"))
+				Assert.Inconclusive("Invalid test sample for IgnoredIdAndComments test");
+			var minified = minifier.MinifyFromString(test);
+			Assert.IsTrue(minified.Contains("unminifiedId"));
+			Assert.IsTrue(minified.Contains("unremovableComment"));
+			Assert.IsTrue(minified.Contains("/*unremovableComment1*/"));
+		}
 	}
 }

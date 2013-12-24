@@ -18,6 +18,8 @@ namespace A
 			C = 7;
 			this.C = 28;
 			bool q = true;
+			/*unremovableComment*/
+			int unminifiedId = 0;
 
 			Console.WriteLine(A);
 			if (q)
@@ -36,6 +38,7 @@ namespace A
 			{
 			}
 			Console.WriteLine(this.C);
+			Console.WriteLine(unminifiedId);
 		}
 
 		private void MethodWithOneStatement()
@@ -61,7 +64,8 @@ namespace A
 		const int a = 0/*comment*/;
 		const int b = 0xFF;
 		private const string s = "asdf";
-
+		
+		/*unremovableComment1*/
 		public C()
 			: base()
 		{

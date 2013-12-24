@@ -36,7 +36,19 @@ namespace CSharpMinifier
 			private set;
 		}
 
-		public Minifier(MinifierOptions options = null)
+		public List<string> IgnoredIdentifiers
+		{
+			get;
+			private set;
+		}
+
+		public List<string> IgnoredComments
+		{
+			get;
+			private set;
+		}
+
+		public Minifier(MinifierOptions options = null, string[] ignoredIdentifiers = null, string[] ignoredComments = null)
 		{
 			Options = options ?? new MinifierOptions();
 
@@ -44,11 +56,11 @@ namespace CSharpMinifier
 			{
 				_projectContent = new CSharpProjectContent();
 				var assemblies = new List<Assembly>
-			{
-				typeof(object).Assembly, // mscorlib
-				typeof(Uri).Assembly, // System.dll
-				typeof(Enumerable).Assembly, // System.Core.dll
-			};
+				{
+					typeof(object).Assembly, // mscorlib
+					typeof(Uri).Assembly, // System.dll
+					typeof(Enumerable).Assembly, // System.Core.dll
+				};
 
 				var unresolvedAssemblies = new IUnresolvedAssembly[assemblies.Count];
 				Parallel.For(
@@ -61,6 +73,20 @@ namespace CSharpMinifier
 					});
 				_projectContent = _projectContent.AddAssemblyReferences((IEnumerable<IUnresolvedAssembly>)unresolvedAssemblies);
 			}
+
+			IgnoredIdentifiers = ignoredIdentifiers == null ? new List<string>() : ignoredIdentifiers.ToList();
+			IgnoredComments = new List<string>();
+			if (ignoredComments != null)
+				foreach (var comment in ignoredComments)
+				{
+					var str = comment;
+					if (str.StartsWith("//"))
+						str = str.Substring("//".Length);
+					else if (str.StartsWith("/*") && str.EndsWith("*/"))
+						str = str.Substring("/*".Length, str.Length - "/*".Length - "*/".Length);
+					if (!IgnoredComments.Contains(str))
+						IgnoredComments.Add(str);
+				}
 		}
 
 		public string MinifyFiles(string[] csFiles)
@@ -218,7 +244,7 @@ namespace CSharpMinifier
 
 		#endregion
 
-		#region Comments Removing
+		#region Comments & Regions Removing
 
 		private void RemoveCommentsAndRegions()
 		{
@@ -231,8 +257,10 @@ namespace CSharpMinifier
 			{
 				if (Options.CommentsRemoving && children is Comment)
 				{
-					var commentType = children.GetPropertyValueEnum<CommentType>("CommentType");
-					if (commentType != CommentType.InactiveCode)
+					var properties = children.GetProperties();
+					var commentType = properties.GetPropertyValueEnum<CommentType>(children, "CommentType");
+					var content = properties.GetPropertyValue(children, "Content");
+					if (!IgnoredComments.Contains(content) && commentType != CommentType.InactiveCode)
 						children.Remove();
 				}
 				else if (Options.RegionsRemoving && children is PreProcessorDirective)
@@ -258,12 +286,14 @@ namespace CSharpMinifier
 
 		private void CompressIdentifiers()
 		{
-			var visitor = new MinifyLocalsAstVisitor();
+			var visitor = new MinifyLocalsAstVisitor(IgnoredIdentifiers);
 			SyntaxTree.AcceptVisitor(visitor);
 
 			var idGenerator = new MinIdGenerator();
 			var substitutor = new Substitutor(idGenerator);
-			var newSubstituton = substitutor.Generate(visitor.MethodsVars, visitor.AllIdNames);
+			var ignoredNames = new List<string>(IgnoredIdentifiers);
+			ignoredNames.AddRange(visitor.AllIdNames);
+			var newSubstituton = substitutor.Generate(visitor.MethodsVars, ignoredNames.ToArray());
 
 			foreach (var method in visitor.MethodsVars)
 			{
@@ -425,14 +455,18 @@ namespace CSharpMinifier
 				return result;
 			}
 
-			if (node is NullReferenceExpression)
+			if (node is ThisReferenceExpression)
+				return "this";
+			else if (node is NullReferenceExpression)
 				return "null";
-			else
-			if (node is CSharpTokenNode || node is CSharpModifierToken)
+			else if (node is CSharpTokenNode || node is CSharpModifierToken)
 				return nodeRole;
 
 			return properties
-				.Where(p => NameKeys.Contains(p.Name)).FirstOrDefault().GetValue(node, null).ToString();
+				.Where(p => NameKeys.Contains(p.Name))
+				.FirstOrDefault()
+				.GetValue(node, null)
+				.ToString();
 		}
 
 		#endregion
