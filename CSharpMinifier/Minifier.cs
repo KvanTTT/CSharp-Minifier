@@ -36,9 +36,9 @@ namespace CSharpMinifier
 			private set;
 		}
 
-		public Minifier(MinifierOptions options)
+		public Minifier(MinifierOptions options = null)
 		{
-			Options = options;
+			Options = options ?? new MinifierOptions();
 
 			if (Options.IdentifiersCompressing)
 			{

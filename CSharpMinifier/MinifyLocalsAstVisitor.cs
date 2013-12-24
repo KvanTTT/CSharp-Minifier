@@ -43,7 +43,6 @@ namespace CSharpMinifier
 			MethodsVars = new Dictionary<string, List<LocalVarDec>>();
 		}
 
-
 		public override void VisitNamespaceDeclaration(NamespaceDeclaration namespaceDeclaration)
 		{
 			CurrentNamespace = namespaceDeclaration.Name;
