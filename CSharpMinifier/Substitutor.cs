@@ -19,7 +19,7 @@ namespace CSharpMinifier
 			Generator = generator;
 		}
 
-		public Dictionary<string, Dictionary<string, string>> Generate(Dictionary<string, List<LocalVarDec>> MethodsVars, IEnumerable<string> excludedNames)
+		public Dictionary<string, Dictionary<string, string>> Generate(Dictionary<string, List<NameNode>> MethodsVars, IEnumerable<string> excludedNames)
 		{
 			var result = new Dictionary<string, Dictionary<string, string>>();
 
@@ -37,12 +37,12 @@ namespace CSharpMinifier
 					{
 						newName = Generator.Next();
 					}
-					while (excludedNames.Contains(newName) && NamesGenerator.CSharpKeywords.Contains(newName));
+					while (excludedNames.Contains(newName) || NamesGenerator.CSharpKeywords.Contains(newName));
 					newNames[i] = newName;
 				}
 
 				int ind = 0;
-				foreach (LocalVarDec v in vars.Value)
+				foreach (NameNode v in vars.Value)
 					if (!newSubstitution.ContainsKey(v.Name))
 						newSubstitution.Add(v.Name, newNames[ind++]);
 

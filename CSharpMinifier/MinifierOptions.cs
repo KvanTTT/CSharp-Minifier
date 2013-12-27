@@ -44,6 +44,12 @@ namespace CSharpMinifier
 			set;
 		}
 
+		public bool ConsoleApp
+		{
+			get;
+			set;
+		}
+
 		public MinifierOptions(bool maxCompression = true)
 		{
 			if (maxCompression)

@@ -116,9 +116,9 @@ namespace CSharpMinifier
 			return Minify();
 		}
 
-		public string MinifyFromString(string CSharpCode)
+		public string MinifyFromString(string csharpCode)
 		{
-			SyntaxTree = new CSharpParser().Parse(CSharpCode, ParserTempFileName);
+			SyntaxTree = new CSharpParser().Parse(csharpCode, ParserTempFileName);
 
 			return Minify();
 		}
@@ -130,10 +130,6 @@ namespace CSharpMinifier
 
 			if (Options.IdentifiersCompressing)
 			{
-				_unresolvedFile = SyntaxTree.ToTypeSystem();
-				_projectContent = _projectContent.AddOrUpdateFiles(_unresolvedFile);
-				_compilation = _projectContent.CreateCompilation();
-				_resolver = new CSharpAstResolver(_compilation, SyntaxTree, _unresolvedFile);
 				CompressIdentifiers();
 			}
 
@@ -286,32 +282,68 @@ namespace CSharpMinifier
 
 		private void CompressIdentifiers()
 		{
-			var visitor = new MinifyLocalsAstVisitor(IgnoredIdentifiers);
-			SyntaxTree.AcceptVisitor(visitor);
+			CompressLocals();
+			CompressMembers();
+			CompressTypes();
+		}
+
+		private void CompressLocals()
+		{
+			Recompile();
+
+			var defs = _compilation.GetAllTypeDefinitions();
+
+			var localsVisitor = new MinifyLocalsAstVisitor(IgnoredIdentifiers);
+			SyntaxTree.AcceptVisitor(localsVisitor);
 
 			var idGenerator = new MinIdGenerator();
 			var substitutor = new Substitutor(idGenerator);
 			var ignoredNames = new List<string>(IgnoredIdentifiers);
-			ignoredNames.AddRange(visitor.AllIdNames);
-			var newSubstituton = substitutor.Generate(visitor.MethodsVars, ignoredNames.ToArray());
+			ignoredNames.AddRange(localsVisitor.NotMembersIdNames);
+			var newSubstituton = substitutor.Generate(localsVisitor.MethodVars, ignoredNames.ToArray());
 
-			foreach (var method in visitor.MethodsVars)
+			foreach (var method in localsVisitor.MethodVars)
 			{
-				var method2 = newSubstituton[method.Key];
-				foreach (LocalVarDec v in method.Value)
-				{
-					RenameLocals(v.Node, method2[v.Name]);
-				}
+				var m = newSubstituton[method.Key];
+				foreach (NameNode v in method.Value)
+					RenameLocals(v.Node, m[v.Name]);
 			}
+		}
+
+		private void CompressMembers()
+		{
+			Recompile();
+
+			var membersVisitor = new MinifyMembersAstVisitor(IgnoredIdentifiers, Options.ConsoleApp);
+			SyntaxTree.AcceptVisitor(membersVisitor);
+
+			var idGenerator = new MinIdGenerator();
+			var substitutor = new Substitutor(idGenerator);
+			var ignoredNames = new List<string>(IgnoredIdentifiers);
+			ignoredNames.AddRange(membersVisitor.NotMembersIdNames);
+			var newSubstituton = substitutor.Generate(membersVisitor.TypeMembers, ignoredNames.ToArray());
+
+			foreach (var member in membersVisitor.TypeMembers)
+			{
+				var m = newSubstituton[member.Key];
+				foreach (NameNode v in member.Value)
+					RenameMembers(v.Node, m[v.Name]);
+			}
+		}
+
+		private void CompressTypes()
+		{
+			Recompile();
+
+
 		}
 
 		private void RenameLocals(AstNode node, string newName)
 		{
 			LocalResolveResult resolveResult = _resolver.Resolve(node) as LocalResolveResult;
-
 			if (resolveResult != null)
 			{
-				FindReferences fr = new FindReferences();
+				var findReferences = new FindReferences();
 				FoundReferenceCallback callback = delegate(AstNode matchNode, ResolveResult result)
 				{
 					if (matchNode is ParameterDeclaration)
@@ -321,8 +353,52 @@ namespace CSharpMinifier
 					else if (matchNode is IdentifierExpression)
 						((IdentifierExpression)matchNode).Identifier = newName;
 				};
-				fr.FindLocalReferences(resolveResult.Variable, _unresolvedFile, SyntaxTree, _compilation, callback, CancellationToken.None);
+				findReferences.FindLocalReferences(resolveResult.Variable, _unresolvedFile, SyntaxTree, _compilation, callback, CancellationToken.None);
 			}
+		}
+
+		private void RenameMembers(AstNode node, string newName)
+		{
+			MemberResolveResult resolveResult = _resolver.Resolve(node) as MemberResolveResult;
+			if (resolveResult != null)
+			{
+				var findReferences = new FindReferences();
+				FoundReferenceCallback callback = delegate(AstNode matchNode, ResolveResult result)
+				{
+					if (matchNode is VariableInitializer)
+						((VariableInitializer)matchNode).Name = newName;
+					else if (matchNode is MethodDeclaration)
+						((MethodDeclaration)matchNode).Name = newName;
+					else if (matchNode is PropertyDeclaration)
+						((PropertyDeclaration)matchNode).Name = newName;
+					else if (matchNode is IndexerDeclaration)
+						((IndexerDeclaration)matchNode).Name = newName;
+					else if (matchNode is OperatorDeclaration)
+						((OperatorDeclaration)matchNode).Name = newName;
+					else if (matchNode is MemberReferenceExpression)
+						((MemberReferenceExpression)matchNode).MemberName = newName;
+					else if (matchNode is IdentifierExpression)
+						((IdentifierExpression)matchNode).Identifier = newName;
+					else if (matchNode is InvocationExpression)
+						((IdentifierExpression)((InvocationExpression)matchNode).Target).Identifier = newName;
+					else
+					{
+					}
+				};
+				var searchScopes = findReferences.GetSearchScopes(resolveResult.Member);
+				findReferences.FindReferencesInFile(searchScopes, _unresolvedFile, SyntaxTree, _compilation, callback, CancellationToken.None);
+			}
+			else
+			{
+			}
+		}
+
+		private void Recompile()
+		{
+			_unresolvedFile = SyntaxTree.ToTypeSystem();
+			_projectContent = _projectContent.AddOrUpdateFiles(_unresolvedFile);
+			_compilation = _projectContent.CreateCompilation();
+			_resolver = new CSharpAstResolver(_compilation, SyntaxTree, _unresolvedFile);
 		}
 
 		#endregion

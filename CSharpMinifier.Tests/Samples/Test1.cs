@@ -6,7 +6,15 @@ namespace A
 
 	internal class A
 	{
-		public int C = 22;
+		protected const char qwer = 'd', fdsa = 's';
+		protected int C = 22;
+		protected int zzz;
+
+		protected string Prop
+		{
+			get;
+			set;
+		}
 
 		public void B()
 		{
@@ -41,6 +49,26 @@ namespace A
 			Console.WriteLine(unminifiedId);
 		}
 
+		public static A operator+(A a, A b)
+		{
+			return null;
+		}
+
+		static A()
+		{
+		}
+
+		public A()
+		{
+			EventHandler(null, null);
+		}
+
+		~A()
+		{
+		}
+
+		public event EventHandler EventHandler;
+
 		private void MethodWithOneStatement()
 		{
 			Console.WriteLine(true);
@@ -70,6 +98,10 @@ namespace A
 			: base()
 		{
 		}
+	}
+
+	interface Inter
+	{
 	}
 }
 // Comment at the end

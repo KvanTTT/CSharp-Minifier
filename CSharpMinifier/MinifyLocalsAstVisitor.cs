@@ -7,32 +7,20 @@ using System.Threading.Tasks;
 
 namespace CSharpMinifier
 {
-	public struct LocalVarDec
-	{
-		public string Name;
-		public AstNode Node;
-
-		public LocalVarDec(string name, AstNode node)
-		{
-			Name = name;
-			Node = node;
-		}
-	}
-
 	public class MinifyLocalsAstVisitor : DepthFirstAstVisitor
 	{
-		string CurrentNamespace;
-		string CurrentType;
-		List<LocalVarDec> CurrentMethodVars;
-		IEnumerable<string> IgnoredLocals;
+		string _currentNamespace;
+		string _currentType;
+		List<NameNode> _currentMethodVars;
+		IEnumerable<string> _ignoredLocals;
 
-		public HashSet<string> AllIdNames
+		public HashSet<string> NotMembersIdNames
 		{
 			get;
 			private set;
 		}
 
-		public Dictionary<string, List<LocalVarDec>> MethodsVars
+		public Dictionary<string, List<NameNode>> MethodVars
 		{
 			get;
 			private set;
@@ -40,53 +28,99 @@ namespace CSharpMinifier
 
 		public MinifyLocalsAstVisitor(IEnumerable<string> ignoredLocals = null)
 		{
-			AllIdNames = new HashSet<string>();
-			MethodsVars = new Dictionary<string, List<LocalVarDec>>();
-			IgnoredLocals = ignoredLocals ?? new List<string>();
+			NotMembersIdNames = new HashSet<string>();
+			MethodVars = new Dictionary<string, List<NameNode>>();
+			_ignoredLocals = ignoredLocals ?? new List<string>();
 		}
 
 		public override void VisitNamespaceDeclaration(NamespaceDeclaration namespaceDeclaration)
 		{
-			CurrentNamespace = namespaceDeclaration.Name;
+			_currentNamespace = namespaceDeclaration.Name;
 			base.VisitNamespaceDeclaration(namespaceDeclaration);
 		}
 
 		public override void VisitTypeDeclaration(TypeDeclaration typeDeclaration)
 		{
-			CurrentType = typeDeclaration.Name;
+			_currentType = typeDeclaration.Name;
 			base.VisitTypeDeclaration(typeDeclaration);
 		}
 
-		public override void VisitFieldDeclaration(FieldDeclaration fieldDeclaration)
+		#region Visit members with body declarations
+
+		public override void VisitMethodDeclaration(MethodDeclaration methodDeclaration)
 		{
-			base.VisitFieldDeclaration(fieldDeclaration);
+			VisitMember(methodDeclaration.Name, methodDeclaration.Parameters.Select(p => p.Type.ToString()));
+			base.VisitMethodDeclaration(methodDeclaration);
 		}
 
 		public override void VisitPropertyDeclaration(PropertyDeclaration propertyDeclaration)
 		{
+			VisitMember(propertyDeclaration.Name);
 			base.VisitPropertyDeclaration(propertyDeclaration);
 		}
 
-		public override void VisitMethodDeclaration(MethodDeclaration methodDeclaration)
+		public override void VisitEventDeclaration(EventDeclaration eventDeclaration)
 		{
-			StringBuilder methodKey = new StringBuilder();
-			methodKey.AppendFormat("{0}.{1}.{2}(", CurrentNamespace, CurrentType, methodDeclaration.Name);
-			foreach (var param in methodDeclaration.Parameters)
-			{
-				methodKey.Append(param.Type);
-				methodKey.Append(',');
-			}
-			methodKey.Remove(methodKey.Length - 1, 1);
-			methodKey.Append(")");
-			CurrentMethodVars = new List<LocalVarDec>();
-			MethodsVars.Add(methodKey.ToString(), CurrentMethodVars);
-			base.VisitMethodDeclaration(methodDeclaration);
+			foreach (var v in eventDeclaration.Variables)
+				VisitMember(v.Name);
+			base.VisitEventDeclaration(eventDeclaration);
 		}
+
+		public override void VisitIndexerDeclaration(IndexerDeclaration indexerDeclaration)
+		{
+			VisitMember(indexerDeclaration.Name, indexerDeclaration.Parameters.Select(p => p.Type.ToString()));
+			base.VisitIndexerDeclaration(indexerDeclaration);
+		}
+
+		public override void VisitOperatorDeclaration(OperatorDeclaration operatorDeclaration)
+		{
+			VisitMember(operatorDeclaration.Name, operatorDeclaration.Parameters.Select(p => p.Type.ToString()));
+			base.VisitOperatorDeclaration(operatorDeclaration);
+		}
+
+		public override void VisitConstructorDeclaration(ConstructorDeclaration constructorDeclaration)
+		{
+			string prefix = "";
+			if ((constructorDeclaration.Modifiers & Modifiers.Static) == Modifiers.Static)
+				prefix = "static.";
+			VisitMember(prefix + constructorDeclaration.Name, constructorDeclaration.Parameters.Select(p => p.Type.ToString()));
+			base.VisitConstructorDeclaration(constructorDeclaration);
+		}
+
+		public override void VisitDestructorDeclaration(DestructorDeclaration destructorDeclaration)
+		{
+			VisitMember(destructorDeclaration.Name);
+			base.VisitDestructorDeclaration(destructorDeclaration);
+		}
+
+		private void VisitMember(string memberName, IEnumerable<string> parameters = null)
+		{
+			StringBuilder memberKey = new StringBuilder();
+			memberKey.AppendFormat("{0}.{1}.{2}", _currentNamespace, _currentType, memberName);
+			if (parameters != null)
+			{
+				memberKey.Append('(');
+				foreach (var param in parameters)
+				{
+					memberKey.Append(param);
+					memberKey.Append(',');
+				}
+				if (parameters.Count() != 0)
+					memberKey.Remove(memberKey.Length - 1, 1);
+				memberKey.Append(')');
+			}
+			_currentMethodVars = new List<NameNode>();
+			MethodVars.Add(memberKey.ToString(), _currentMethodVars);
+		}
+
+		#endregion
+
+		#region Visit local declarations
 
 		public override void VisitParameterDeclaration(ParameterDeclaration parameterDeclaration)
 		{
-			if (!IgnoredLocals.Contains(parameterDeclaration.Name))
-				CurrentMethodVars.Add(new LocalVarDec(parameterDeclaration.Name, parameterDeclaration));
+			if (!_ignoredLocals.Contains(parameterDeclaration.Name))
+				_currentMethodVars.Add(new NameNode(parameterDeclaration.Name, parameterDeclaration));
 			base.VisitParameterDeclaration(parameterDeclaration);
 		}
 
@@ -94,15 +128,18 @@ namespace CSharpMinifier
 		{
 			foreach (var varInitializer in variableDeclarationStatement.Variables)
 			{
-				if (!IgnoredLocals.Contains(varInitializer.Name))
-					CurrentMethodVars.Add(new LocalVarDec(varInitializer.Name, varInitializer));
+				if (!_ignoredLocals.Contains(varInitializer.Name))
+					_currentMethodVars.Add(new NameNode(varInitializer.Name, varInitializer));
 			}
 			base.VisitVariableDeclarationStatement(variableDeclarationStatement);
 		}
 
+		#endregion
+
 		public override void VisitIdentifier(Identifier identifier)
 		{
-			AllIdNames.Add(identifier.Name);
+			if (_currentMethodVars == null || _currentMethodVars.FirstOrDefault(v => v.Name == identifier.Name) == null)
+				NotMembersIdNames.Add(identifier.Name);
 			base.VisitIdentifier(identifier);
 		}
 	}

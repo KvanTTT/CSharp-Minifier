@@ -40,7 +40,7 @@ namespace CSharpMinifier
 		{
 			int length = _random.Next(MinLength, MaxLength + 1);
 
-			if (CurrentCombinationNumber >= _generatedIds.Count)
+			if (CurrentCombinationNumber < _generatedIds.Count)
 			{
 				StringBuilder result = new StringBuilder(length);
 				do
