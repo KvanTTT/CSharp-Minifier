@@ -48,6 +48,8 @@ namespace CSharpMinifier
 			private set;
 		}
 
+		#region Public
+
 		public Minifier(MinifierOptions options = null, string[] ignoredIdentifiers = null, string[] ignoredComments = null)
 		{
 			Options = options ?? new MinifierOptions();
@@ -182,12 +184,13 @@ namespace CSharpMinifier
 			}
 		}
 
+		#endregion
+
 		#region Misc Compression
 
 		private void CompressMisc()
 		{
-			foreach (var children in SyntaxTree.Children)
-				CompressMisc(children);
+			CompressMisc(SyntaxTree);
 		}
 
 		private void CompressMisc(AstNode node)
@@ -215,6 +218,17 @@ namespace CSharpMinifier
 						children.Remove();
 					else
 						modifier &= ~Modifiers.Private;
+				}
+				else if (children is NamespaceDeclaration)
+				{
+					if (Options.RemoveNamespaces)
+					{
+						var childrenCount = children.Children.Count();
+						children.Children.ElementAt(childrenCount - 1).Remove();
+						children.Children.ElementAt(2).Remove();
+						children.Children.ElementAt(1).Remove();
+						children.Children.ElementAt(0).Remove();
+					}
 				}
 				else
 				{
@@ -284,12 +298,14 @@ namespace CSharpMinifier
 		{
 			CompressLocals();
 			CompressMembers();
-			CompressTypes();
 		}
 
 		private void CompressLocals()
 		{
-			Recompile();
+			_unresolvedFile = SyntaxTree.ToTypeSystem();
+			_projectContent = _projectContent.AddOrUpdateFiles(_unresolvedFile);
+			_compilation = _projectContent.CreateCompilation();
+			_resolver = new CSharpAstResolver(_compilation, SyntaxTree, _unresolvedFile);
 
 			var defs = _compilation.GetAllTypeDefinitions();
 
@@ -304,15 +320,18 @@ namespace CSharpMinifier
 
 			foreach (var method in localsVisitor.MethodVars)
 			{
-				var m = newSubstituton[method.Key];
+				var method2 = newSubstituton[method.Key];
 				foreach (NameNode v in method.Value)
-					RenameLocals(v.Node, m[v.Name]);
+					RenameLocals(v.Node, method2[v.Name]);
 			}
 		}
 
 		private void CompressMembers()
 		{
-			Recompile();
+			_unresolvedFile = SyntaxTree.ToTypeSystem();
+			_projectContent = _projectContent.AddOrUpdateFiles(_unresolvedFile);
+			_compilation = _projectContent.CreateCompilation();
+			_resolver = new CSharpAstResolver(_compilation, SyntaxTree, _unresolvedFile);
 
 			var membersVisitor = new MinifyMembersAstVisitor(IgnoredIdentifiers, Options.ConsoleApp);
 			SyntaxTree.AcceptVisitor(membersVisitor);
@@ -325,17 +344,10 @@ namespace CSharpMinifier
 
 			foreach (var member in membersVisitor.TypeMembers)
 			{
-				var m = newSubstituton[member.Key];
+				var member2 = newSubstituton[member.Key];
 				foreach (NameNode v in member.Value)
-					RenameMembers(v.Node, m[v.Name]);
+					RenameMembers(v.Node, member2[v.Name]);
 			}
-		}
-
-		private void CompressTypes()
-		{
-			Recompile();
-
-
 		}
 
 		private void RenameLocals(AstNode node, string newName)
@@ -391,14 +403,6 @@ namespace CSharpMinifier
 			else
 			{
 			}
-		}
-
-		private void Recompile()
-		{
-			_unresolvedFile = SyntaxTree.ToTypeSystem();
-			_projectContent = _projectContent.AddOrUpdateFiles(_unresolvedFile);
-			_compilation = _projectContent.CreateCompilation();
-			_resolver = new CSharpAstResolver(_compilation, SyntaxTree, _unresolvedFile);
 		}
 
 		#endregion

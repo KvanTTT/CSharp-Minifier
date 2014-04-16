@@ -48,9 +48,7 @@
 			this.ofdInputCodeFiles = new System.Windows.Forms.OpenFileDialog();
 			this.cbMinifyFiles = new System.Windows.Forms.CheckBox();
 			this.lblOutputCompilied = new System.Windows.Forms.Label();
-			this.pbOutputCompilied = new System.Windows.Forms.PictureBox();
 			this.lblInputCompilied = new System.Windows.Forms.Label();
-			this.pbInputCompilied = new System.Windows.Forms.PictureBox();
 			this.cbRemoveRegions = new System.Windows.Forms.CheckBox();
 			this.cbCompressMisc = new System.Windows.Forms.CheckBox();
 			this.label5 = new System.Windows.Forms.Label();
@@ -59,20 +57,24 @@
 			this.tbOutputLength = new System.Windows.Forms.TextBox();
 			this.tbOutputInputRatio = new System.Windows.Forms.TextBox();
 			this.label7 = new System.Windows.Forms.Label();
+			this.pbInputCompilied = new System.Windows.Forms.PictureBox();
+			this.pbOutputCompilied = new System.Windows.Forms.PictureBox();
+			this.cbRemoveNamespaces = new System.Windows.Forms.CheckBox();
+			this.cbConsoleApp = new System.Windows.Forms.CheckBox();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
 			this.splitContainer.Panel1.SuspendLayout();
 			this.splitContainer.Panel2.SuspendLayout();
 			this.splitContainer.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.tbInput)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.tbOutput)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.pbOutputCompilied)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbInputCompilied)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.pbOutputCompilied)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// btnMinify
 			// 
 			this.btnMinify.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnMinify.Location = new System.Drawing.Point(577, 190);
+			this.btnMinify.Location = new System.Drawing.Point(577, 235);
 			this.btnMinify.Name = "btnMinify";
 			this.btnMinify.Size = new System.Drawing.Size(164, 26);
 			this.btnMinify.TabIndex = 1;
@@ -260,7 +262,7 @@
 			// tbLineLength
 			// 
 			this.tbLineLength.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbLineLength.Location = new System.Drawing.Point(657, 137);
+			this.tbLineLength.Location = new System.Drawing.Point(657, 184);
 			this.tbLineLength.Name = "tbLineLength";
 			this.tbLineLength.Size = new System.Drawing.Size(84, 20);
 			this.tbLineLength.TabIndex = 7;
@@ -271,7 +273,7 @@
 			// 
 			this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(577, 140);
+			this.label3.Location = new System.Drawing.Point(577, 187);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(63, 13);
 			this.label3.TabIndex = 8;
@@ -286,7 +288,7 @@
 			// 
 			this.cbMinifyFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.cbMinifyFiles.AutoSize = true;
-			this.cbMinifyFiles.Location = new System.Drawing.Point(580, 167);
+			this.cbMinifyFiles.Location = new System.Drawing.Point(580, 212);
 			this.cbMinifyFiles.Name = "cbMinifyFiles";
 			this.cbMinifyFiles.Size = new System.Drawing.Size(47, 17);
 			this.cbMinifyFiles.TabIndex = 9;
@@ -302,16 +304,6 @@
 			this.lblOutputCompilied.Size = new System.Drawing.Size(0, 13);
 			this.lblOutputCompilied.TabIndex = 11;
 			// 
-			// pbOutputCompilied
-			// 
-			this.pbOutputCompilied.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.pbOutputCompilied.Location = new System.Drawing.Point(577, 644);
-			this.pbOutputCompilied.Name = "pbOutputCompilied";
-			this.pbOutputCompilied.Size = new System.Drawing.Size(35, 33);
-			this.pbOutputCompilied.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-			this.pbOutputCompilied.TabIndex = 10;
-			this.pbOutputCompilied.TabStop = false;
-			// 
 			// lblInputCompilied
 			// 
 			this.lblInputCompilied.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -321,17 +313,6 @@
 			this.lblInputCompilied.Size = new System.Drawing.Size(0, 13);
 			this.lblInputCompilied.TabIndex = 13;
 			this.lblInputCompilied.Visible = false;
-			// 
-			// pbInputCompilied
-			// 
-			this.pbInputCompilied.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.pbInputCompilied.Location = new System.Drawing.Point(577, 605);
-			this.pbInputCompilied.Name = "pbInputCompilied";
-			this.pbInputCompilied.Size = new System.Drawing.Size(35, 33);
-			this.pbInputCompilied.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-			this.pbInputCompilied.TabIndex = 12;
-			this.pbInputCompilied.TabStop = false;
-			this.pbInputCompilied.Visible = false;
 			// 
 			// cbRemoveRegions
 			// 
@@ -416,11 +397,60 @@
 			this.label7.TabIndex = 20;
 			this.label7.Text = "Ratio";
 			// 
+			// pbInputCompilied
+			// 
+			this.pbInputCompilied.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.pbInputCompilied.Location = new System.Drawing.Point(577, 605);
+			this.pbInputCompilied.Name = "pbInputCompilied";
+			this.pbInputCompilied.Size = new System.Drawing.Size(35, 33);
+			this.pbInputCompilied.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+			this.pbInputCompilied.TabIndex = 12;
+			this.pbInputCompilied.TabStop = false;
+			this.pbInputCompilied.Visible = false;
+			// 
+			// pbOutputCompilied
+			// 
+			this.pbOutputCompilied.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.pbOutputCompilied.Location = new System.Drawing.Point(577, 644);
+			this.pbOutputCompilied.Name = "pbOutputCompilied";
+			this.pbOutputCompilied.Size = new System.Drawing.Size(35, 33);
+			this.pbOutputCompilied.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+			this.pbOutputCompilied.TabIndex = 10;
+			this.pbOutputCompilied.TabStop = false;
+			// 
+			// cbRemoveNamespaces
+			// 
+			this.cbRemoveNamespaces.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.cbRemoveNamespaces.AutoSize = true;
+			this.cbRemoveNamespaces.Checked = true;
+			this.cbRemoveNamespaces.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.cbRemoveNamespaces.Location = new System.Drawing.Point(577, 150);
+			this.cbRemoveNamespaces.Name = "cbRemoveNamespaces";
+			this.cbRemoveNamespaces.Size = new System.Drawing.Size(131, 17);
+			this.cbRemoveNamespaces.TabIndex = 22;
+			this.cbRemoveNamespaces.Text = "Remove Namespaces";
+			this.cbRemoveNamespaces.UseVisualStyleBackColor = true;
+			// 
+			// cbConsoleApp
+			// 
+			this.cbConsoleApp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.cbConsoleApp.AutoSize = true;
+			this.cbConsoleApp.Checked = true;
+			this.cbConsoleApp.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.cbConsoleApp.Location = new System.Drawing.Point(577, 127);
+			this.cbConsoleApp.Name = "cbConsoleApp";
+			this.cbConsoleApp.Size = new System.Drawing.Size(86, 17);
+			this.cbConsoleApp.TabIndex = 23;
+			this.cbConsoleApp.Text = "Console App";
+			this.cbConsoleApp.UseVisualStyleBackColor = true;
+			// 
 			// frmMain
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(753, 721);
+			this.Controls.Add(this.cbConsoleApp);
+			this.Controls.Add(this.cbRemoveNamespaces);
 			this.Controls.Add(this.tbOutputInputRatio);
 			this.Controls.Add(this.label7);
 			this.Controls.Add(this.tbOutputLength);
@@ -453,8 +483,8 @@
 			this.splitContainer.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.tbInput)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.tbOutput)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.pbOutputCompilied)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbInputCompilied)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.pbOutputCompilied)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -491,6 +521,8 @@
 		private System.Windows.Forms.TextBox tbOutputLength;
 		private System.Windows.Forms.TextBox tbOutputInputRatio;
 		private System.Windows.Forms.Label label7;
+		private System.Windows.Forms.CheckBox cbRemoveNamespaces;
+		private System.Windows.Forms.CheckBox cbConsoleApp;
     }
 }
 

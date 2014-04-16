@@ -165,5 +165,29 @@ namespace CSharpMinifier.GUI.Properties {
                 this["InputPanelHeight"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ConsoleApp {
+            get {
+                return ((bool)(this["ConsoleApp"]));
+            }
+            set {
+                this["ConsoleApp"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool RemoveNamespaces {
+            get {
+                return ((bool)(this["RemoveNamespaces"]));
+            }
+            set {
+                this["RemoveNamespaces"] = value;
+            }
+        }
     }
 }

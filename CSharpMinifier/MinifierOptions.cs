@@ -50,6 +50,12 @@ namespace CSharpMinifier
 			set;
 		}
 
+		public bool RemoveNamespaces
+		{
+			get;
+			set;
+		}
+
 		public MinifierOptions(bool maxCompression = true)
 		{
 			if (maxCompression)
@@ -59,6 +65,7 @@ namespace CSharpMinifier
 				CommentsRemoving = true;
 				RegionsRemoving = true;
 				MiscCompressing = true;
+				RemoveNamespaces = true;
 			}
 		}
 	}
