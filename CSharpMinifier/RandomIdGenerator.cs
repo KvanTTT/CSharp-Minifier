@@ -58,7 +58,7 @@ namespace CSharpMinifier
 				CurrentCombination = _generatedIds[CurrentCombinationNumber];
 
 			CurrentCombinationNumber++;
-			return CurrentCombination;
+			return Prefix + CurrentCombination + Postfix;
 		}
 
 		public override int CurrentCombinationNumber

@@ -98,6 +98,11 @@ namespace A
 			: base()
 		{
 		}
+
+		public override string ToString()
+		{
+			return "C string";
+		}
 	}
 
 	interface Inter

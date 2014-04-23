@@ -52,7 +52,7 @@ namespace CSharpMinifier
 			CurrentCombination = result.ToString();
 			CurrentCombinationNumber++;
 			
-			return CurrentCombination;
+			return Prefix + CurrentCombination + Postfix;
 		}
 
 		public override int CurrentCombinationNumber

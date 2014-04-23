@@ -32,6 +32,8 @@ namespace CSharpMinifier
 		{
 			CurrentCombinationNumber = -1;
 			CurrentCombination = string.Empty;
+			Prefix = "";
+			Postfix = "";
 		}
 
 		public virtual int CurrentCombinationNumber
@@ -41,6 +43,18 @@ namespace CSharpMinifier
 		}
 
 		public string CurrentCombination
+		{
+			get;
+			protected set;
+		}
+
+		public string Prefix
+		{
+			get;
+			protected set;
+		}
+
+		public string Postfix
 		{
 			get;
 			protected set;

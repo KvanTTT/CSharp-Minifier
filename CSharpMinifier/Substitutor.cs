@@ -19,11 +19,11 @@ namespace CSharpMinifier
 			Generator = generator;
 		}
 
-		public Dictionary<string, Dictionary<string, string>> Generate(Dictionary<string, List<NameNode>> MethodsVars, IEnumerable<string> excludedNames)
+		public Dictionary<string, Dictionary<string, string>> Generate(Dictionary<string, List<NameNode>> methodsVars, IEnumerable<string> excludedNames)
 		{
 			var result = new Dictionary<string, Dictionary<string, string>>();
 
-			foreach (var vars in MethodsVars)
+			foreach (var vars in methodsVars)
 			{
 				int varCount = vars.Value.Count;
 				string[] newNames = new string[varCount];

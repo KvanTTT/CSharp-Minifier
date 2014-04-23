@@ -47,6 +47,7 @@
     <Compile Include="Samples\MiscCompression.cs" />
     <Compile Include="Samples\RLE.cs" />
     <Compile Include="Samples\Test1.cs" />
+    <Compile Include="Samples\Test2.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

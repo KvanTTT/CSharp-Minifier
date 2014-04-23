@@ -66,6 +66,8 @@ namespace CSharpMinifier.GUI
 			cbMinifyFiles.Checked = Settings.Default.MinifyFiles;
 			if (Settings.Default.FileList != null)
 				FillList(Settings.Default.FileList.Cast<string>().ToArray());
+			cbCompressPublic.Checked = Settings.Default.CompressPublic;
+			cbRemoveToStringMethods.Checked = Settings.Default.RemoveToStringMethods;
 		}
 
 		private void frmMain_FormClosed(object sender, FormClosedEventArgs e)
@@ -87,6 +89,8 @@ namespace CSharpMinifier.GUI
 			foreach (var fileName in Sources)
 				stringCollection.Add(fileName.Key);
 			Settings.Default.FileList = stringCollection;
+			Settings.Default.CompressPublic = cbCompressPublic.Checked;
+			Settings.Default.RemoveToStringMethods = cbRemoveToStringMethods.Checked;
 			Settings.Default.Save();
 		}
 
@@ -102,6 +106,8 @@ namespace CSharpMinifier.GUI
 				ConsoleApp = cbConsoleApp.Checked,
 				RemoveNamespaces = cbRemoveNamespaces.Checked,
 				LineLength = int.Parse(tbLineLength.Text),
+				RemoveToStringMethods = cbRemoveToStringMethods.Checked,
+				CompressPublic = cbCompressPublic.Checked
 			};
 			Minifier minifier = new Minifier(minifierOptions);
 			tbOutput.Text = !cbMinifyFiles.Checked ? minifier.MinifyFromString(tbInput.Text) : minifier.MinifyFiles(Sources.Select(source => source.Value).ToArray());
@@ -150,6 +156,11 @@ namespace CSharpMinifier.GUI
 		}
 
 		private void tbInput_Load(object sender, EventArgs e)
+		{
+
+		}
+
+		private void checkBox2_CheckedChanged(object sender, EventArgs e)
 		{
 
 		}

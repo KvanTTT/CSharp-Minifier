@@ -56,6 +56,18 @@ namespace CSharpMinifier
 			set;
 		}
 
+		public bool CompressPublic
+		{
+			get;
+			set;
+		}
+
+		public bool RemoveToStringMethods
+		{
+			get;
+			set;
+		}
+
 		public MinifierOptions(bool maxCompression = true)
 		{
 			if (maxCompression)
@@ -66,6 +78,8 @@ namespace CSharpMinifier
 				RegionsRemoving = true;
 				MiscCompressing = true;
 				RemoveNamespaces = true;
+				CompressPublic = true;
+				RemoveToStringMethods = true;
 			}
 		}
 	}
