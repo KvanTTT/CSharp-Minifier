@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompileUtils.cs" />
+    <Compile Include="MinifyTypesAstVisitor.cs" />
     <Compile Include="NameNode.cs" />
     <Compile Include="MinIdGenerator.cs" />
     <Compile Include="Minifier.cs" />
@@ -65,8 +66,8 @@
     <Compile Include="NRefactoryUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RandomIdGenerator.cs" />
+    <Compile Include="ResolveResultType.cs" />
     <Compile Include="Substitutor.cs" />
-    <Compile Include="TypeMemberDec.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">

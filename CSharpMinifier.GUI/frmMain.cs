@@ -57,7 +57,9 @@ namespace CSharpMinifier.GUI
 				splitContainer.SplitterDistance = Settings.Default.InputPanelHeight;
 			cbRemoveComments.Checked = Settings.Default.RemoveComments;
 			cbRemoveRegions.Checked = Settings.Default.RemoveRegions;
-			cbCompressIdentifiers.Checked = Settings.Default.CompressIdentifiers;
+			cbCompressLocalVars.Checked = Settings.Default.LocalVarsCompressing;
+			cbCompressMemebers.Checked = Settings.Default.MembersCompressing;
+			cbCompressTypes.Checked = Settings.Default.TypesCompressing;
 			cbRemoveSpaces.Checked = Settings.Default.RemoveSpaces;
 			cbCompressMisc.Checked = Settings.Default.MiscCompressing;
 			cbRemoveNamespaces.Checked = Settings.Default.RemoveNamespaces;
@@ -78,7 +80,9 @@ namespace CSharpMinifier.GUI
 			Settings.Default.InputPanelHeight = splitContainer.Panel1.Height;
 			Settings.Default.RemoveComments = cbRemoveComments.Checked;
 			Settings.Default.RemoveRegions = cbRemoveRegions.Checked;
-			Settings.Default.CompressIdentifiers = cbCompressIdentifiers.Checked;
+			Settings.Default.LocalVarsCompressing = cbCompressLocalVars.Checked;
+			Settings.Default.MembersCompressing = cbCompressMemebers.Checked;
+			Settings.Default.TypesCompressing = cbCompressTypes.Checked;
 			Settings.Default.RemoveSpaces = cbRemoveSpaces.Checked;
 			Settings.Default.MiscCompressing = cbCompressMisc.Checked;
 			Settings.Default.ConsoleApp = cbConsoleApp.Checked;
@@ -98,7 +102,9 @@ namespace CSharpMinifier.GUI
 		{
 			var minifierOptions = new MinifierOptions
 			{
-				IdentifiersCompressing = cbCompressIdentifiers.Checked,
+				LocalVarsCompressing = cbCompressLocalVars.Checked,
+				MembersCompressing = cbCompressMemebers.Checked,
+				TypesCompressing = cbCompressTypes.Checked,
 				SpacesRemoving = cbRemoveSpaces.Checked,
 				RegionsRemoving = cbRemoveRegions.Checked,
 				CommentsRemoving = cbRemoveComments.Checked,
@@ -157,12 +163,6 @@ namespace CSharpMinifier.GUI
 
 		private void tbInput_Load(object sender, EventArgs e)
 		{
-
-		}
-
-		private void checkBox2_CheckedChanged(object sender, EventArgs e)
-		{
-
 		}
 	}
 }

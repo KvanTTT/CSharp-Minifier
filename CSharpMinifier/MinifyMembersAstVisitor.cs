@@ -8,9 +8,9 @@ namespace CSharpMinifier
 {
 	public class MinifyMembersAstVisitor : DepthFirstAstVisitor
 	{
-		string _currentNamespace;
-		List<NameNode> _currentMembers;
-		IEnumerable<string> _ignoredMembers;
+		private string _currentNamespace;
+		private List<NameNode> _currentMembers;
+		private IEnumerable<string> _ignoredMembers;
 
 		public bool ConsoleApp
 		{
@@ -36,7 +36,7 @@ namespace CSharpMinifier
 			private set;
 		}
 
-		public Dictionary<string, List<NameNode>> TypeMembers
+		public Dictionary<string, List<NameNode>> TypesMembers
 		{
 			get;
 			private set;
@@ -44,7 +44,7 @@ namespace CSharpMinifier
 
 		public MinifyMembersAstVisitor(IEnumerable<string> ignoredMembers, bool consoleApp, bool compressPublic, bool removeToString)
 		{
-			TypeMembers = new Dictionary<string, List<NameNode>>();
+			TypesMembers = new Dictionary<string, List<NameNode>>();
 			NotMembersIdNames = new HashSet<string>();
 			_ignoredMembers = ignoredMembers ?? new List<string>();
 			ConsoleApp = consoleApp;
@@ -60,8 +60,14 @@ namespace CSharpMinifier
 
 		public override void VisitTypeDeclaration(TypeDeclaration typeDeclaration)
 		{
-			_currentMembers = new List<NameNode>();
-			TypeMembers.Add(_currentNamespace + "." + typeDeclaration.Name, _currentMembers);
+			var key = (string.IsNullOrEmpty(_currentNamespace) ? "" : _currentNamespace + ".") + typeDeclaration.Name;
+			if (!TypesMembers.ContainsKey(key))
+			{
+				_currentMembers = new List<NameNode>();
+				TypesMembers.Add(key, _currentMembers);
+			}
+			else
+				_currentMembers = TypesMembers[key];
 			base.VisitTypeDeclaration(typeDeclaration);
 		}
 

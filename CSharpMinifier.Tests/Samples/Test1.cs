@@ -105,7 +105,15 @@ namespace A
 		}
 	}
 
+	internal class D : A
+	{
+	}
+
 	interface Inter
+	{
+	}
+
+	struct str
 	{
 	}
 }

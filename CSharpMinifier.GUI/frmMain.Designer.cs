@@ -40,7 +40,7 @@
 			this.tbOutput = new FastColoredTextBoxNS.FastColoredTextBox();
 			this.label2 = new System.Windows.Forms.Label();
 			this.cbRemoveSpaces = new System.Windows.Forms.CheckBox();
-			this.cbCompressIdentifiers = new System.Windows.Forms.CheckBox();
+			this.cbCompressLocalVars = new System.Windows.Forms.CheckBox();
 			this.cbRemoveComments = new System.Windows.Forms.CheckBox();
 			this.btnCopyToClipboard = new System.Windows.Forms.Button();
 			this.tbLineLength = new System.Windows.Forms.TextBox();
@@ -63,6 +63,8 @@
 			this.cbConsoleApp = new System.Windows.Forms.CheckBox();
 			this.cbRemoveToStringMethods = new System.Windows.Forms.CheckBox();
 			this.cbCompressPublic = new System.Windows.Forms.CheckBox();
+			this.cbCompressMemebers = new System.Windows.Forms.CheckBox();
+			this.cbCompressTypes = new System.Windows.Forms.CheckBox();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
 			this.splitContainer.Panel1.SuspendLayout();
 			this.splitContainer.Panel2.SuspendLayout();
@@ -76,7 +78,7 @@
 			// btnMinify
 			// 
 			this.btnMinify.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnMinify.Location = new System.Drawing.Point(577, 270);
+			this.btnMinify.Location = new System.Drawing.Point(579, 321);
 			this.btnMinify.Name = "btnMinify";
 			this.btnMinify.Size = new System.Drawing.Size(164, 26);
 			this.btnMinify.TabIndex = 1;
@@ -217,25 +219,25 @@
 			this.cbRemoveSpaces.AutoSize = true;
 			this.cbRemoveSpaces.Checked = true;
 			this.cbRemoveSpaces.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbRemoveSpaces.Location = new System.Drawing.Point(577, 81);
+			this.cbRemoveSpaces.Location = new System.Drawing.Point(579, 86);
 			this.cbRemoveSpaces.Name = "cbRemoveSpaces";
 			this.cbRemoveSpaces.Size = new System.Drawing.Size(166, 17);
 			this.cbRemoveSpaces.TabIndex = 3;
 			this.cbRemoveSpaces.Text = "Remove spaces && line breaks";
 			this.cbRemoveSpaces.UseVisualStyleBackColor = true;
 			// 
-			// cbCompressIdentifiers
+			// cbCompressLocalVars
 			// 
-			this.cbCompressIdentifiers.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.cbCompressIdentifiers.AutoSize = true;
-			this.cbCompressIdentifiers.Checked = true;
-			this.cbCompressIdentifiers.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbCompressIdentifiers.Location = new System.Drawing.Point(577, 58);
-			this.cbCompressIdentifiers.Name = "cbCompressIdentifiers";
-			this.cbCompressIdentifiers.Size = new System.Drawing.Size(119, 17);
-			this.cbCompressIdentifiers.TabIndex = 4;
-			this.cbCompressIdentifiers.Text = "Compress identifiers";
-			this.cbCompressIdentifiers.UseVisualStyleBackColor = true;
+			this.cbCompressLocalVars.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.cbCompressLocalVars.AutoSize = true;
+			this.cbCompressLocalVars.Checked = true;
+			this.cbCompressLocalVars.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.cbCompressLocalVars.Location = new System.Drawing.Point(579, 17);
+			this.cbCompressLocalVars.Name = "cbCompressLocalVars";
+			this.cbCompressLocalVars.Size = new System.Drawing.Size(120, 17);
+			this.cbCompressLocalVars.TabIndex = 4;
+			this.cbCompressLocalVars.Text = "Compress local vars";
+			this.cbCompressLocalVars.UseVisualStyleBackColor = true;
 			// 
 			// cbRemoveComments
 			// 
@@ -243,7 +245,7 @@
 			this.cbRemoveComments.AutoSize = true;
 			this.cbRemoveComments.Checked = true;
 			this.cbRemoveComments.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbRemoveComments.Location = new System.Drawing.Point(577, 12);
+			this.cbRemoveComments.Location = new System.Drawing.Point(579, 109);
 			this.cbRemoveComments.Name = "cbRemoveComments";
 			this.cbRemoveComments.Size = new System.Drawing.Size(117, 17);
 			this.cbRemoveComments.TabIndex = 5;
@@ -264,7 +266,7 @@
 			// tbLineLength
 			// 
 			this.tbLineLength.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbLineLength.Location = new System.Drawing.Point(657, 219);
+			this.tbLineLength.Location = new System.Drawing.Point(659, 270);
 			this.tbLineLength.Name = "tbLineLength";
 			this.tbLineLength.Size = new System.Drawing.Size(84, 20);
 			this.tbLineLength.TabIndex = 7;
@@ -275,7 +277,7 @@
 			// 
 			this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(577, 222);
+			this.label3.Location = new System.Drawing.Point(579, 273);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(63, 13);
 			this.label3.TabIndex = 8;
@@ -290,7 +292,7 @@
 			// 
 			this.cbMinifyFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.cbMinifyFiles.AutoSize = true;
-			this.cbMinifyFiles.Location = new System.Drawing.Point(580, 247);
+			this.cbMinifyFiles.Location = new System.Drawing.Point(582, 298);
 			this.cbMinifyFiles.Name = "cbMinifyFiles";
 			this.cbMinifyFiles.Size = new System.Drawing.Size(47, 17);
 			this.cbMinifyFiles.TabIndex = 9;
@@ -322,7 +324,7 @@
 			this.cbRemoveRegions.AutoSize = true;
 			this.cbRemoveRegions.Checked = true;
 			this.cbRemoveRegions.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbRemoveRegions.Location = new System.Drawing.Point(577, 35);
+			this.cbRemoveRegions.Location = new System.Drawing.Point(579, 132);
 			this.cbRemoveRegions.Name = "cbRemoveRegions";
 			this.cbRemoveRegions.Size = new System.Drawing.Size(103, 17);
 			this.cbRemoveRegions.TabIndex = 14;
@@ -335,7 +337,7 @@
 			this.cbCompressMisc.AutoSize = true;
 			this.cbCompressMisc.Checked = true;
 			this.cbCompressMisc.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbCompressMisc.Location = new System.Drawing.Point(577, 104);
+			this.cbCompressMisc.Location = new System.Drawing.Point(579, 155);
 			this.cbCompressMisc.Name = "cbCompressMisc";
 			this.cbCompressMisc.Size = new System.Drawing.Size(97, 17);
 			this.cbCompressMisc.TabIndex = 15;
@@ -426,7 +428,7 @@
 			this.cbRemoveNamespaces.AutoSize = true;
 			this.cbRemoveNamespaces.Checked = true;
 			this.cbRemoveNamespaces.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbRemoveNamespaces.Location = new System.Drawing.Point(577, 150);
+			this.cbRemoveNamespaces.Location = new System.Drawing.Point(579, 201);
 			this.cbRemoveNamespaces.Name = "cbRemoveNamespaces";
 			this.cbRemoveNamespaces.Size = new System.Drawing.Size(131, 17);
 			this.cbRemoveNamespaces.TabIndex = 22;
@@ -439,7 +441,7 @@
 			this.cbConsoleApp.AutoSize = true;
 			this.cbConsoleApp.Checked = true;
 			this.cbConsoleApp.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbConsoleApp.Location = new System.Drawing.Point(577, 127);
+			this.cbConsoleApp.Location = new System.Drawing.Point(579, 178);
 			this.cbConsoleApp.Name = "cbConsoleApp";
 			this.cbConsoleApp.Size = new System.Drawing.Size(86, 17);
 			this.cbConsoleApp.TabIndex = 23;
@@ -452,7 +454,7 @@
 			this.cbRemoveToStringMethods.AutoSize = true;
 			this.cbRemoveToStringMethods.Checked = true;
 			this.cbRemoveToStringMethods.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbRemoveToStringMethods.Location = new System.Drawing.Point(577, 196);
+			this.cbRemoveToStringMethods.Location = new System.Drawing.Point(579, 247);
 			this.cbRemoveToStringMethods.Name = "cbRemoveToStringMethods";
 			this.cbRemoveToStringMethods.Size = new System.Drawing.Size(115, 17);
 			this.cbRemoveToStringMethods.TabIndex = 24;
@@ -465,19 +467,46 @@
 			this.cbCompressPublic.AutoSize = true;
 			this.cbCompressPublic.Checked = true;
 			this.cbCompressPublic.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbCompressPublic.Location = new System.Drawing.Point(577, 173);
+			this.cbCompressPublic.Location = new System.Drawing.Point(579, 224);
 			this.cbCompressPublic.Name = "cbCompressPublic";
 			this.cbCompressPublic.Size = new System.Drawing.Size(104, 17);
 			this.cbCompressPublic.TabIndex = 25;
 			this.cbCompressPublic.Text = "Compress Public";
 			this.cbCompressPublic.UseVisualStyleBackColor = true;
-			this.cbCompressPublic.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
+			// 
+			// cbCompressMemebers
+			// 
+			this.cbCompressMemebers.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.cbCompressMemebers.AutoSize = true;
+			this.cbCompressMemebers.Checked = true;
+			this.cbCompressMemebers.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.cbCompressMemebers.Location = new System.Drawing.Point(579, 40);
+			this.cbCompressMemebers.Name = "cbCompressMemebers";
+			this.cbCompressMemebers.Size = new System.Drawing.Size(123, 17);
+			this.cbCompressMemebers.TabIndex = 26;
+			this.cbCompressMemebers.Text = "Compress memebers";
+			this.cbCompressMemebers.UseVisualStyleBackColor = true;
+			// 
+			// cbCompressTypes
+			// 
+			this.cbCompressTypes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.cbCompressTypes.AutoSize = true;
+			this.cbCompressTypes.Checked = true;
+			this.cbCompressTypes.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.cbCompressTypes.Location = new System.Drawing.Point(579, 63);
+			this.cbCompressTypes.Name = "cbCompressTypes";
+			this.cbCompressTypes.Size = new System.Drawing.Size(100, 17);
+			this.cbCompressTypes.TabIndex = 27;
+			this.cbCompressTypes.Text = "Compress types";
+			this.cbCompressTypes.UseVisualStyleBackColor = true;
 			// 
 			// frmMain
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(753, 721);
+			this.Controls.Add(this.cbCompressTypes);
+			this.Controls.Add(this.cbCompressMemebers);
 			this.Controls.Add(this.cbCompressPublic);
 			this.Controls.Add(this.cbRemoveToStringMethods);
 			this.Controls.Add(this.cbConsoleApp);
@@ -499,7 +528,7 @@
 			this.Controls.Add(this.tbLineLength);
 			this.Controls.Add(this.btnCopyToClipboard);
 			this.Controls.Add(this.cbRemoveComments);
-			this.Controls.Add(this.cbCompressIdentifiers);
+			this.Controls.Add(this.cbCompressLocalVars);
 			this.Controls.Add(this.cbRemoveSpaces);
 			this.Controls.Add(this.splitContainer);
 			this.Controls.Add(this.btnMinify);
@@ -528,7 +557,7 @@
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label2;
         private System.Windows.Forms.CheckBox cbRemoveSpaces;
-        private System.Windows.Forms.CheckBox cbCompressIdentifiers;
+        private System.Windows.Forms.CheckBox cbCompressLocalVars;
         private System.Windows.Forms.CheckBox cbRemoveComments;
         private System.Windows.Forms.Button btnCopyToClipboard;
 		private System.Windows.Forms.TextBox tbLineLength;
@@ -556,6 +585,8 @@
 		private System.Windows.Forms.CheckBox cbConsoleApp;
 		private System.Windows.Forms.CheckBox cbRemoveToStringMethods;
 		private System.Windows.Forms.CheckBox cbCompressPublic;
+		private System.Windows.Forms.CheckBox cbCompressMemebers;
+		private System.Windows.Forms.CheckBox cbCompressTypes;
     }
 }
 

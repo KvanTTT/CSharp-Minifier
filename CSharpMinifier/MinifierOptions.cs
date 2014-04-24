@@ -8,7 +8,19 @@ namespace CSharpMinifier
 {
 	public class MinifierOptions
 	{
-		public bool IdentifiersCompressing
+		public bool LocalVarsCompressing
+		{
+			get;
+			set;
+		}
+
+		public bool MembersCompressing
+		{
+			get;
+			set;
+		}
+
+		public bool TypesCompressing
 		{
 			get;
 			set;
@@ -72,7 +84,9 @@ namespace CSharpMinifier
 		{
 			if (maxCompression)
 			{
-				IdentifiersCompressing = true;
+				LocalVarsCompressing = true;
+				MembersCompressing = true;
+				TypesCompressing = true;
 				SpacesRemoving = true;
 				CommentsRemoving = true;
 				RegionsRemoving = true;

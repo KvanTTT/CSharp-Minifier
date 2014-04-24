@@ -48,7 +48,6 @@ namespace CSharpMinifier.Tests
 		{
 			var minifierOptions = new MinifierOptions
 			{
-				IdentifiersCompressing = false,
 				SpacesRemoving = true,
 				CommentsRemoving = true,
 				LineLength = 80,
@@ -65,13 +64,10 @@ namespace CSharpMinifier.Tests
 		[Test]
 		public void RemoveComments()
 		{
-			var minifierOptions = new MinifierOptions()
+			var minifierOptions = new MinifierOptions(false)
 			{
-				IdentifiersCompressing = false,
 				SpacesRemoving = true,
-				CommentsRemoving = true,
-				LineLength = 0,
-				RegionsRemoving = false
+				CommentsRemoving = true
 			};
 			var minifier = new Minifier(minifierOptions);
 
@@ -90,10 +86,7 @@ namespace CSharpMinifier.Tests
 		{
 			var minifierOptions = new MinifierOptions
 			{
-				IdentifiersCompressing = false,
 				SpacesRemoving = true,
-				CommentsRemoving = false,
-				LineLength = 0,
 				RegionsRemoving = true
 			};
 			var minifier = new Minifier(minifierOptions);
@@ -112,7 +105,9 @@ namespace CSharpMinifier.Tests
 		{
 			var minifierOptions = new MinifierOptions(false)
 			{
-				IdentifiersCompressing = true
+				LocalVarsCompressing = true,
+				MembersCompressing = true,
+				TypesCompressing = true
 			};
 			var minifier = new Minifier(minifierOptions);
 			foreach (var sample in Samples)

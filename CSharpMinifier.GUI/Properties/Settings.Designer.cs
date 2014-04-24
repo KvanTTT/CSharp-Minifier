@@ -38,18 +38,6 @@ namespace CSharpMinifier.GUI.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool CompressIdentifiers {
-            get {
-                return ((bool)(this["CompressIdentifiers"]));
-            }
-            set {
-                this["CompressIdentifiers"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool RemoveSpaces {
             get {
                 return ((bool)(this["RemoveSpaces"]));
@@ -211,6 +199,42 @@ namespace CSharpMinifier.GUI.Properties {
             }
             set {
                 this["CompressPublic"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool LocalVarsCompressing {
+            get {
+                return ((bool)(this["LocalVarsCompressing"]));
+            }
+            set {
+                this["LocalVarsCompressing"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool MembersCompressing {
+            get {
+                return ((bool)(this["MembersCompressing"]));
+            }
+            set {
+                this["MembersCompressing"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool TypesCompressing {
+            get {
+                return ((bool)(this["TypesCompressing"]));
+            }
+            set {
+                this["TypesCompressing"] = value;
             }
         }
     }

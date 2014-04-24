@@ -9,12 +9,12 @@ namespace CSharpMinifier
 {
 	public class MinifyLocalsAstVisitor : DepthFirstAstVisitor
 	{
-		string _currentNamespace;
-		string _currentType;
-		List<NameNode> _currentMethodVars;
-		IEnumerable<string> _ignoredLocals;
+		private string _currentNamespace;
+		private string _currentType;
+		private List<NameNode> _currentMethodVars;
+		private IEnumerable<string> _ignoredLocals;
 
-		public HashSet<string> NotMembersIdNames
+		public HashSet<string> NotLocalsIdNames
 		{
 			get;
 			private set;
@@ -28,7 +28,7 @@ namespace CSharpMinifier
 
 		public MinifyLocalsAstVisitor(IEnumerable<string> ignoredLocals = null)
 		{
-			NotMembersIdNames = new HashSet<string>();
+			NotLocalsIdNames = new HashSet<string>();
 			MethodVars = new Dictionary<string, List<NameNode>>();
 			_ignoredLocals = ignoredLocals ?? new List<string>();
 		}
@@ -139,7 +139,7 @@ namespace CSharpMinifier
 		public override void VisitIdentifier(Identifier identifier)
 		{
 			if (_currentMethodVars == null || _currentMethodVars.FirstOrDefault(v => v.Name == identifier.Name) == null)
-				NotMembersIdNames.Add(identifier.Name);
+				NotLocalsIdNames.Add(identifier.Name);
 			base.VisitIdentifier(identifier);
 		}
 	}
