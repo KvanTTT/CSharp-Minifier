@@ -17,6 +17,7 @@ namespace CSharpMinifier
 	public class Minifier
 	{
 		private static string[] NameKeys = new string[] { "Name", "LiteralValue", "Keyword" };
+		private const string VarId = "var";
 		public static string ParserTempFileName = "temp.cs";
 
 		private CSharpUnresolvedFile _unresolvedFile;
@@ -54,7 +55,7 @@ namespace CSharpMinifier
 		{
 			Options = options ?? new MinifierOptions();
 
-			if (Options.LocalVarsCompressing || Options.MembersCompressing || Options.TypesCompressing)
+			//if (Options.LocalVarsCompressing || Options.MembersCompressing || Options.TypesCompressing)
 			{
 				_projectContent = new CSharpProjectContent();
 				var assemblies = new List<Assembly>
@@ -143,7 +144,7 @@ namespace CSharpMinifier
 			string result;
 			if (Options.SpacesRemoving)
 			{
-				if (Options.LocalVarsCompressing || Options.MembersCompressing || Options.TypesCompressing)
+				if (Options.MiscCompressing || Options.LocalVarsCompressing || Options.MembersCompressing || Options.TypesCompressing)
 				{
 					// TODO: Fix it.
 					SyntaxTree = new CSharpParser().Parse(SyntaxTree.GetText(), ParserTempFileName);
@@ -200,6 +201,7 @@ namespace CSharpMinifier
 
 		private void CompressHelper()
 		{
+			CompileAndResolve();
 			CompressHelper(SyntaxTree);
 		}
 
@@ -209,7 +211,7 @@ namespace CSharpMinifier
 			{
 				if (Options.MiscCompressing && children is PrimitiveExpression)
 				{
-					var primitiveExpression = ((PrimitiveExpression)children);
+					var primitiveExpression = (PrimitiveExpression)children;
 					if (IsIntegerNumber(primitiveExpression.Value))
 					{
 						var str = primitiveExpression.Value.ToString();
@@ -223,8 +225,9 @@ namespace CSharpMinifier
 				}
 				else if (Options.MiscCompressing && children is CSharpModifierToken)
 				{
+					// private int a => int a
 					var modifier = ((CSharpModifierToken)children).Modifier;
-					if ((modifier & Modifiers.Private) == Modifiers.Private && (modifier & ~Modifiers.Private) == 0)
+					if (modifier.HasFlag(Modifiers.Private) && (modifier & ~Modifiers.Private) == 0)
 						children.Remove();
 					else
 						modifier &= ~Modifiers.Private;
@@ -252,15 +255,93 @@ namespace CSharpMinifier
 					foreach (var c in parent.Children)
 						CompressHelper(c);
 				}
+				else if (Options.MiscCompressing && children is VariableDeclarationStatement)
+				{
+					// List<byte> a = new List<byte>() => var a = new List<byte>()
+					// var a = new b() => b a = new b()
+					var varDecExpr = (VariableDeclarationStatement)children;
+					if (!varDecExpr.Modifiers.HasFlag(Modifiers.Const))
+					{
+						var type = varDecExpr.Type.ToString().Replace(" ", "");
+						if (type == VarId)
+						{
+							// Resolving expression type.
+							CompileAndResolve();
+							var expectedType = _resolver.GetExpectedType(varDecExpr.Variables.Single().Initializer);
+							if (expectedType.Namespace != "System.Collections.Generic")
+							{
+								string typeStr = expectedType.Name;
+								bool replace = NamesGenerator.CSharpTypeSynonyms.TryGetValue(typeStr, out typeStr);
+								if (!replace)
+									typeStr = expectedType.Name;
+								if (typeStr.Length <= VarId.Length)
+									replace = true;
+								else
+									replace = false;
+								if (replace)
+								{
+									if (expectedType.Namespace == "System")
+										varDecExpr.Type = new PrimitiveType(typeStr);
+									else
+										varDecExpr.Type = new SimpleType(typeStr);
+								}
+							}
+						}
+						else
+						{
+							if (varDecExpr.Variables.Count == 1)
+							{
+								string typeStr;
+								var typeStrWithoutNamespaces = varDecExpr.Type.ToString();
+								typeStrWithoutNamespaces = typeStrWithoutNamespaces.Substring(typeStrWithoutNamespaces.LastIndexOf('.') + 1);
+								NamesGenerator.CSharpTypeSynonyms.TryGetValue(typeStrWithoutNamespaces, out typeStr);
+								if (typeStr == null)
+									typeStr = varDecExpr.Type.ToString();
+								var initializer = varDecExpr.Variables.Single().Initializer;
+								if (((typeStr == "string" || typeStr == "char" || typeStr == "bool") && initializer != NullReferenceExpression.Null)
+									|| initializer is ObjectCreateExpression)
+								{
+									if (VarId.Length < type.Length)
+										varDecExpr.Type = new SimpleType(VarId);
+								}
+							}
+						}
+					}
+					foreach (var variable in varDecExpr.Variables)
+						CompressHelper(children);
+				}
 				else
 				{
 					if (Options.MiscCompressing && children is BlockStatement && children.Role.ToString() != "Body")
 					{
+						// if (a) { b; } => if (a) b;
 						var childrenCount = children.Children.Count();
 						if (childrenCount == 3)
 							children.ReplaceWith(children.Children.ElementAt(1));
 						else if (childrenCount < 3)
 							children.Remove();
+					}
+					else if (Options.MiscCompressing && children is BinaryOperatorExpression)
+					{
+						// if (a == true) => if (a)
+						// if (a == false) => if (!a)
+						var binaryExpression = (BinaryOperatorExpression)children;
+						var primitiveExpression = binaryExpression.Left as PrimitiveExpression;
+						var expression = binaryExpression.Right;
+						if (primitiveExpression == null)
+						{
+							primitiveExpression = binaryExpression.Right as PrimitiveExpression;
+							expression = binaryExpression.Left;
+						}
+						if (primitiveExpression != null && primitiveExpression.Value is bool)
+						{
+							var boolean = (bool)primitiveExpression.Value;
+							expression.Remove();
+							if (boolean)
+								children.ReplaceWith(expression);
+							else
+								children.ReplaceWith(new UnaryOperatorExpression(UnaryOperatorType.Not, expression));
+						}
 					}
 					CompressHelper(children);
 				}
@@ -377,11 +458,16 @@ namespace CSharpMinifier
 
 		private void CompileAndAcceptVisitor(DepthFirstAstVisitor visitor)
 		{
+			CompileAndResolve();
+			SyntaxTree.AcceptVisitor(visitor);
+		}
+
+		private void CompileAndResolve()
+		{
 			_unresolvedFile = SyntaxTree.ToTypeSystem();
 			_projectContent = _projectContent.AddOrUpdateFiles(_unresolvedFile);
 			_compilation = _projectContent.CreateCompilation();
 			_resolver = new CSharpAstResolver(_compilation, SyntaxTree, _unresolvedFile);
-			SyntaxTree.AcceptVisitor(visitor);
 		}
 
 		private void AppendResolvedNodesAndNewNames(ResolveResultType type, List<Tuple<AstNode, string>> astSubstitution, AstNode node, string newName)
@@ -437,7 +523,16 @@ namespace CSharpMinifier
 			else if (node is IdentifierExpression)
 				((IdentifierExpression)node).Identifier = newName;
 			else if (node is InvocationExpression)
-				((IdentifierExpression)((InvocationExpression)node).Target).Identifier = newName;
+			{
+				var invExpression = (InvocationExpression)node;
+				if (invExpression.Target is IdentifierExpression)
+					((IdentifierExpression)invExpression.Target).Identifier = newName;
+				else if (invExpression.Target is MemberReferenceExpression)
+					((MemberReferenceExpression)invExpression.Target).MemberName = newName;
+				else
+				{
+				}
+			}
 			else if (node is NamedExpression)
 				((NamedExpression)node).Name = newName;
 

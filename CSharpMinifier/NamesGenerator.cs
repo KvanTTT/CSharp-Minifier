@@ -21,6 +21,26 @@ namespace CSharpMinifier
 			"ushort", "using", "virtual", "void", "volatile", "while"
 		};
 
+		public static Dictionary<string, string> CSharpTypeSynonyms = new Dictionary<string, string>()
+		{
+			{ "Boolean", "bool" },
+			{ "Char", "char" },
+			{ "Byte", "byte" },
+			{ "Double", "double" },
+			{ "False", "false" },
+			{ "Single", "float" },
+			{ "Int32", "int" },
+			{ "Int64", "long" },
+			{ "Object", "object" },
+			{ "SByte", "sbyte" },
+			{ "Int16", "short" },
+			{ "String", "string" },
+			{ "True", "true" },
+			{ "UInt32", "uint" },
+			{ "UInt64", "ulong" },
+			{ "UInt16", "ushort" }
+		};
+
 		public abstract string Next();
 
 		public NamesGenerator()

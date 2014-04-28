@@ -8,8 +8,8 @@ namespace CSharpMinifier
 {
 	public class MinifyMembersAstVisitor : DepthFirstAstVisitor
 	{
-		private string _currentNamespace;
-		private List<NameNode> _currentMembers;
+		private Stack<Tuple<string, CSharpTokenNode>> _currentNamespaces = new Stack<Tuple<string,CSharpTokenNode>>();
+		private Stack<Tuple<string, List<NameNode>, CSharpTokenNode>> _currentMembers = new Stack<Tuple<string, List<NameNode>, CSharpTokenNode>>();
 		private IEnumerable<string> _ignoredMembers;
 
 		public bool ConsoleApp
@@ -54,20 +54,32 @@ namespace CSharpMinifier
 
 		public override void VisitNamespaceDeclaration(NamespaceDeclaration namespaceDeclaration)
 		{
-			_currentNamespace = namespaceDeclaration.Name;
+			_currentNamespaces.Push(new Tuple<string, CSharpTokenNode>(namespaceDeclaration.Name, (CSharpTokenNode)namespaceDeclaration.Children.Last()));
 			base.VisitNamespaceDeclaration(namespaceDeclaration);
 		}
 
 		public override void VisitTypeDeclaration(TypeDeclaration typeDeclaration)
 		{
-			var key = (string.IsNullOrEmpty(_currentNamespace) ? "" : _currentNamespace + ".") + typeDeclaration.Name;
+			string key = string.Join(".", _currentNamespaces.ToArray().Reverse().Select(ns => ns.Item1));
+			if (key != "")
+				key += ".";
+			key += string.Join(".", _currentMembers.ToArray().Reverse().Select(m => m.Item1));
+			if (key != "")
+				key += ".";
+			key += typeDeclaration.Name;
+
+			List<NameNode> nameNodes;
 			if (!TypesMembers.ContainsKey(key))
 			{
-				_currentMembers = new List<NameNode>();
-				TypesMembers.Add(key, _currentMembers);
+				nameNodes = new List<NameNode>();
+				TypesMembers.Add(key, nameNodes);
 			}
 			else
-				_currentMembers = TypesMembers[key];
+				nameNodes = TypesMembers[key];
+
+			_currentMembers.Push(new Tuple<string, List<NameNode>, CSharpTokenNode>(typeDeclaration.Name, nameNodes,
+				(CSharpTokenNode)typeDeclaration.Children.Last()));
+
 			base.VisitTypeDeclaration(typeDeclaration);
 		}
 
@@ -78,7 +90,7 @@ namespace CSharpMinifier
 			if (CheckModifiers(fieldDeclaration))
 				foreach (var v in fieldDeclaration.Variables)
 					if (!_ignoredMembers.Contains(v.Name))
-						_currentMembers.Add(new NameNode(v.Name, v));
+						_currentMembers.Peek().Item2.Add(new NameNode(v.Name, v));
 			base.VisitFieldDeclaration(fieldDeclaration);
 		}
 
@@ -87,7 +99,7 @@ namespace CSharpMinifier
 			if (CheckModifiers(methodDeclaration) && !_ignoredMembers.Contains(methodDeclaration.Name) &&
 				(ConsoleApp ? methodDeclaration.Name != "Main" : true) &&
 				(methodDeclaration.Modifiers & Modifiers.Override) != Modifiers.Override)
-					_currentMembers.Add(new NameNode(methodDeclaration.Name, methodDeclaration));
+					_currentMembers.Peek().Item2.Add(new NameNode(methodDeclaration.Name, methodDeclaration));
 			if (RemoveToString && methodDeclaration.Name == "ToString" && (methodDeclaration.Modifiers & Modifiers.Override) == Modifiers.Override)
 				methodDeclaration.Remove();
 			base.VisitMethodDeclaration(methodDeclaration);
@@ -97,7 +109,7 @@ namespace CSharpMinifier
 		{
 			if (CheckModifiers(propertyDeclaration) && !_ignoredMembers.Contains(propertyDeclaration.Name) &&
 				(propertyDeclaration.Modifiers & Modifiers.Override) != Modifiers.Override)
-				_currentMembers.Add(new NameNode(propertyDeclaration.Name, propertyDeclaration));
+				_currentMembers.Peek().Item2.Add(new NameNode(propertyDeclaration.Name, propertyDeclaration));
 			base.VisitPropertyDeclaration(propertyDeclaration);
 		}
 
@@ -105,7 +117,7 @@ namespace CSharpMinifier
 		{
 			if (CheckModifiers(eventDeclaration) && !_ignoredMembers.Contains(eventDeclaration.Name))
 				foreach (var v in eventDeclaration.Variables)
-					_currentMembers.Add(new NameNode(v.Name, v));
+					_currentMembers.Peek().Item2.Add(new NameNode(v.Name, v));
 			base.VisitEventDeclaration(eventDeclaration);
 		}
 
@@ -131,9 +143,22 @@ namespace CSharpMinifier
 
 		#endregion
 
+		public override void VisitCSharpTokenNode(CSharpTokenNode token)
+		{
+			if (_currentNamespaces.Count != 0 && token == _currentNamespaces.Peek().Item2)
+			{
+				_currentNamespaces.Pop();
+			}
+			else if (_currentMembers.Count != 0 && token == _currentMembers.Peek().Item3)
+			{
+				_currentMembers.Pop();
+			}
+			base.VisitCSharpTokenNode(token);
+		}
+
 		public override void VisitIdentifier(Identifier identifier)
 		{
-			if (_currentMembers == null || _currentMembers.FirstOrDefault(v => v.Name == identifier.Name) == null)
+			if (_currentMembers.Count == 0 || _currentMembers.Peek().Item2.FirstOrDefault(v => v.Name == identifier.Name) == null)
 				NotMembersIdNames.Add(identifier.Name);
 			base.VisitIdentifier(identifier);
 		}

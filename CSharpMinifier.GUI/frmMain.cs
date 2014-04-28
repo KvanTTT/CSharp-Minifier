@@ -1,4 +1,5 @@
 ﻿using CSharpMinifier.GUI.Properties;
+using FastColoredTextBoxNS;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -121,7 +122,8 @@ namespace CSharpMinifier.GUI
 			tbInputLength.Text = tbInput.Text.Length.ToString();
 			tbOutputLength.Text = tbOutput.Text.Length.ToString();
 			tbOutputInputRatio.Text = ((double)tbOutput.Text.Length / tbInput.Text.Length).ToString("0.000000");
-			if (CompileUtils.CanCompile(tbOutput.Text))
+			var compileResult = CompileUtils.Compile(tbOutput.Text);
+			if (!compileResult.Errors.HasErrors)
 			{
 				pbOutputCompilied.Image = Resources.Ok;
 				lblOutputCompilied.Text = "Compilied";
@@ -130,8 +132,17 @@ namespace CSharpMinifier.GUI
 			{
 				pbOutputCompilied.Image = Resources.Error;
 				lblOutputCompilied.Text = "Not compilied";
+				dgvErrors.Rows.Clear();
+				for (int i = 0; i < compileResult.Errors.Count; i++)
+				{
+					var error = compileResult.Errors[i];
+					dgvErrors.Rows.Add(error.Line.ToString(), error.Column.ToString(),
+						error.ErrorText, "output");
+				}
 			}
 		}
+
+		
 
 		private void btnCopyToClipboard_Click(object sender, EventArgs e)
 		{
@@ -163,6 +174,21 @@ namespace CSharpMinifier.GUI
 
 		private void tbInput_Load(object sender, EventArgs e)
 		{
+		}
+
+		private void dgvErrors_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
+		{
+			if (dgvErrors.SelectedRows.Count > 0)
+			{
+				var cells = dgvErrors.SelectedRows[0].Cells;
+				bool input = cells[3].Value.ToString() == "input";
+				var textBox = input ? tbInput : tbOutput;
+				int line = Convert.ToInt32(cells[0].Value);
+				int column = Convert.ToInt32(cells[1].Value);
+				textBox.Navigate(line);
+				textBox.Selection = new Range(textBox, column - 1, line - 1, column - 1, line - 1);
+				textBox.Focus();
+			}
 		}
 	}
 }

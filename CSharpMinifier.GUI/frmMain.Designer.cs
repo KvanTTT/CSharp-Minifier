@@ -65,6 +65,12 @@
 			this.cbCompressPublic = new System.Windows.Forms.CheckBox();
 			this.cbCompressMemebers = new System.Windows.Forms.CheckBox();
 			this.cbCompressTypes = new System.Windows.Forms.CheckBox();
+			this.dgvErrors = new System.Windows.Forms.DataGridView();
+			this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.label8 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
 			this.splitContainer.Panel1.SuspendLayout();
 			this.splitContainer.Panel2.SuspendLayout();
@@ -73,14 +79,15 @@
 			((System.ComponentModel.ISupportInitialize)(this.tbOutput)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbInputCompilied)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbOutputCompilied)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.dgvErrors)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// btnMinify
 			// 
 			this.btnMinify.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnMinify.Location = new System.Drawing.Point(579, 321);
+			this.btnMinify.Location = new System.Drawing.Point(663, 321);
 			this.btnMinify.Name = "btnMinify";
-			this.btnMinify.Size = new System.Drawing.Size(164, 26);
+			this.btnMinify.Size = new System.Drawing.Size(191, 26);
 			this.btnMinify.TabIndex = 1;
 			this.btnMinify.Text = "Minify";
 			this.btnMinify.UseVisualStyleBackColor = true;
@@ -107,8 +114,8 @@
 			// 
 			this.splitContainer.Panel2.Controls.Add(this.tbOutput);
 			this.splitContainer.Panel2.Controls.Add(this.label2);
-			this.splitContainer.Size = new System.Drawing.Size(559, 697);
-			this.splitContainer.SplitterDistance = 341;
+			this.splitContainer.Size = new System.Drawing.Size(645, 753);
+			this.splitContainer.SplitterDistance = 368;
 			this.splitContainer.TabIndex = 2;
 			// 
 			// tbInput
@@ -130,7 +137,7 @@
 			this.tbInput.Paddings = new System.Windows.Forms.Padding(0);
 			this.tbInput.RightBracket = ')';
 			this.tbInput.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
-			this.tbInput.Size = new System.Drawing.Size(420, 303);
+			this.tbInput.Size = new System.Drawing.Size(506, 330);
 			this.tbInput.TabIndex = 10;
 			this.tbInput.Text = resources.GetString("tbInput.Text");
 			this.tbInput.Zoom = 100;
@@ -138,7 +145,7 @@
 			// btnOpenFiles
 			// 
 			this.btnOpenFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnOpenFiles.Location = new System.Drawing.Point(465, 5);
+			this.btnOpenFiles.Location = new System.Drawing.Point(551, 5);
 			this.btnOpenFiles.Name = "btnOpenFiles";
 			this.btnOpenFiles.Size = new System.Drawing.Size(89, 23);
 			this.btnOpenFiles.TabIndex = 9;
@@ -151,7 +158,7 @@
 			this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label4.AutoSize = true;
 			this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-			this.label4.Location = new System.Drawing.Point(431, 10);
+			this.label4.Location = new System.Drawing.Point(517, 10);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(37, 16);
 			this.label4.TabIndex = 9;
@@ -162,9 +169,9 @@
 			this.lbInputFiles.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.lbInputFiles.FormattingEnabled = true;
-			this.lbInputFiles.Location = new System.Drawing.Point(434, 33);
+			this.lbInputFiles.Location = new System.Drawing.Point(520, 33);
 			this.lbInputFiles.Name = "lbInputFiles";
-			this.lbInputFiles.Size = new System.Drawing.Size(120, 303);
+			this.lbInputFiles.Size = new System.Drawing.Size(120, 329);
 			this.lbInputFiles.TabIndex = 9;
 			this.lbInputFiles.SelectedIndexChanged += new System.EventHandler(this.lbInputFiles_SelectedIndexChanged);
 			// 
@@ -198,7 +205,7 @@
 			this.tbOutput.ReadOnly = true;
 			this.tbOutput.RightBracket = ')';
 			this.tbOutput.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
-			this.tbOutput.Size = new System.Drawing.Size(546, 324);
+			this.tbOutput.Size = new System.Drawing.Size(632, 353);
 			this.tbOutput.TabIndex = 11;
 			this.tbOutput.WordWrap = true;
 			this.tbOutput.Zoom = 100;
@@ -219,7 +226,7 @@
 			this.cbRemoveSpaces.AutoSize = true;
 			this.cbRemoveSpaces.Checked = true;
 			this.cbRemoveSpaces.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbRemoveSpaces.Location = new System.Drawing.Point(579, 86);
+			this.cbRemoveSpaces.Location = new System.Drawing.Point(663, 86);
 			this.cbRemoveSpaces.Name = "cbRemoveSpaces";
 			this.cbRemoveSpaces.Size = new System.Drawing.Size(166, 17);
 			this.cbRemoveSpaces.TabIndex = 3;
@@ -232,7 +239,7 @@
 			this.cbCompressLocalVars.AutoSize = true;
 			this.cbCompressLocalVars.Checked = true;
 			this.cbCompressLocalVars.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbCompressLocalVars.Location = new System.Drawing.Point(579, 17);
+			this.cbCompressLocalVars.Location = new System.Drawing.Point(663, 17);
 			this.cbCompressLocalVars.Name = "cbCompressLocalVars";
 			this.cbCompressLocalVars.Size = new System.Drawing.Size(120, 17);
 			this.cbCompressLocalVars.TabIndex = 4;
@@ -245,7 +252,7 @@
 			this.cbRemoveComments.AutoSize = true;
 			this.cbRemoveComments.Checked = true;
 			this.cbRemoveComments.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbRemoveComments.Location = new System.Drawing.Point(579, 109);
+			this.cbRemoveComments.Location = new System.Drawing.Point(663, 109);
 			this.cbRemoveComments.Name = "cbRemoveComments";
 			this.cbRemoveComments.Size = new System.Drawing.Size(117, 17);
 			this.cbRemoveComments.TabIndex = 5;
@@ -255,9 +262,9 @@
 			// btnCopyToClipboard
 			// 
 			this.btnCopyToClipboard.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnCopyToClipboard.Location = new System.Drawing.Point(577, 683);
+			this.btnCopyToClipboard.Location = new System.Drawing.Point(665, 738);
 			this.btnCopyToClipboard.Name = "btnCopyToClipboard";
-			this.btnCopyToClipboard.Size = new System.Drawing.Size(164, 26);
+			this.btnCopyToClipboard.Size = new System.Drawing.Size(189, 26);
 			this.btnCopyToClipboard.TabIndex = 6;
 			this.btnCopyToClipboard.Text = "Copy to clipboard";
 			this.btnCopyToClipboard.UseVisualStyleBackColor = true;
@@ -266,7 +273,7 @@
 			// tbLineLength
 			// 
 			this.tbLineLength.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbLineLength.Location = new System.Drawing.Point(659, 270);
+			this.tbLineLength.Location = new System.Drawing.Point(743, 270);
 			this.tbLineLength.Name = "tbLineLength";
 			this.tbLineLength.Size = new System.Drawing.Size(84, 20);
 			this.tbLineLength.TabIndex = 7;
@@ -277,7 +284,7 @@
 			// 
 			this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(579, 273);
+			this.label3.Location = new System.Drawing.Point(663, 273);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(63, 13);
 			this.label3.TabIndex = 8;
@@ -292,7 +299,7 @@
 			// 
 			this.cbMinifyFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.cbMinifyFiles.AutoSize = true;
-			this.cbMinifyFiles.Location = new System.Drawing.Point(582, 298);
+			this.cbMinifyFiles.Location = new System.Drawing.Point(666, 298);
 			this.cbMinifyFiles.Name = "cbMinifyFiles";
 			this.cbMinifyFiles.Size = new System.Drawing.Size(47, 17);
 			this.cbMinifyFiles.TabIndex = 9;
@@ -303,7 +310,7 @@
 			// 
 			this.lblOutputCompilied.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.lblOutputCompilied.AutoSize = true;
-			this.lblOutputCompilied.Location = new System.Drawing.Point(618, 654);
+			this.lblOutputCompilied.Location = new System.Drawing.Point(706, 709);
 			this.lblOutputCompilied.Name = "lblOutputCompilied";
 			this.lblOutputCompilied.Size = new System.Drawing.Size(0, 13);
 			this.lblOutputCompilied.TabIndex = 11;
@@ -312,7 +319,7 @@
 			// 
 			this.lblInputCompilied.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.lblInputCompilied.AutoSize = true;
-			this.lblInputCompilied.Location = new System.Drawing.Point(618, 615);
+			this.lblInputCompilied.Location = new System.Drawing.Point(706, 670);
 			this.lblInputCompilied.Name = "lblInputCompilied";
 			this.lblInputCompilied.Size = new System.Drawing.Size(0, 13);
 			this.lblInputCompilied.TabIndex = 13;
@@ -324,7 +331,7 @@
 			this.cbRemoveRegions.AutoSize = true;
 			this.cbRemoveRegions.Checked = true;
 			this.cbRemoveRegions.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbRemoveRegions.Location = new System.Drawing.Point(579, 132);
+			this.cbRemoveRegions.Location = new System.Drawing.Point(663, 132);
 			this.cbRemoveRegions.Name = "cbRemoveRegions";
 			this.cbRemoveRegions.Size = new System.Drawing.Size(103, 17);
 			this.cbRemoveRegions.TabIndex = 14;
@@ -337,7 +344,7 @@
 			this.cbCompressMisc.AutoSize = true;
 			this.cbCompressMisc.Checked = true;
 			this.cbCompressMisc.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbCompressMisc.Location = new System.Drawing.Point(579, 155);
+			this.cbCompressMisc.Location = new System.Drawing.Point(663, 155);
 			this.cbCompressMisc.Name = "cbCompressMisc";
 			this.cbCompressMisc.Size = new System.Drawing.Size(97, 17);
 			this.cbCompressMisc.TabIndex = 15;
@@ -348,7 +355,7 @@
 			// 
 			this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(577, 508);
+			this.label5.Location = new System.Drawing.Point(665, 571);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(67, 13);
 			this.label5.TabIndex = 16;
@@ -358,7 +365,7 @@
 			// 
 			this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.label6.AutoSize = true;
-			this.label6.Location = new System.Drawing.Point(577, 537);
+			this.label6.Location = new System.Drawing.Point(665, 600);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(75, 13);
 			this.label6.TabIndex = 17;
@@ -367,7 +374,7 @@
 			// tbInputLength
 			// 
 			this.tbInputLength.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbInputLength.Location = new System.Drawing.Point(669, 505);
+			this.tbInputLength.Location = new System.Drawing.Point(757, 568);
 			this.tbInputLength.Name = "tbInputLength";
 			this.tbInputLength.ReadOnly = true;
 			this.tbInputLength.Size = new System.Drawing.Size(72, 20);
@@ -376,7 +383,7 @@
 			// tbOutputLength
 			// 
 			this.tbOutputLength.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbOutputLength.Location = new System.Drawing.Point(669, 534);
+			this.tbOutputLength.Location = new System.Drawing.Point(757, 597);
 			this.tbOutputLength.Name = "tbOutputLength";
 			this.tbOutputLength.ReadOnly = true;
 			this.tbOutputLength.Size = new System.Drawing.Size(72, 20);
@@ -385,7 +392,7 @@
 			// tbOutputInputRatio
 			// 
 			this.tbOutputInputRatio.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbOutputInputRatio.Location = new System.Drawing.Point(669, 560);
+			this.tbOutputInputRatio.Location = new System.Drawing.Point(757, 623);
 			this.tbOutputInputRatio.Name = "tbOutputInputRatio";
 			this.tbOutputInputRatio.ReadOnly = true;
 			this.tbOutputInputRatio.Size = new System.Drawing.Size(72, 20);
@@ -395,7 +402,7 @@
 			// 
 			this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.label7.AutoSize = true;
-			this.label7.Location = new System.Drawing.Point(577, 563);
+			this.label7.Location = new System.Drawing.Point(665, 626);
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(32, 13);
 			this.label7.TabIndex = 20;
@@ -404,7 +411,7 @@
 			// pbInputCompilied
 			// 
 			this.pbInputCompilied.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.pbInputCompilied.Location = new System.Drawing.Point(577, 605);
+			this.pbInputCompilied.Location = new System.Drawing.Point(665, 660);
 			this.pbInputCompilied.Name = "pbInputCompilied";
 			this.pbInputCompilied.Size = new System.Drawing.Size(35, 33);
 			this.pbInputCompilied.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -415,7 +422,7 @@
 			// pbOutputCompilied
 			// 
 			this.pbOutputCompilied.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.pbOutputCompilied.Location = new System.Drawing.Point(577, 644);
+			this.pbOutputCompilied.Location = new System.Drawing.Point(665, 699);
 			this.pbOutputCompilied.Name = "pbOutputCompilied";
 			this.pbOutputCompilied.Size = new System.Drawing.Size(35, 33);
 			this.pbOutputCompilied.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -428,7 +435,7 @@
 			this.cbRemoveNamespaces.AutoSize = true;
 			this.cbRemoveNamespaces.Checked = true;
 			this.cbRemoveNamespaces.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbRemoveNamespaces.Location = new System.Drawing.Point(579, 201);
+			this.cbRemoveNamespaces.Location = new System.Drawing.Point(663, 201);
 			this.cbRemoveNamespaces.Name = "cbRemoveNamespaces";
 			this.cbRemoveNamespaces.Size = new System.Drawing.Size(131, 17);
 			this.cbRemoveNamespaces.TabIndex = 22;
@@ -441,7 +448,7 @@
 			this.cbConsoleApp.AutoSize = true;
 			this.cbConsoleApp.Checked = true;
 			this.cbConsoleApp.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbConsoleApp.Location = new System.Drawing.Point(579, 178);
+			this.cbConsoleApp.Location = new System.Drawing.Point(663, 178);
 			this.cbConsoleApp.Name = "cbConsoleApp";
 			this.cbConsoleApp.Size = new System.Drawing.Size(86, 17);
 			this.cbConsoleApp.TabIndex = 23;
@@ -454,7 +461,7 @@
 			this.cbRemoveToStringMethods.AutoSize = true;
 			this.cbRemoveToStringMethods.Checked = true;
 			this.cbRemoveToStringMethods.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbRemoveToStringMethods.Location = new System.Drawing.Point(579, 247);
+			this.cbRemoveToStringMethods.Location = new System.Drawing.Point(663, 247);
 			this.cbRemoveToStringMethods.Name = "cbRemoveToStringMethods";
 			this.cbRemoveToStringMethods.Size = new System.Drawing.Size(115, 17);
 			this.cbRemoveToStringMethods.TabIndex = 24;
@@ -467,7 +474,7 @@
 			this.cbCompressPublic.AutoSize = true;
 			this.cbCompressPublic.Checked = true;
 			this.cbCompressPublic.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbCompressPublic.Location = new System.Drawing.Point(579, 224);
+			this.cbCompressPublic.Location = new System.Drawing.Point(663, 224);
 			this.cbCompressPublic.Name = "cbCompressPublic";
 			this.cbCompressPublic.Size = new System.Drawing.Size(104, 17);
 			this.cbCompressPublic.TabIndex = 25;
@@ -480,7 +487,7 @@
 			this.cbCompressMemebers.AutoSize = true;
 			this.cbCompressMemebers.Checked = true;
 			this.cbCompressMemebers.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbCompressMemebers.Location = new System.Drawing.Point(579, 40);
+			this.cbCompressMemebers.Location = new System.Drawing.Point(663, 40);
 			this.cbCompressMemebers.Name = "cbCompressMemebers";
 			this.cbCompressMemebers.Size = new System.Drawing.Size(123, 17);
 			this.cbCompressMemebers.TabIndex = 26;
@@ -493,18 +500,76 @@
 			this.cbCompressTypes.AutoSize = true;
 			this.cbCompressTypes.Checked = true;
 			this.cbCompressTypes.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.cbCompressTypes.Location = new System.Drawing.Point(579, 63);
+			this.cbCompressTypes.Location = new System.Drawing.Point(663, 63);
 			this.cbCompressTypes.Name = "cbCompressTypes";
 			this.cbCompressTypes.Size = new System.Drawing.Size(100, 17);
 			this.cbCompressTypes.TabIndex = 27;
 			this.cbCompressTypes.Text = "Compress types";
 			this.cbCompressTypes.UseVisualStyleBackColor = true;
 			// 
+			// dgvErrors
+			// 
+			this.dgvErrors.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.dgvErrors.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells;
+			this.dgvErrors.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+			this.dgvErrors.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Column1,
+            this.Column2,
+            this.Column3,
+            this.Column4});
+			this.dgvErrors.Location = new System.Drawing.Point(666, 437);
+			this.dgvErrors.Name = "dgvErrors";
+			this.dgvErrors.ReadOnly = true;
+			this.dgvErrors.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+			this.dgvErrors.Size = new System.Drawing.Size(188, 111);
+			this.dgvErrors.TabIndex = 28;
+			this.dgvErrors.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dgvErrors_CellMouseDoubleClick);
+			// 
+			// Column1
+			// 
+			this.Column1.HeaderText = "Line";
+			this.Column1.Name = "Column1";
+			this.Column1.ReadOnly = true;
+			this.Column1.Width = 52;
+			// 
+			// Column2
+			// 
+			this.Column2.HeaderText = "Row";
+			this.Column2.Name = "Column2";
+			this.Column2.ReadOnly = true;
+			this.Column2.Width = 54;
+			// 
+			// Column3
+			// 
+			this.Column3.HeaderText = "Description";
+			this.Column3.Name = "Column3";
+			this.Column3.ReadOnly = true;
+			this.Column3.Width = 85;
+			// 
+			// Column4
+			// 
+			this.Column4.HeaderText = "Field";
+			this.Column4.Name = "Column4";
+			this.Column4.ReadOnly = true;
+			this.Column4.Width = 54;
+			// 
+			// label8
+			// 
+			this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.label8.AutoSize = true;
+			this.label8.Location = new System.Drawing.Point(665, 409);
+			this.label8.Name = "label8";
+			this.label8.Size = new System.Drawing.Size(34, 13);
+			this.label8.TabIndex = 29;
+			this.label8.Text = "Errors";
+			// 
 			// frmMain
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(753, 721);
+			this.ClientSize = new System.Drawing.Size(866, 777);
+			this.Controls.Add(this.label8);
+			this.Controls.Add(this.dgvErrors);
 			this.Controls.Add(this.cbCompressTypes);
 			this.Controls.Add(this.cbCompressMemebers);
 			this.Controls.Add(this.cbCompressPublic);
@@ -545,6 +610,7 @@
 			((System.ComponentModel.ISupportInitialize)(this.tbOutput)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbInputCompilied)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.pbOutputCompilied)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.dgvErrors)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -587,6 +653,12 @@
 		private System.Windows.Forms.CheckBox cbCompressPublic;
 		private System.Windows.Forms.CheckBox cbCompressMemebers;
 		private System.Windows.Forms.CheckBox cbCompressTypes;
+		private System.Windows.Forms.DataGridView dgvErrors;
+		private System.Windows.Forms.Label label8;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Column3;
+		private System.Windows.Forms.DataGridViewTextBoxColumn Column4;
     }
 }
 

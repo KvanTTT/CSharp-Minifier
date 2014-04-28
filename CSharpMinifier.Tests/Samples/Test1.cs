@@ -1,5 +1,7 @@
 // Comment at the begin
 using System;
+using System.Collections.Generic;
+
 namespace A
 {
 	#region Test region
@@ -10,6 +12,10 @@ namespace A
 		protected int C = 22;
 		protected int zzz;
 
+		class a
+		{
+		}
+
 		protected string Prop
 		{
 			get;
@@ -18,8 +24,14 @@ namespace A
 
 		public void B()
 		{
+			const uint M = 34;
+
+			List<int> asdf = new List<int>();
+			List<int> qwer;
+
 			int A = 10;
 			var b = new B();
+			B b1 = new B();
 			b.A = 5;
 
 			int C = 4;

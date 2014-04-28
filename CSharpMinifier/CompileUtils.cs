@@ -11,6 +11,11 @@ namespace CSharpMinifier
 	{
 		public static bool CanCompile(string program)
 		{
+			return !Compile(program).Errors.HasErrors;
+		}
+
+		public static CompilerResults Compile(string program)
+		{
 			CompilerResults compilerResults = null;
 			using (CSharpCodeProvider provider = new CSharpCodeProvider())
 			{
@@ -20,7 +25,7 @@ namespace CSharpMinifier
 				}),
 				new string[] { program });
 			}
-			return !compilerResults.Errors.HasErrors;
+			return compilerResults;
 		}
 	}
 }

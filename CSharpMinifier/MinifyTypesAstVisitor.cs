@@ -80,8 +80,8 @@ namespace CSharpMinifier
 
 		public override void VisitIdentifier(Identifier identifier)
 		{
-			/*if (_currentMembers == null || _currentMembers.FirstOrDefault(v => v.Name == identifier.Name) == null)
-				NotTypesIdNames.Add(identifier.Name);*/
+			if (Types.FirstOrDefault(t => t.Name == identifier.Name) == null)
+				NotTypesIdNames.Add(identifier.Name);
 			base.VisitIdentifier(identifier);
 		}
 
