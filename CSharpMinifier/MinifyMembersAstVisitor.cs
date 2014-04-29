@@ -113,6 +113,13 @@ namespace CSharpMinifier
 			base.VisitPropertyDeclaration(propertyDeclaration);
 		}
 
+		public override void VisitEnumMemberDeclaration(EnumMemberDeclaration enumMemberDeclaration)
+		{
+			if (!_ignoredMembers.Contains(enumMemberDeclaration.Name))
+				_currentMembers.Peek().Item2.Add(new NameNode(enumMemberDeclaration.Name, enumMemberDeclaration));
+ 			base.VisitEnumMemberDeclaration(enumMemberDeclaration);
+		}
+
 		public override void VisitEventDeclaration(EventDeclaration eventDeclaration)
 		{
 			if (CheckModifiers(eventDeclaration) && !_ignoredMembers.Contains(eventDeclaration.Name))

@@ -540,6 +540,8 @@ namespace CSharpMinifier
 				((TypeDeclaration)node).Name = newName;
 			else if (node is SimpleType)
 				((SimpleType)node).Identifier = newName;
+			else if (node is EnumMemberDeclaration)
+				((EnumMemberDeclaration)node).Name = newName;
 			else
 			{
 			}
@@ -621,7 +623,17 @@ namespace CSharpMinifier
 			}
 			else
 			{
-				foreach (AstNode children in node.Children)
+				List<AstNode> childrens;
+				if (node is ArraySpecifier)
+				{
+					childrens = new List<AstNode>();
+					childrens.Add(node.Children.FirstOrDefault(c => c.Role.ToString() == "["));
+					childrens.AddRange(node.Children.Where(c => c.Role.ToString() != "[" && c.Role.ToString() != "]"));
+					childrens.AddRange(node.Children.Where(c => c.Role.ToString() == "]"));
+				}
+				else
+					childrens = node.Children.ToList();
+				foreach (AstNode children in childrens)
 				{
 					RemoveSpacesAndAppend(children);
 					if (children.Children.Count() <= 1)
