@@ -237,5 +237,29 @@ namespace CSharpMinifier.GUI.Properties {
                 this["TypesCompressing"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Code {
+            get {
+                return ((string)(this["Code"]));
+            }
+            set {
+                this["Code"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool UselessMembersCompressing {
+            get {
+                return ((bool)(this["UselessMembersCompressing"]));
+            }
+            set {
+                this["UselessMembersCompressing"] = value;
+            }
+        }
     }
 }

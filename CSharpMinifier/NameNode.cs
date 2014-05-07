@@ -16,5 +16,10 @@ namespace CSharpMinifier
 			Name = name;
 			Node = node;
 		}
+
+		public override string ToString()
+		{
+			return Name + "; " + Node.ToString();
+		}
 	}
 }

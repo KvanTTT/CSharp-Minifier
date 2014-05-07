@@ -64,7 +64,7 @@ namespace CSharpMinifier
 			if (key != "")
 				key += ".";
 			key += string.Join(".", _currentMembers.ToArray().Reverse().Select(m => m.Item1));
-			if (key != "")
+			if (key != "" && key[key.Length - 1] != '.')
 				key += ".";
 			key += typeDeclaration.Name;
 
@@ -117,7 +117,7 @@ namespace CSharpMinifier
 		{
 			if (!_ignoredMembers.Contains(enumMemberDeclaration.Name))
 				_currentMembers.Peek().Item2.Add(new NameNode(enumMemberDeclaration.Name, enumMemberDeclaration));
- 			base.VisitEnumMemberDeclaration(enumMemberDeclaration);
+			base.VisitEnumMemberDeclaration(enumMemberDeclaration);
 		}
 
 		public override void VisitEventDeclaration(EventDeclaration eventDeclaration)

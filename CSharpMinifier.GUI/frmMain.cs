@@ -69,8 +69,10 @@ namespace CSharpMinifier.GUI
 			cbMinifyFiles.Checked = Settings.Default.MinifyFiles;
 			if (Settings.Default.FileList != null)
 				FillList(Settings.Default.FileList.Cast<string>().ToArray());
+			tbInput.Text = Settings.Default.Code;
 			cbCompressPublic.Checked = Settings.Default.CompressPublic;
 			cbRemoveToStringMethods.Checked = Settings.Default.RemoveToStringMethods;
+			cbUselessMembersCompressing.Checked = Settings.Default.UselessMembersCompressing;
 		}
 
 		private void frmMain_FormClosed(object sender, FormClosedEventArgs e)
@@ -94,8 +96,10 @@ namespace CSharpMinifier.GUI
 			foreach (var fileName in Sources)
 				stringCollection.Add(fileName.Key);
 			Settings.Default.FileList = stringCollection;
+			Settings.Default.Code = tbInput.Text;
 			Settings.Default.CompressPublic = cbCompressPublic.Checked;
 			Settings.Default.RemoveToStringMethods = cbRemoveToStringMethods.Checked;
+			Settings.Default.UselessMembersCompressing = cbUselessMembersCompressing.Checked;
 			Settings.Default.Save();
 		}
 
@@ -111,10 +115,10 @@ namespace CSharpMinifier.GUI
 				CommentsRemoving = cbRemoveComments.Checked,
 				MiscCompressing = cbCompressMisc.Checked,
 				ConsoleApp = cbConsoleApp.Checked,
-				RemoveNamespaces = cbRemoveNamespaces.Checked,
+				NamespacesRemoving = cbRemoveNamespaces.Checked,
 				LineLength = int.Parse(tbLineLength.Text),
-				RemoveToStringMethods = cbRemoveToStringMethods.Checked,
-				CompressPublic = cbCompressPublic.Checked
+				ToStringMethodsRemoving = cbRemoveToStringMethods.Checked,
+				PublicCompressing = cbCompressPublic.Checked
 			};
 			Minifier minifier = new Minifier(minifierOptions);
 			tbOutput.Text = !cbMinifyFiles.Checked ? minifier.MinifyFromString(tbInput.Text) : minifier.MinifyFiles(Sources.Select(source => source.Value).ToArray());

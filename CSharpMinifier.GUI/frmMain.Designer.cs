@@ -71,6 +71,7 @@
 			this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.label8 = new System.Windows.Forms.Label();
+			this.cbUselessMembersCompressing = new System.Windows.Forms.CheckBox();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
 			this.splitContainer.Panel1.SuspendLayout();
 			this.splitContainer.Panel2.SuspendLayout();
@@ -85,7 +86,7 @@
 			// btnMinify
 			// 
 			this.btnMinify.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnMinify.Location = new System.Drawing.Point(663, 321);
+			this.btnMinify.Location = new System.Drawing.Point(665, 346);
 			this.btnMinify.Name = "btnMinify";
 			this.btnMinify.Size = new System.Drawing.Size(191, 26);
 			this.btnMinify.TabIndex = 1;
@@ -273,7 +274,7 @@
 			// tbLineLength
 			// 
 			this.tbLineLength.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.tbLineLength.Location = new System.Drawing.Point(743, 270);
+			this.tbLineLength.Location = new System.Drawing.Point(745, 295);
 			this.tbLineLength.Name = "tbLineLength";
 			this.tbLineLength.Size = new System.Drawing.Size(84, 20);
 			this.tbLineLength.TabIndex = 7;
@@ -284,7 +285,7 @@
 			// 
 			this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(663, 273);
+			this.label3.Location = new System.Drawing.Point(665, 298);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(63, 13);
 			this.label3.TabIndex = 8;
@@ -299,7 +300,7 @@
 			// 
 			this.cbMinifyFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.cbMinifyFiles.AutoSize = true;
-			this.cbMinifyFiles.Location = new System.Drawing.Point(666, 298);
+			this.cbMinifyFiles.Location = new System.Drawing.Point(668, 323);
 			this.cbMinifyFiles.Name = "cbMinifyFiles";
 			this.cbMinifyFiles.Size = new System.Drawing.Size(47, 17);
 			this.cbMinifyFiles.TabIndex = 9;
@@ -563,11 +564,25 @@
 			this.label8.TabIndex = 29;
 			this.label8.Text = "Errors";
 			// 
+			// cbUselessMembersCompressing
+			// 
+			this.cbUselessMembersCompressing.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.cbUselessMembersCompressing.AutoSize = true;
+			this.cbUselessMembersCompressing.Checked = true;
+			this.cbUselessMembersCompressing.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.cbUselessMembersCompressing.Location = new System.Drawing.Point(663, 270);
+			this.cbUselessMembersCompressing.Name = "cbUselessMembersCompressing";
+			this.cbUselessMembersCompressing.Size = new System.Drawing.Size(172, 17);
+			this.cbUselessMembersCompressing.TabIndex = 30;
+			this.cbUselessMembersCompressing.Text = "Useless Members Compressing";
+			this.cbUselessMembersCompressing.UseVisualStyleBackColor = true;
+			// 
 			// frmMain
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(866, 777);
+			this.Controls.Add(this.cbUselessMembersCompressing);
 			this.Controls.Add(this.label8);
 			this.Controls.Add(this.dgvErrors);
 			this.Controls.Add(this.cbCompressTypes);
@@ -659,6 +674,7 @@
 		private System.Windows.Forms.DataGridViewTextBoxColumn Column2;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Column3;
 		private System.Windows.Forms.DataGridViewTextBoxColumn Column4;
+		private System.Windows.Forms.CheckBox cbUselessMembersCompressing;
     }
 }
 

@@ -131,14 +131,14 @@ namespace CSharpMinifier
 			if (Options.CommentsRemoving || Options.RegionsRemoving)
 				RemoveCommentsAndRegions();
 
-			if (Options.LocalVarsCompressing)
+			if (Options.LocalVarsCompressing || Options.UselessMembersCompressing)
 				CompressLocals();
-			if (Options.MembersCompressing)
+			if (Options.MembersCompressing || Options.UselessMembersCompressing)
 				CompressMembers();
 			if (Options.TypesCompressing)
 				CompressTypes();
 
-			if (Options.MiscCompressing || Options.RemoveNamespaces)
+			if (Options.MiscCompressing || Options.NamespacesRemoving)
 				CompressHelper();
 
 			string result;
@@ -150,7 +150,7 @@ namespace CSharpMinifier
 					SyntaxTree = new CSharpParser().Parse(SyntaxTree.GetText(), ParserTempFileName);
 				}
 				
-				result = ToStringWithoutSpaces();
+				result = GetStringWithoutSpaces();
 			}
 			else
 				result = SyntaxTree.GetText();
@@ -232,7 +232,7 @@ namespace CSharpMinifier
 					else
 						modifier &= ~Modifiers.Private;
 				}
-				else if (Options.RemoveNamespaces && children is NamespaceDeclaration)
+				else if (Options.NamespacesRemoving && children is NamespaceDeclaration)
 				{
 					var childrenCount = children.Children.Count();
 					children.Children.ElementAt(childrenCount - 1).Remove();
@@ -406,54 +406,55 @@ namespace CSharpMinifier
 			ignoredNames.AddRange(localsVisitor.NotLocalsIdNames);
 			var substituton = substitutor.Generate(localsVisitor.MethodVars, ignoredNames.ToArray());
 
-			var astSubstitution = new List<Tuple<AstNode, string>>();
+			var astSubstitution = new Dictionary<string, List<Tuple<string, List<AstNode>>>>();
 			foreach (var method in localsVisitor.MethodVars)
 			{
+				var localVarsAstNodes = new List<Tuple<string, List<AstNode>>>();
+				astSubstitution[method.Key] = localVarsAstNodes;
 				var localsSubst = substituton[method.Key];
 				foreach (NameNode localVar in method.Value)
-					AppendResolvedNodesAndNewNames(ResolveResultType.Local, astSubstitution, localVar.Node, localsSubst[localVar.Name]);
+					localVarsAstNodes.Add(new Tuple<string,List<AstNode>>(localsSubst[localVar.Name], GetResolvedNodes(ResolveResultType.Local, localVar.Node)));
 			}
 
-			foreach (var resolveNode in astSubstitution)
-				RenameNode(resolveNode.Item1, resolveNode.Item2);
+			RenameOrRemoveNodes(astSubstitution, true, Options.LocalVarsCompressing);
 		}
 
 		private void CompressMembers()
 		{
-			var membersVisitor = new MinifyMembersAstVisitor(IgnoredIdentifiers, Options.ConsoleApp, Options.CompressPublic, Options.RemoveToStringMethods);
+			var membersVisitor = new MinifyMembersAstVisitor(IgnoredIdentifiers, Options.ConsoleApp, Options.PublicCompressing, Options.ToStringMethodsRemoving);
 			CompileAndAcceptVisitor(membersVisitor);
 			var substitutor = new Substitutor(new MinIdGenerator());
 			var ignoredNames = new List<string>(IgnoredIdentifiers);
 			ignoredNames.AddRange(membersVisitor.NotMembersIdNames);
 			var substituton = substitutor.Generate(membersVisitor.TypesMembers, ignoredNames.ToArray());
 
-			var astSubstitution = new List<Tuple<AstNode, string>>();
+			var astSubstitution = new Dictionary<string, List<Tuple<string, List<AstNode>>>>();
 			foreach (var typeMembers in membersVisitor.TypesMembers)
 			{
+				var typeMembersAstNodes = new List<Tuple<string, List<AstNode>>>();
+				astSubstitution[typeMembers.Key] = typeMembersAstNodes;
 				var membersSubst = substituton[typeMembers.Key];
 				foreach (NameNode member in typeMembers.Value)
-					AppendResolvedNodesAndNewNames(ResolveResultType.Member, astSubstitution, member.Node, membersSubst[member.Name]);
+					typeMembersAstNodes.Add(new Tuple<string,List<AstNode>>(membersSubst[member.Name], GetResolvedNodes(ResolveResultType.Member, member.Node)));
 			}
 
-			foreach (var resolveNode in astSubstitution)
-				RenameNode(resolveNode.Item1, resolveNode.Item2);
+			RenameOrRemoveNodes(astSubstitution, true, Options.MembersCompressing);
 		}
 
 		private void CompressTypes()
 		{
-			var typesVisitor = new MinifyTypesAstVisitor(IgnoredIdentifiers, Options.CompressPublic);
+			var typesVisitor = new MinifyTypesAstVisitor(IgnoredIdentifiers, Options.PublicCompressing);
 			CompileAndAcceptVisitor(typesVisitor);
 			var substitutor = new Substitutor(new MinIdGenerator());
 			var ignoredNames = new List<string>(IgnoredIdentifiers);
 			ignoredNames.AddRange(typesVisitor.NotTypesIdNames);
 			var substitution = substitutor.Generate(typesVisitor.Types, ignoredNames.ToArray());
 
-			var astSubstitution = new List<Tuple<AstNode, string>>();
+			var astSubstitution = new List<Tuple<string, List<AstNode>>>();
 			foreach (var type in typesVisitor.Types)
-				AppendResolvedNodesAndNewNames(ResolveResultType.Type, astSubstitution, type.Node, substitution[type.Name]);
+				astSubstitution.Add(new Tuple<string, List<AstNode>>(substitution[type.Name], GetResolvedNodes(ResolveResultType.Type, type.Node)));
 
-			foreach (var resolveNode in astSubstitution)
-				RenameNode(resolveNode.Item1, resolveNode.Item2);
+			RenameOrRemoveNodes(astSubstitution, false, Options.TypesCompressing);
 		}
 
 		private void CompileAndAcceptVisitor(DepthFirstAstVisitor visitor)
@@ -470,15 +471,16 @@ namespace CSharpMinifier
 			_resolver = new CSharpAstResolver(_compilation, SyntaxTree, _unresolvedFile);
 		}
 
-		private void AppendResolvedNodesAndNewNames(ResolveResultType type, List<Tuple<AstNode, string>> astSubstitution, AstNode node, string newName)
+		private List<AstNode> GetResolvedNodes(ResolveResultType type, AstNode node)
 		{
+			var resolvedNodes = new List<AstNode>();
 			ResolveResult resolveResult = _resolver.Resolve(node);
 			if (resolveResult != null)
 			{
 				var findReferences = new FindReferences();
 				FoundReferenceCallback callback = delegate(AstNode matchNode, ResolveResult result)
 				{
-					astSubstitution.Add(new Tuple<AstNode, string>(matchNode, newName));
+					resolvedNodes.Add(matchNode);
 				};
 
 				if (type == ResolveResultType.Local)
@@ -498,6 +500,59 @@ namespace CSharpMinifier
 			}
 			else
 			{
+			}
+			return resolvedNodes;
+		}
+
+		private void RenameOrRemoveNodes(Dictionary<string, List<Tuple<string, List<AstNode>>>> substitution, bool removeOneRefNodes, bool rename)
+		{
+			foreach (var resolveNode in substitution)
+				RenameOrRemoveNodes(resolveNode.Value, removeOneRefNodes, rename);
+		}
+
+		private void RenameOrRemoveNodes(List<Tuple<string, List<AstNode>>> substitution, bool removeOneRefNodes, bool rename)
+		{
+			foreach (var node in substitution)
+			{
+				if (rename)
+				{
+					foreach (var astNode in node.Item2)
+						RenameNode(astNode, node.Item1);
+				}
+
+				var first = node.Item2.First() as VariableInitializer;
+				if (removeOneRefNodes && Options.UselessMembersCompressing && first != null)
+				{
+					bool constNode = false;
+					var fieldDeclaration = first.Parent as FieldDeclaration;
+					if (fieldDeclaration != null)
+						constNode = fieldDeclaration.Modifiers.HasFlag(Modifiers.Const);
+					else
+					{
+						var varDeclaration = first.Parent as VariableDeclarationStatement;
+						if (varDeclaration != null)
+							constNode = varDeclaration.Modifiers.HasFlag(Modifiers.Const);
+					}
+
+					if (!constNode || first.Initializer == NullReferenceExpression.Null)
+					{
+						//if (node.Item2.Count == 1)
+						//	first.Parent.Remove();
+					}
+					else
+					{
+						var initializerStr = GetStringWithoutSpaces(first.Parent);
+						var exprStr = GetStringWithoutSpaces(first.Initializer);
+						if (initializerStr.Length + (node.Item2.Count - 1) * node.Item1.Length > (node.Item2.Count - 1) * exprStr.Length)
+						{
+							foreach (var child in node.Item2.Skip(1))
+							{
+								child.ReplaceWith(first.Initializer.Clone());
+							}
+							first.Parent.Remove();
+						}
+					}
+				}
 			}
 		}
 
@@ -551,73 +606,57 @@ namespace CSharpMinifier
 
 		#region Removing of spaces and line breaks
 
-		AstNode _prevNode;
-		StringBuilder _line;
-		StringBuilder _result;
-
-		private string ToStringWithoutSpaces()
+		private string GetStringWithoutSpaces()
 		{
-			_result = new StringBuilder();
-			_line = new StringBuilder(Options.LineLength);
-
-			_prevNode = null;
-			foreach (var children in SyntaxTree.Children)
-			{
-				RemoveSpacesAndAppend(children);
-				if (children.Children.Count() <= 1)
-					_prevNode = children;
-			}
-			_result.Append(_line);
-
-			return _result.ToString();
+			return GetStringWithoutSpaces(SyntaxTree.Children);
 		}
 
-		private void RemoveSpacesAndAppend(AstNode node)
+		private string GetStringWithoutSpaces(AstNode node)
+		{
+			return GetStringWithoutSpaces(new List<AstNode>() { node });
+		}
+
+		private string GetStringWithoutSpaces(IEnumerable<AstNode> nodes)
+		{
+			AstNode prevNode;
+			StringBuilder line;
+			StringBuilder result;
+
+			result = new StringBuilder();
+			line = new StringBuilder(Options.LineLength);
+
+			prevNode = null;
+			foreach (var node in nodes)
+			{
+				RemoveSpacesAndAppend(node, prevNode, line, result);
+				if (node.Children.Count() <= 1)
+					prevNode = node;
+			}
+			result.Append(line);
+
+			return result.ToString();
+		}
+
+		private void RemoveSpacesAndAppend(AstNode node, AstNode prevNode, StringBuilder line, StringBuilder result)
 		{
 			if (node.Children.Count() == 0)
 			{
-				string beginSymbols = " ";
-				char last = (char)0;
-				if (_line.Length != 0)
-					last = _line[_line.Length - 1];
+				string indent = GetIndent(node, prevNode, line);
 
-				if (last == ' ' || last == '\r' || last == '\n' || _prevNode == null || node == null)
-					beginSymbols = "";
-				else
-				{
-					var prevComment = _prevNode as Comment;
-					if (prevComment != null)
-					{
-						if (prevComment.CommentType == CommentType.SingleLine || prevComment.CommentType == CommentType.Documentation)
-							beginSymbols = Environment.NewLine;
-						else
-							beginSymbols = "";
-					}
-					else if (node is PreProcessorDirective || _prevNode is PreProcessorDirective)
-						beginSymbols = Environment.NewLine;
-					else
-					{
-						if ((_prevNode is CSharpTokenNode && _prevNode.Role.ToString().All(c => !char.IsLetterOrDigit(c))) ||
-							(node is CSharpTokenNode && node.Role.ToString().All(c => !char.IsLetterOrDigit(c))) ||
-							node is Comment)
-								beginSymbols = "";
-					}
-				}
-
-				string newString = beginSymbols + GetLeafNodeString(node);
+				string newString = indent + GetLeafNodeString(node);
 				if (Options.LineLength == 0)
-					_result.Append(newString);
+					result.Append(newString);
 				else
 				{
-					if (_line.Length + newString.Length > Options.LineLength)
+					if (line.Length + newString.Length > Options.LineLength)
 					{
-						_result.AppendLine(_line.ToString());
-						_line.Clear();
-						_line.Append(newString.TrimStart());
+						result.AppendLine(line.ToString());
+						line.Clear();
+						line.Append(newString.TrimStart());
 					}
 					else
 					{
-						_line.Append(newString);
+						line.Append(newString);
 					}
 				}
 			}
@@ -635,11 +674,44 @@ namespace CSharpMinifier
 					childrens = node.Children.ToList();
 				foreach (AstNode children in childrens)
 				{
-					RemoveSpacesAndAppend(children);
+					RemoveSpacesAndAppend(children, prevNode, line, result);
 					if (children.Children.Count() <= 1)
-						_prevNode = children;
+						prevNode = children;
 				}
 			}
+		}
+
+		private string GetIndent(AstNode node, AstNode prevNode, StringBuilder line)
+		{
+			string indent = " ";
+			char last = (char)0;
+			if (line.Length != 0)
+				last = line[line.Length - 1];
+
+			if (last == ' ' || last == '\r' || last == '\n' || prevNode == null || node == null)
+				indent = "";
+			else
+			{
+				var prevComment = prevNode as Comment;
+				if (prevComment != null)
+				{
+					if (prevComment.CommentType == CommentType.SingleLine || prevComment.CommentType == CommentType.Documentation)
+						indent = Environment.NewLine;
+					else
+						indent = "";
+				}
+				else if (node is PreProcessorDirective || prevNode is PreProcessorDirective)
+					indent = Environment.NewLine;
+				else
+				{
+					if ((prevNode is CSharpTokenNode && prevNode.Role.ToString().All(c => !char.IsLetterOrDigit(c))) ||
+						(node is CSharpTokenNode && node.Role.ToString().All(c => !char.IsLetterOrDigit(c))) ||
+						node is Comment)
+						indent = "";
+				}
+			}
+
+			return indent;
 		}
 
 		public static string GetLeafNodeString(AstNode node)

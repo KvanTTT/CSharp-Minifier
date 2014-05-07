@@ -62,19 +62,25 @@ namespace CSharpMinifier
 			set;
 		}
 
-		public bool RemoveNamespaces
+		public bool NamespacesRemoving
 		{
 			get;
 			set;
 		}
 
-		public bool CompressPublic
+		public bool PublicCompressing
 		{
 			get;
 			set;
 		}
 
-		public bool RemoveToStringMethods
+		public bool ToStringMethodsRemoving
+		{
+			get;
+			set;
+		}
+
+		public bool UselessMembersCompressing
 		{
 			get;
 			set;
@@ -91,9 +97,10 @@ namespace CSharpMinifier
 				CommentsRemoving = true;
 				RegionsRemoving = true;
 				MiscCompressing = true;
-				RemoveNamespaces = true;
-				CompressPublic = true;
-				RemoveToStringMethods = true;
+				NamespacesRemoving = true;
+				PublicCompressing = true;
+				ToStringMethodsRemoving = true;
+				UselessMembersCompressing = true;
 			}
 		}
 	}
