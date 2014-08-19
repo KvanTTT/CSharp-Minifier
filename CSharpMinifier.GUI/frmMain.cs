@@ -1,5 +1,4 @@
 ﻿using CSharpMinifier.GUI.Properties;
-using FastColoredTextBoxNS;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -127,16 +126,16 @@ namespace CSharpMinifier.GUI
 			tbOutputLength.Text = tbOutput.Text.Length.ToString();
 			tbOutputInputRatio.Text = ((double)tbOutput.Text.Length / tbInput.Text.Length).ToString("0.000000");
 			var compileResult = CompileUtils.Compile(tbOutput.Text);
-			if (!compileResult.Errors.HasErrors)
+            dgvErrors.Rows.Clear();
+            if (!compileResult.Errors.HasErrors)
 			{
 				pbOutputCompilied.Image = Resources.Ok;
-				lblOutputCompilied.Text = "Compilied";
+				lblOutputCompilied.Text = "Compilied";                
 			}
 			else
 			{
 				pbOutputCompilied.Image = Resources.Error;
 				lblOutputCompilied.Text = "Not compilied";
-				dgvErrors.Rows.Clear();
 				for (int i = 0; i < compileResult.Errors.Count; i++)
 				{
 					var error = compileResult.Errors[i];
@@ -144,9 +143,7 @@ namespace CSharpMinifier.GUI
 						error.ErrorText, "output");
 				}
 			}
-		}
-
-		
+		}		
 
 		private void btnCopyToClipboard_Click(object sender, EventArgs e)
 		{
@@ -189,10 +186,17 @@ namespace CSharpMinifier.GUI
 				var textBox = input ? tbInput : tbOutput;
 				int line = Convert.ToInt32(cells[0].Value);
 				int column = Convert.ToInt32(cells[1].Value);
-				textBox.Navigate(line);
-				textBox.Selection = new Range(textBox, column - 1, line - 1, column - 1, line - 1);
-				textBox.Focus();
+                var pos = GetPosFromLineColumn(textBox.Text, line, column);
+                textBox.Select(pos, 0);
+                textBox.ScrollToCaret();
+                textBox.Focus();
 			}
 		}
+
+        private int GetPosFromLineColumn(string text, int line, int column)
+        {
+            var strs = text.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            return strs.Take(line - 1).Aggregate(0, (count, str) => count += str.Length + Environment.NewLine.Length) + column - 1;
+        }
 	}
 }

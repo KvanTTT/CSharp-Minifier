@@ -54,7 +54,7 @@ namespace CSharpMinifier
 
 		public override void VisitNamespaceDeclaration(NamespaceDeclaration namespaceDeclaration)
 		{
-			_currentNamespaces.Push(new Tuple<string, CSharpTokenNode>(namespaceDeclaration.Name, (CSharpTokenNode)namespaceDeclaration.Children.Last()));
+			_currentNamespaces.Push(new Tuple<string, CSharpTokenNode>(namespaceDeclaration.Name, namespaceDeclaration.Children.LastOrDefault() as CSharpTokenNode));
 			base.VisitNamespaceDeclaration(namespaceDeclaration);
 		}
 

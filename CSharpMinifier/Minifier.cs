@@ -236,8 +236,10 @@ namespace CSharpMinifier
                     var childsToRemove = children.Children.TakeWhile(c => !(c is CSharpTokenNode && c.Role.ToString() == "{"));
                     foreach (var child in childsToRemove)
                         child.Remove();
-                    children.Children.First().Remove();
-                    children.Children.Last().Remove();
+                    if (children.Children.Count() > 0)
+                        children.Children.First().Remove();
+                    if (children.Children.Count() > 0)
+                        children.Children.Last().Remove();
 					var namespaceChildrens = children.Children;
 
 					var parent = children.Parent;
@@ -482,20 +484,30 @@ namespace CSharpMinifier
 					resolvedNodes.Add(matchNode);
 				};
 
-				if (type == ResolveResultType.Local)
-					findReferences.FindLocalReferences((resolveResult as LocalResolveResult).Variable, _unresolvedFile, SyntaxTree, _compilation, callback, CancellationToken.None);
-				else if (type == ResolveResultType.Member)
-				{
-					var memberResolveResult = resolveResult as MemberResolveResult;
-					var searchScopes = findReferences.GetSearchScopes(memberResolveResult.Member);
-					findReferences.FindReferencesInFile(searchScopes, _unresolvedFile, SyntaxTree, _compilation, callback, CancellationToken.None);
-				}
-				else if (type == ResolveResultType.Type)
-				{
-					var typeResolveResult = resolveResult as TypeResolveResult;
-					var searchScopes = findReferences.GetSearchScopes(typeResolveResult.Type.GetDefinition());
-					findReferences.FindReferencesInFile(searchScopes, _unresolvedFile, SyntaxTree, _compilation, callback, CancellationToken.None);
-				}
+                if (type == ResolveResultType.Local)
+                {
+                    var localResolveResult = resolveResult as LocalResolveResult;
+                    if (localResolveResult != null)
+                        findReferences.FindLocalReferences(localResolveResult.Variable, _unresolvedFile, SyntaxTree, _compilation, callback, CancellationToken.None);
+                }
+                else if (type == ResolveResultType.Member)
+                {
+                    var memberResolveResult = resolveResult as MemberResolveResult;
+                    if (memberResolveResult != null)
+                    {
+                        var searchScopes = findReferences.GetSearchScopes(memberResolveResult.Member);
+                        findReferences.FindReferencesInFile(searchScopes, _unresolvedFile, SyntaxTree, _compilation, callback, CancellationToken.None);
+                    }
+                }
+                else if (type == ResolveResultType.Type)
+                {
+                    var typeResolveResult = resolveResult as TypeResolveResult;
+                    if (typeResolveResult != null)
+                    {
+                        var searchScopes = findReferences.GetSearchScopes(typeResolveResult.Type.GetDefinition());
+                        findReferences.FindReferencesInFile(searchScopes, _unresolvedFile, SyntaxTree, _compilation, callback, CancellationToken.None);
+                    }
+                }
 			}
 			else
 			{
@@ -519,7 +531,7 @@ namespace CSharpMinifier
 						RenameNode(astNode, node.Item1);
 				}
 
-				var first = node.Item2.First() as VariableInitializer;
+                var first = node.Item2.FirstOrDefault() as VariableInitializer;
 				if (removeOneRefNodes && Options.UselessMembersCompressing && first != null)
 				{
 					bool constNode = false;
