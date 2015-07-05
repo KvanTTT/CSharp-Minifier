@@ -126,8 +126,8 @@ namespace CSharpMinifier.GUI
 			tbOutputLength.Text = tbOutput.Text.Length.ToString();
 			tbOutputInputRatio.Text = ((double)tbOutput.Text.Length / tbInput.Text.Length).ToString("0.000000");
 			var compileResult = CompileUtils.Compile(tbOutput.Text);
-            dgvErrors.Rows.Clear();
-            if (!compileResult.Errors.HasErrors)
+			dgvErrors.Rows.Clear();
+			if (!compileResult.Errors.HasErrors)
 			{
 				pbOutputCompilied.Image = Resources.Ok;
 				lblOutputCompilied.Text = "Compilied";                
@@ -186,17 +186,27 @@ namespace CSharpMinifier.GUI
 				var textBox = input ? tbInput : tbOutput;
 				int line = Convert.ToInt32(cells[0].Value);
 				int column = Convert.ToInt32(cells[1].Value);
-                var pos = GetPosFromLineColumn(textBox.Text, line, column);
-                textBox.Select(pos, 0);
-                textBox.ScrollToCaret();
-                textBox.Focus();
+				var pos = GetPosFromLineColumn(textBox.Text, line, column);
+				textBox.Select(pos, 0);
+				textBox.ScrollToCaret();
+				textBox.Focus();
 			}
 		}
 
-        private int GetPosFromLineColumn(string text, int line, int column)
-        {
-            var strs = text.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
-            return strs.Take(line - 1).Aggregate(0, (count, str) => count += str.Length + Environment.NewLine.Length) + column - 1;
-        }
+		private int GetPosFromLineColumn(string text, int line, int column)
+		{
+			var strs = text.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+			return strs.Take(line - 1).Aggregate(0, (count, str) => count += str.Length + Environment.NewLine.Length) + column - 1;
+		}
+
+		private void tbInput_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.Control && e.KeyCode == Keys.A)
+			{
+				if (sender != null)
+					((TextBox)sender).SelectAll();
+				e.Handled = true;
+			}
+		}
 	}
 }

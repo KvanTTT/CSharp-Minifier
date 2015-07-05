@@ -24,7 +24,7 @@ namespace CSharpMinifier
 		private IProjectContent _projectContent;
 		private ICompilation _compilation;
 		private CSharpAstResolver _resolver;
-        private AstNode _prevNode;
+		private AstNode _prevNode;
 
 		public SyntaxTree SyntaxTree
 		{
@@ -52,44 +52,44 @@ namespace CSharpMinifier
 
 		#region Public
 
-        public Minifier(MinifierOptions options = null, string[] ignoredIdentifiers = null, string[] ignoredComments = null)
-        {
-            Options = options ?? new MinifierOptions();
+		public Minifier(MinifierOptions options = null, string[] ignoredIdentifiers = null, string[] ignoredComments = null)
+		{
+			Options = options ?? new MinifierOptions();
 
-            _projectContent = new CSharpProjectContent();
-            var assemblies = new List<Assembly>
+			_projectContent = new CSharpProjectContent();
+			var assemblies = new List<Assembly>
 				{
 					typeof(object).Assembly, // mscorlib
 					typeof(Uri).Assembly, // System.dll
 					typeof(Enumerable).Assembly, // System.Core.dll
 				};
 
-            var unresolvedAssemblies = new IUnresolvedAssembly[assemblies.Count];
-            Parallel.For(
-                0, assemblies.Count,
-                delegate(int i)
-                {
-                    var loader = new CecilLoader();
-                    var path = assemblies[i].Location;
-                    unresolvedAssemblies[i] = loader.LoadAssemblyFile(assemblies[i].Location);
-                });
-            _projectContent = _projectContent.AddAssemblyReferences((IEnumerable<IUnresolvedAssembly>)unresolvedAssemblies);
+			var unresolvedAssemblies = new IUnresolvedAssembly[assemblies.Count];
+			Parallel.For(
+				0, assemblies.Count,
+				delegate(int i)
+				{
+					var loader = new CecilLoader();
+					var path = assemblies[i].Location;
+					unresolvedAssemblies[i] = loader.LoadAssemblyFile(assemblies[i].Location);
+				});
+			_projectContent = _projectContent.AddAssemblyReferences((IEnumerable<IUnresolvedAssembly>)unresolvedAssemblies);
 
 
-            IgnoredIdentifiers = ignoredIdentifiers == null ? new List<string>() : ignoredIdentifiers.ToList();
-            IgnoredComments = new List<string>();
-            if (ignoredComments != null)
-                foreach (var comment in ignoredComments)
-                {
-                    var str = comment;
-                    if (str.StartsWith("//"))
-                        str = str.Substring("//".Length);
-                    else if (str.StartsWith("/*") && str.EndsWith("*/"))
-                        str = str.Substring("/*".Length, str.Length - "/*".Length - "*/".Length);
-                    if (!IgnoredComments.Contains(str))
-                        IgnoredComments.Add(str);
-                }
-        }
+			IgnoredIdentifiers = ignoredIdentifiers == null ? new List<string>() : ignoredIdentifiers.ToList();
+			IgnoredComments = new List<string>();
+			if (ignoredComments != null)
+				foreach (var comment in ignoredComments)
+				{
+					var str = comment;
+					if (str.StartsWith("//"))
+						str = str.Substring("//".Length);
+					else if (str.StartsWith("/*") && str.EndsWith("*/"))
+						str = str.Substring("/*".Length, str.Length - "/*".Length - "*/".Length);
+					if (!IgnoredComments.Contains(str))
+						IgnoredComments.Add(str);
+				}
+		}
 
 		public string MinifyFiles(string[] csFiles)
 		{
@@ -208,7 +208,7 @@ namespace CSharpMinifier
 		{
 			foreach (var children in node.Children)
 			{
-                if (Options.MiscCompressing && children is PrimitiveExpression)
+				if (Options.MiscCompressing && children is PrimitiveExpression)
 				{
 					var primitiveExpression = (PrimitiveExpression)children;
 					if (IsIntegerNumber(primitiveExpression.Value))
@@ -233,13 +233,13 @@ namespace CSharpMinifier
 				}
 				else if (Options.NamespacesRemoving && children is NamespaceDeclaration)
 				{			
-                    var childsToRemove = children.Children.TakeWhile(c => !(c is CSharpTokenNode && c.Role.ToString() == "{"));
-                    foreach (var child in childsToRemove)
-                        child.Remove();
-                    if (children.Children.Count() > 0)
-                        children.Children.First().Remove();
-                    if (children.Children.Count() > 0)
-                        children.Children.Last().Remove();
+					var childsToRemove = children.Children.TakeWhile(c => !(c is CSharpTokenNode && c.Role.ToString() == "{"));
+					foreach (var child in childsToRemove)
+						child.Remove();
+					if (children.Children.Count() > 0)
+						children.Children.First().Remove();
+					if (children.Children.Count() > 0)
+						children.Children.Last().Remove();
 					var namespaceChildrens = children.Children;
 
 					var parent = children.Parent;
@@ -313,37 +313,37 @@ namespace CSharpMinifier
 				}
 				else
 				{
-                    if (Options.MiscCompressing && children is BlockStatement && children.Role.ToString() != "Body")
-                    {
-                        // if (a) { b; } => if (a) b;
-                        var childrenCount = children.Children.Count(c => !(c is NewLineNode));
-                        if (childrenCount == 3)
-                            children.ReplaceWith(children.Children.Skip(1).FirstOrDefault(c => !(c is NewLineNode)));
-                        else if (childrenCount < 3)
-                            children.Remove();
-                    }
-                    else if (Options.MiscCompressing && children is BinaryOperatorExpression)
-                    {
-                        // if (a == true) => if (a)
-                        // if (a == false) => if (!a)
-                        var binaryExpression = (BinaryOperatorExpression)children;
-                        var primitiveExpression = binaryExpression.Left as PrimitiveExpression;
-                        var expression = binaryExpression.Right;
-                        if (primitiveExpression == null)
-                        {
-                            primitiveExpression = binaryExpression.Right as PrimitiveExpression;
-                            expression = binaryExpression.Left;
-                        }
-                        if (primitiveExpression != null && primitiveExpression.Value is bool)
-                        {
-                            var boolean = (bool)primitiveExpression.Value;
-                            expression.Remove();
-                            if (boolean)
-                                children.ReplaceWith(expression);
-                            else
-                                children.ReplaceWith(new UnaryOperatorExpression(UnaryOperatorType.Not, expression));
-                        }
-                    }
+					if (Options.MiscCompressing && children is BlockStatement && children.Role.ToString() != "Body")
+					{
+						// if (a) { b; } => if (a) b;
+						var childrenCount = children.Children.Count(c => !(c is NewLineNode));
+						if (childrenCount == 3)
+							children.ReplaceWith(children.Children.Skip(1).FirstOrDefault(c => !(c is NewLineNode)));
+						else if (childrenCount < 3)
+							children.Remove();
+					}
+					else if (Options.MiscCompressing && children is BinaryOperatorExpression)
+					{
+						// if (a == true) => if (a)
+						// if (a == false) => if (!a)
+						var binaryExpression = (BinaryOperatorExpression)children;
+						var primitiveExpression = binaryExpression.Left as PrimitiveExpression;
+						var expression = binaryExpression.Right;
+						if (primitiveExpression == null)
+						{
+							primitiveExpression = binaryExpression.Right as PrimitiveExpression;
+							expression = binaryExpression.Left;
+						}
+						if (primitiveExpression != null && primitiveExpression.Value is bool)
+						{
+							var boolean = (bool)primitiveExpression.Value;
+							expression.Remove();
+							if (boolean)
+								children.ReplaceWith(expression);
+							else
+								children.ReplaceWith(new UnaryOperatorExpression(UnaryOperatorType.Not, expression));
+						}
+					}
 					TraverseNodes(children);
 				}
 			}
@@ -484,30 +484,30 @@ namespace CSharpMinifier
 					resolvedNodes.Add(matchNode);
 				};
 
-                if (type == ResolveResultType.Local)
-                {
-                    var localResolveResult = resolveResult as LocalResolveResult;
-                    if (localResolveResult != null)
-                        findReferences.FindLocalReferences(localResolveResult.Variable, _unresolvedFile, SyntaxTree, _compilation, callback, CancellationToken.None);
-                }
-                else if (type == ResolveResultType.Member)
-                {
-                    var memberResolveResult = resolveResult as MemberResolveResult;
-                    if (memberResolveResult != null)
-                    {
-                        var searchScopes = findReferences.GetSearchScopes(memberResolveResult.Member);
-                        findReferences.FindReferencesInFile(searchScopes, _unresolvedFile, SyntaxTree, _compilation, callback, CancellationToken.None);
-                    }
-                }
-                else if (type == ResolveResultType.Type)
-                {
-                    var typeResolveResult = resolveResult as TypeResolveResult;
-                    if (typeResolveResult != null)
-                    {
-                        var searchScopes = findReferences.GetSearchScopes(typeResolveResult.Type.GetDefinition());
-                        findReferences.FindReferencesInFile(searchScopes, _unresolvedFile, SyntaxTree, _compilation, callback, CancellationToken.None);
-                    }
-                }
+				if (type == ResolveResultType.Local)
+				{
+					var localResolveResult = resolveResult as LocalResolveResult;
+					if (localResolveResult != null)
+						findReferences.FindLocalReferences(localResolveResult.Variable, _unresolvedFile, SyntaxTree, _compilation, callback, CancellationToken.None);
+				}
+				else if (type == ResolveResultType.Member)
+				{
+					var memberResolveResult = resolveResult as MemberResolveResult;
+					if (memberResolveResult != null)
+					{
+						var searchScopes = findReferences.GetSearchScopes(memberResolveResult.Member);
+						findReferences.FindReferencesInFile(searchScopes, _unresolvedFile, SyntaxTree, _compilation, callback, CancellationToken.None);
+					}
+				}
+				else if (type == ResolveResultType.Type)
+				{
+					var typeResolveResult = resolveResult as TypeResolveResult;
+					if (typeResolveResult != null)
+					{
+						var searchScopes = findReferences.GetSearchScopes(typeResolveResult.Type.GetDefinition());
+						findReferences.FindReferencesInFile(searchScopes, _unresolvedFile, SyntaxTree, _compilation, callback, CancellationToken.None);
+					}
+				}
 			}
 			else
 			{
@@ -531,7 +531,7 @@ namespace CSharpMinifier
 						RenameNode(astNode, node.Item1);
 				}
 
-                var first = node.Item2.FirstOrDefault() as VariableInitializer;
+				var first = node.Item2.FirstOrDefault() as VariableInitializer;
 				if (removeOneRefNodes && Options.UselessMembersCompressing && first != null)
 				{
 					bool constNode = false;
@@ -646,49 +646,74 @@ namespace CSharpMinifier
 			return result.ToString();
 		}
 
-        private void RemoveSpacesAndAppend(AstNode node, StringBuilder line, StringBuilder result)
-        {
-            if (node.Children.Count() == 0)
-            {
-                string indent = GetIndent(node, line);
+		private void RemoveSpacesAndAppend(AstNode node, StringBuilder line, StringBuilder result)
+		{
+			if (node.Children.Count() == 0)
+			{
+				string indent = GetIndent(node, line);
 
-                string newString = indent + GetLeafNodeString(node);
-                if (Options.LineLength == 0)
-                    result.Append(newString);
-                else
-                {
-                    if (line.Length + newString.Length > Options.LineLength)
-                    {
-                        result.AppendLine(line.ToString());
-                        line.Clear();
-                        line.Append(newString.TrimStart());
-                    }
-                    else
-                    {
-                        line.Append(newString);
-                    }
-                }
-            }
-            else
-            {
-                List<AstNode> childrens;
-                if (node is ArraySpecifier)
-                {
-                    childrens = new List<AstNode>();
-                    childrens.Add(node.Children.FirstOrDefault(c => c.Role.ToString() == "["));
-                    childrens.AddRange(node.Children.Where(c => c.Role.ToString() != "[" && c.Role.ToString() != "]"));
-                    childrens.AddRange(node.Children.Where(c => c.Role.ToString() == "]"));
-                }
-                else
-                    childrens = node.Children.ToList();
-                foreach (AstNode children in childrens)
-                {
-                    RemoveSpacesAndAppend(children, line, result);
-                    if (children.Children.Count() <= 1 && !(children is NewLineNode))
-                        _prevNode = children;
-                }
-            }
-        }
+				string newString = indent + GetLeafNodeString(node);
+				if (Options.LineLength == 0)
+					result.Append(newString);
+				else
+				{
+					if (line.Length + newString.Length > Options.LineLength)
+					{
+						result.AppendLine(line.ToString());
+						line.Clear();
+						line.Append(newString.TrimStart());
+					}
+					else
+					{
+						line.Append(newString);
+					}
+				}
+			}
+			else
+			{
+				List<AstNode> childrens;
+				if (node is ArraySpecifier)
+				{
+					childrens = new List<AstNode>();
+					childrens.Add(node.Children.FirstOrDefault(c => c.Role.ToString() == "["));
+					childrens.AddRange(node.Children.Where(c => c.Role.ToString() != "[" && c.Role.ToString() != "]"));
+					childrens.AddRange(node.Children.Where(c => c.Role.ToString() == "]"));
+				}
+				else if (node is ArrayInitializerExpression)
+				{
+					var arrayInitExpr = (ArrayInitializerExpression)node;
+					childrens = node.Children.ToList();
+					int exprNodeInd1 = -1, exprNodeInd2 = -1, commaInd1 = -1;
+					for (int i = 0; i < childrens.Count; i++)
+					{
+						var c = childrens[i];
+						if (!(c is NewLineNode || c is CSharpTokenNode))
+						{
+							if (exprNodeInd1 == -1)
+								exprNodeInd1 = i;
+							else
+							{
+								exprNodeInd2 = i;
+								break;
+							}
+						}
+						else if (exprNodeInd1 > -1 && exprNodeInd2 == -1 && c.ToString() == ",")
+							commaInd1 = i;
+					}
+					if (exprNodeInd1 != -1 && commaInd1 == -1 && exprNodeInd2 != -1)
+						childrens.Insert(exprNodeInd1 + 1,
+							new CSharpTokenNode(TextLocation.Empty, Roles.Comma) { Role = Roles.Comma });
+				}
+				else
+					childrens = node.Children.ToList();
+				foreach (AstNode children in childrens)
+				{
+					RemoveSpacesAndAppend(children, line, result);
+					if (children.Children.Count() <= 1 && !(children is NewLineNode))
+						_prevNode = children;
+				}
+			}
+		}
 
 		private string GetIndent(AstNode node, StringBuilder line)
 		{
@@ -714,11 +739,11 @@ namespace CSharpMinifier
 				else
 				{
 					if ((_prevNode is CSharpTokenNode && _prevNode.Role.ToString().All(c => !char.IsLetterOrDigit(c))) ||
-                        _prevNode is NewLineNode ||
+						_prevNode is NewLineNode ||
 						(node is CSharpTokenNode && node.Role.ToString().All(c => !char.IsLetterOrDigit(c))) ||
-                        node is NewLineNode ||
-                        node is Comment)
-						    indent = "";
+						node is NewLineNode ||
+						node is Comment)
+							indent = "";
 				}
 			}
 
@@ -776,8 +801,8 @@ namespace CSharpMinifier
 				return "null";
 			else if (node is CSharpTokenNode || node is CSharpModifierToken)
 				return nodeRole;
-            else if (node is NewLineNode)
-                return "";
+			else if (node is NewLineNode)
+				return "";
 
 			return properties
 				.Where(p => NameKeys.Contains(p.Name))

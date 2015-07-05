@@ -31,10 +31,12 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.btnMinify = new System.Windows.Forms.Button();
             this.splitContainer = new System.Windows.Forms.SplitContainer();
+            this.tbInput = new System.Windows.Forms.TextBox();
             this.btnOpenFiles = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
             this.lbInputFiles = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.tbOutput = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.cbRemoveSpaces = new System.Windows.Forms.CheckBox();
             this.cbCompressLocalVars = new System.Windows.Forms.CheckBox();
@@ -68,8 +70,6 @@
             this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.label8 = new System.Windows.Forms.Label();
             this.cbUselessMembersCompressing = new System.Windows.Forms.CheckBox();
-            this.tbInput = new System.Windows.Forms.TextBox();
-            this.tbOutput = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -114,6 +114,20 @@
             this.splitContainer.SplitterDistance = 338;
             this.splitContainer.TabIndex = 2;
             // 
+            // tbInput
+            // 
+            this.tbInput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbInput.Location = new System.Drawing.Point(8, 33);
+            this.tbInput.Multiline = true;
+            this.tbInput.Name = "tbInput";
+            this.tbInput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.tbInput.Size = new System.Drawing.Size(506, 299);
+            this.tbInput.TabIndex = 11;
+            this.tbInput.Text = resources.GetString("tbInput.Text");
+            this.tbInput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tbInput_KeyDown);
+            // 
             // btnOpenFiles
             // 
             this.btnOpenFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -156,6 +170,20 @@
             this.label1.Size = new System.Drawing.Size(36, 16);
             this.label1.TabIndex = 2;
             this.label1.Text = "Input";
+            // 
+            // tbOutput
+            // 
+            this.tbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tbOutput.Location = new System.Drawing.Point(8, 25);
+            this.tbOutput.Multiline = true;
+            this.tbOutput.Name = "tbOutput";
+            this.tbOutput.ReadOnly = true;
+            this.tbOutput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.tbOutput.Size = new System.Drawing.Size(632, 323);
+            this.tbOutput.TabIndex = 12;
+            this.tbOutput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tbInput_KeyDown);
             // 
             // label2
             // 
@@ -510,32 +538,6 @@
             this.cbUselessMembersCompressing.TabIndex = 30;
             this.cbUselessMembersCompressing.Text = "Useless Members Compressing";
             this.cbUselessMembersCompressing.UseVisualStyleBackColor = true;
-            // 
-            // tbInput
-            // 
-            this.tbInput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbInput.Location = new System.Drawing.Point(8, 33);
-            this.tbInput.Multiline = true;
-            this.tbInput.Name = "tbInput";
-            this.tbInput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tbInput.Size = new System.Drawing.Size(506, 299);
-            this.tbInput.TabIndex = 11;
-            this.tbInput.Text = resources.GetString("tbInput.Text");
-            // 
-            // tbOutput
-            // 
-            this.tbOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbOutput.Location = new System.Drawing.Point(8, 25);
-            this.tbOutput.Multiline = true;
-            this.tbOutput.Name = "tbOutput";
-            this.tbOutput.ReadOnly = true;
-            this.tbOutput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tbOutput.Size = new System.Drawing.Size(632, 323);
-            this.tbOutput.TabIndex = 12;
             // 
             // frmMain
             // 
