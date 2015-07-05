@@ -117,7 +117,8 @@ namespace CSharpMinifier.GUI
 				NamespacesRemoving = cbRemoveNamespaces.Checked,
 				LineLength = int.Parse(tbLineLength.Text),
 				ToStringMethodsRemoving = cbRemoveToStringMethods.Checked,
-				PublicCompressing = cbCompressPublic.Checked
+				PublicCompressing = cbCompressPublic.Checked,
+				EnumToIntConversion = cbEnumToIntConversion.Checked
 			};
 			Minifier minifier = new Minifier(minifierOptions);
 			tbOutput.Text = !cbMinifyFiles.Checked ? minifier.MinifyFromString(tbInput.Text) : minifier.MinifyFiles(Sources.Select(source => source.Value).ToArray());

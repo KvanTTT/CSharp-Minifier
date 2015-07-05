@@ -11,6 +11,10 @@ namespace A
 		protected const char qwer = 'd', fdsa = 's';
 		protected int C = 22;
 		protected int zzz;
+		protected Dictionary<string, int> dict = new Dictionary<string, int>()
+		{
+			{ "a", 23 }
+		};
 
 		class a
 		{

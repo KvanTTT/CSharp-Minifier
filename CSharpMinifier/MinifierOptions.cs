@@ -86,6 +86,12 @@ namespace CSharpMinifier
 			set;
 		}
 
+		public bool EnumToIntConversion
+		{
+			get;
+			set;
+		}
+
 		public MinifierOptions(bool maxCompression = true)
 		{
 			if (maxCompression)
@@ -101,6 +107,7 @@ namespace CSharpMinifier
 				PublicCompressing = true;
 				ToStringMethodsRemoving = true;
 				UselessMembersCompressing = true;
+				EnumToIntConversion = true;
 			}
 		}
 	}

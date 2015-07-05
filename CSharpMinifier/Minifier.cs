@@ -136,21 +136,14 @@ namespace CSharpMinifier
 				CompressMembers();
 			if (Options.TypesCompressing)
 				CompressTypes();
-
+            if (Options.EnumToIntConversion)
+                ConvertEnumToInts();
 			if (Options.MiscCompressing || Options.NamespacesRemoving)
-				TraverseNodes();
+				CompressMixed();
 
 			string result;
 			if (Options.SpacesRemoving)
-			{
-				if (Options.MiscCompressing || Options.LocalVarsCompressing || Options.MembersCompressing || Options.TypesCompressing)
-				{
-					// TODO: Fix it.
-					SyntaxTree = new CSharpParser().Parse(SyntaxTree.ToString(), ParserTempFileName);
-				}
-				
 				result = GetStringWithoutSpaces();
-			}
 			else
 				result = SyntaxTree.ToString();
 
@@ -198,8 +191,9 @@ namespace CSharpMinifier
 
 		#region Misc Compression
 
-		private void TraverseNodes()
+		private void CompressMixed()
 		{
+			UpdateSyntaxTree();
 			CompileAndResolve();
 			TraverseNodes(SyntaxTree);
 		}
@@ -458,6 +452,33 @@ namespace CSharpMinifier
 			RenameOrRemoveNodes(astSubstitution, false, Options.TypesCompressing);
 		}
 
+		private void ConvertEnumToInts()
+		{
+			UpdateSyntaxTree();
+			var enumVisitor = new MinifyEnumsAstVisitor();
+			CompileAndAcceptVisitor(enumVisitor);
+
+			var members = enumVisitor.EnumMembers;
+            foreach (var member in members)
+            {
+                var enumTypeRefs = GetResolvedNodes(ResolveResultType.Type, member.Key);
+                foreach (var enumMember in member.Value)
+                {
+                    var initExpr = ((EnumMemberDeclaration)enumMember.Node).Initializer;
+                    var enumMemberRefs = GetResolvedNodes(ResolveResultType.Member, enumMember.Node);
+                    foreach (var node in enumMemberRefs)
+                    {
+                        if (!(node is EntityDeclaration))
+                            node.ReplaceWith(initExpr.Clone());
+                    }
+                }
+                foreach (var typeRef in enumTypeRefs)
+                    if (typeRef is SimpleType)
+                        typeRef.ReplaceWith(new PrimitiveType("int"));
+                member.Key.Remove();
+            }
+		}
+
 		private void CompileAndAcceptVisitor(DepthFirstAstVisitor visitor)
 		{
 			CompileAndResolve();
@@ -612,12 +633,19 @@ namespace CSharpMinifier
 			}
 		}
 
+		private void UpdateSyntaxTree()
+		{
+			// TODO: Fix it.
+			SyntaxTree = new CSharpParser().Parse(SyntaxTree.ToString(), ParserTempFileName);
+		}
+
 		#endregion
 
 		#region Removing of spaces and line breaks
 
 		private string GetStringWithoutSpaces()
 		{
+			UpdateSyntaxTree();
 			return GetStringWithoutSpaces(SyntaxTree.Children);
 		}
 
@@ -687,7 +715,7 @@ namespace CSharpMinifier
 					for (int i = 0; i < childrens.Count; i++)
 					{
 						var c = childrens[i];
-						if (!(c is NewLineNode || c is CSharpTokenNode))
+						if (!(c is NewLineNode || c is CSharpTokenNode || c is Comment))
 						{
 							if (exprNodeInd1 == -1)
 								exprNodeInd1 = i;

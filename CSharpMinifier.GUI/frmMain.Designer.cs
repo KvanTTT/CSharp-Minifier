@@ -70,6 +70,7 @@
             this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.label8 = new System.Windows.Forms.Label();
             this.cbUselessMembersCompressing = new System.Windows.Forms.CheckBox();
+            this.cbEnumToIntConversion = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
@@ -81,7 +82,7 @@
             // btnMinify
             // 
             this.btnMinify.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnMinify.Location = new System.Drawing.Point(665, 346);
+            this.btnMinify.Location = new System.Drawing.Point(665, 386);
             this.btnMinify.Name = "btnMinify";
             this.btnMinify.Size = new System.Drawing.Size(191, 26);
             this.btnMinify.TabIndex = 1;
@@ -110,8 +111,8 @@
             // 
             this.splitContainer.Panel2.Controls.Add(this.tbOutput);
             this.splitContainer.Panel2.Controls.Add(this.label2);
-            this.splitContainer.Size = new System.Drawing.Size(645, 693);
-            this.splitContainer.SplitterDistance = 338;
+            this.splitContainer.Size = new System.Drawing.Size(645, 747);
+            this.splitContainer.SplitterDistance = 364;
             this.splitContainer.TabIndex = 2;
             // 
             // tbInput
@@ -123,7 +124,7 @@
             this.tbInput.Multiline = true;
             this.tbInput.Name = "tbInput";
             this.tbInput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tbInput.Size = new System.Drawing.Size(506, 299);
+            this.tbInput.Size = new System.Drawing.Size(506, 325);
             this.tbInput.TabIndex = 11;
             this.tbInput.Text = resources.GetString("tbInput.Text");
             this.tbInput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tbInput_KeyDown);
@@ -157,7 +158,7 @@
             this.lbInputFiles.FormattingEnabled = true;
             this.lbInputFiles.Location = new System.Drawing.Point(520, 33);
             this.lbInputFiles.Name = "lbInputFiles";
-            this.lbInputFiles.Size = new System.Drawing.Size(120, 290);
+            this.lbInputFiles.Size = new System.Drawing.Size(120, 316);
             this.lbInputFiles.TabIndex = 9;
             this.lbInputFiles.SelectedIndexChanged += new System.EventHandler(this.lbInputFiles_SelectedIndexChanged);
             // 
@@ -181,7 +182,7 @@
             this.tbOutput.Name = "tbOutput";
             this.tbOutput.ReadOnly = true;
             this.tbOutput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tbOutput.Size = new System.Drawing.Size(632, 323);
+            this.tbOutput.Size = new System.Drawing.Size(632, 351);
             this.tbOutput.TabIndex = 12;
             this.tbOutput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tbInput_KeyDown);
             // 
@@ -237,7 +238,7 @@
             // btnCopyToClipboard
             // 
             this.btnCopyToClipboard.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCopyToClipboard.Location = new System.Drawing.Point(665, 678);
+            this.btnCopyToClipboard.Location = new System.Drawing.Point(665, 732);
             this.btnCopyToClipboard.Name = "btnCopyToClipboard";
             this.btnCopyToClipboard.Size = new System.Drawing.Size(189, 26);
             this.btnCopyToClipboard.TabIndex = 6;
@@ -248,7 +249,7 @@
             // tbLineLength
             // 
             this.tbLineLength.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbLineLength.Location = new System.Drawing.Point(745, 295);
+            this.tbLineLength.Location = new System.Drawing.Point(745, 335);
             this.tbLineLength.Name = "tbLineLength";
             this.tbLineLength.Size = new System.Drawing.Size(84, 20);
             this.tbLineLength.TabIndex = 7;
@@ -259,7 +260,7 @@
             // 
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(665, 298);
+            this.label3.Location = new System.Drawing.Point(665, 338);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(63, 13);
             this.label3.TabIndex = 8;
@@ -274,7 +275,7 @@
             // 
             this.cbMinifyFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cbMinifyFiles.AutoSize = true;
-            this.cbMinifyFiles.Location = new System.Drawing.Point(668, 323);
+            this.cbMinifyFiles.Location = new System.Drawing.Point(668, 363);
             this.cbMinifyFiles.Name = "cbMinifyFiles";
             this.cbMinifyFiles.Size = new System.Drawing.Size(47, 17);
             this.cbMinifyFiles.TabIndex = 9;
@@ -285,7 +286,7 @@
             // 
             this.lblOutputCompilied.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lblOutputCompilied.AutoSize = true;
-            this.lblOutputCompilied.Location = new System.Drawing.Point(706, 649);
+            this.lblOutputCompilied.Location = new System.Drawing.Point(706, 703);
             this.lblOutputCompilied.Name = "lblOutputCompilied";
             this.lblOutputCompilied.Size = new System.Drawing.Size(0, 13);
             this.lblOutputCompilied.TabIndex = 11;
@@ -294,7 +295,7 @@
             // 
             this.lblInputCompilied.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lblInputCompilied.AutoSize = true;
-            this.lblInputCompilied.Location = new System.Drawing.Point(706, 649);
+            this.lblInputCompilied.Location = new System.Drawing.Point(706, 703);
             this.lblInputCompilied.Name = "lblInputCompilied";
             this.lblInputCompilied.Size = new System.Drawing.Size(0, 13);
             this.lblInputCompilied.TabIndex = 13;
@@ -330,7 +331,7 @@
             // 
             this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(664, 560);
+            this.label5.Location = new System.Drawing.Point(664, 614);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(67, 13);
             this.label5.TabIndex = 16;
@@ -340,7 +341,7 @@
             // 
             this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(664, 587);
+            this.label6.Location = new System.Drawing.Point(664, 641);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(75, 13);
             this.label6.TabIndex = 17;
@@ -349,7 +350,7 @@
             // tbInputLength
             // 
             this.tbInputLength.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbInputLength.Location = new System.Drawing.Point(756, 557);
+            this.tbInputLength.Location = new System.Drawing.Point(756, 611);
             this.tbInputLength.Name = "tbInputLength";
             this.tbInputLength.ReadOnly = true;
             this.tbInputLength.Size = new System.Drawing.Size(72, 20);
@@ -358,7 +359,7 @@
             // tbOutputLength
             // 
             this.tbOutputLength.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbOutputLength.Location = new System.Drawing.Point(756, 586);
+            this.tbOutputLength.Location = new System.Drawing.Point(756, 640);
             this.tbOutputLength.Name = "tbOutputLength";
             this.tbOutputLength.ReadOnly = true;
             this.tbOutputLength.Size = new System.Drawing.Size(72, 20);
@@ -367,7 +368,7 @@
             // tbOutputInputRatio
             // 
             this.tbOutputInputRatio.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.tbOutputInputRatio.Location = new System.Drawing.Point(756, 612);
+            this.tbOutputInputRatio.Location = new System.Drawing.Point(756, 666);
             this.tbOutputInputRatio.Name = "tbOutputInputRatio";
             this.tbOutputInputRatio.ReadOnly = true;
             this.tbOutputInputRatio.Size = new System.Drawing.Size(72, 20);
@@ -377,7 +378,7 @@
             // 
             this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(664, 615);
+            this.label7.Location = new System.Drawing.Point(664, 669);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(32, 13);
             this.label7.TabIndex = 20;
@@ -386,7 +387,7 @@
             // pbOutputCompilied
             // 
             this.pbOutputCompilied.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.pbOutputCompilied.Location = new System.Drawing.Point(668, 639);
+            this.pbOutputCompilied.Location = new System.Drawing.Point(668, 693);
             this.pbOutputCompilied.Name = "pbOutputCompilied";
             this.pbOutputCompilied.Size = new System.Drawing.Size(35, 33);
             this.pbOutputCompilied.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -480,7 +481,7 @@
             this.Column2,
             this.Column3,
             this.Column4});
-            this.dgvErrors.Location = new System.Drawing.Point(665, 426);
+            this.dgvErrors.Location = new System.Drawing.Point(665, 480);
             this.dgvErrors.Name = "dgvErrors";
             this.dgvErrors.ReadOnly = true;
             this.dgvErrors.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
@@ -520,7 +521,7 @@
             // 
             this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(664, 405);
+            this.label8.Location = new System.Drawing.Point(664, 459);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(34, 13);
             this.label8.TabIndex = 29;
@@ -539,11 +540,25 @@
             this.cbUselessMembersCompressing.Text = "Useless Members Compressing";
             this.cbUselessMembersCompressing.UseVisualStyleBackColor = true;
             // 
+            // cbEnumToIntConversion
+            // 
+            this.cbEnumToIntConversion.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbEnumToIntConversion.AutoSize = true;
+            this.cbEnumToIntConversion.Checked = true;
+            this.cbEnumToIntConversion.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbEnumToIntConversion.Location = new System.Drawing.Point(663, 293);
+            this.cbEnumToIntConversion.Name = "cbEnumToIntConversion";
+            this.cbEnumToIntConversion.Size = new System.Drawing.Size(140, 17);
+            this.cbEnumToIntConversion.TabIndex = 31;
+            this.cbEnumToIntConversion.Text = "Enum To Int Conversion";
+            this.cbEnumToIntConversion.UseVisualStyleBackColor = true;
+            // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(866, 717);
+            this.ClientSize = new System.Drawing.Size(866, 771);
+            this.Controls.Add(this.cbEnumToIntConversion);
             this.Controls.Add(this.cbUselessMembersCompressing);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.dgvErrors);
@@ -632,6 +647,7 @@
 		private System.Windows.Forms.CheckBox cbUselessMembersCompressing;
         private System.Windows.Forms.TextBox tbInput;
         private System.Windows.Forms.TextBox tbOutput;
+        private System.Windows.Forms.CheckBox cbEnumToIntConversion;
     }
 }
 
