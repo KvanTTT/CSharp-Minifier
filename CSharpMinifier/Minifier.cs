@@ -808,9 +808,11 @@ namespace CSharpMinifier
 			else if (nodeRole == "Target" || nodeRole == "Right")
 			{
 				string typeName = node.GetType().Name;
-				if (typeName == "ThisReferenceExpression")
+				if (typeName == nameof(ThisReferenceExpression))
 					return "this";
-				else if (typeName == "NullReferenceExpression")
+				else if (typeName == nameof(BaseReferenceExpression))
+					return "base";
+				else if (typeName == nameof(NullReferenceExpression))
 					return "null";
 			}
 			else if (nodeRole == "PreProcessorDirective")
