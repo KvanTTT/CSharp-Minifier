@@ -67,7 +67,7 @@ namespace CSharpMinifier
 			var unresolvedAssemblies = new IUnresolvedAssembly[assemblies.Count];
 			Parallel.For(
 				0, assemblies.Count,
-				delegate(int i)
+				delegate (int i)
 				{
 					var loader = new CecilLoader();
 					var path = assemblies[i].Location;
@@ -136,8 +136,8 @@ namespace CSharpMinifier
 				CompressMembers();
 			if (Options.TypesCompressing)
 				CompressTypes();
-            if (Options.EnumToIntConversion)
-                ConvertEnumToInts();
+			if (Options.EnumToIntConversion)
+				ConvertEnumToInts();
 			if (Options.MiscCompressing || Options.NamespacesRemoving)
 				CompressMixed();
 
@@ -226,7 +226,7 @@ namespace CSharpMinifier
 						modifier &= ~Modifiers.Private;
 				}
 				else if (Options.NamespacesRemoving && children is NamespaceDeclaration)
-				{			
+				{
 					var childsToRemove = children.Children.TakeWhile(c => !(c is CSharpTokenNode && c.Role.ToString() == "{"));
 					foreach (var child in childsToRemove)
 						child.Remove();
@@ -408,7 +408,7 @@ namespace CSharpMinifier
 				astSubstitution[method.Key] = localVarsAstNodes;
 				var localsSubst = substituton[method.Key];
 				foreach (NameNode localVar in method.Value)
-					localVarsAstNodes.Add(new Tuple<string,List<AstNode>>(localsSubst[localVar.Name], GetResolvedNodes(ResolveResultType.Local, localVar.Node)));
+					localVarsAstNodes.Add(new Tuple<string, List<AstNode>>(localsSubst[localVar.Name], GetResolvedNodes(ResolveResultType.Local, localVar.Node)));
 			}
 
 			RenameOrRemoveNodes(astSubstitution, true, Options.LocalVarsCompressing);
@@ -430,7 +430,7 @@ namespace CSharpMinifier
 				astSubstitution[typeMembers.Key] = typeMembersAstNodes;
 				var membersSubst = substituton[typeMembers.Key];
 				foreach (NameNode member in typeMembers.Value)
-					typeMembersAstNodes.Add(new Tuple<string,List<AstNode>>(membersSubst[member.Name], GetResolvedNodes(ResolveResultType.Member, member.Node)));
+					typeMembersAstNodes.Add(new Tuple<string, List<AstNode>>(membersSubst[member.Name], GetResolvedNodes(ResolveResultType.Member, member.Node)));
 			}
 
 			RenameOrRemoveNodes(astSubstitution, true, Options.MembersCompressing);
@@ -459,24 +459,24 @@ namespace CSharpMinifier
 			CompileAndAcceptVisitor(enumVisitor);
 
 			var members = enumVisitor.EnumMembers;
-            foreach (var member in members)
-            {
-                var enumTypeRefs = GetResolvedNodes(ResolveResultType.Type, member.Key);
-                foreach (var enumMember in member.Value)
-                {
-                    var initExpr = ((EnumMemberDeclaration)enumMember.Node).Initializer;
-                    var enumMemberRefs = GetResolvedNodes(ResolveResultType.Member, enumMember.Node);
-                    foreach (var node in enumMemberRefs)
-                    {
-                        if (!(node is EntityDeclaration))
-                            node.ReplaceWith(initExpr.Clone());
-                    }
-                }
-                foreach (var typeRef in enumTypeRefs)
-                    if (typeRef is SimpleType)
-                        typeRef.ReplaceWith(new PrimitiveType("int"));
-                member.Key.Remove();
-            }
+			foreach (var member in members)
+			{
+				var enumTypeRefs = GetResolvedNodes(ResolveResultType.Type, member.Key);
+				foreach (var enumMember in member.Value)
+				{
+					var initExpr = ((EnumMemberDeclaration)enumMember.Node).Initializer;
+					var enumMemberRefs = GetResolvedNodes(ResolveResultType.Member, enumMember.Node);
+					foreach (var node in enumMemberRefs)
+					{
+						if (!(node is EntityDeclaration))
+							node.ReplaceWith(initExpr.Clone());
+					}
+				}
+				foreach (var typeRef in enumTypeRefs)
+					if (typeRef is SimpleType)
+						typeRef.ReplaceWith(new PrimitiveType("int"));
+				member.Key.Remove();
+			}
 		}
 
 		private void CompileAndAcceptVisitor(DepthFirstAstVisitor visitor)
@@ -500,7 +500,7 @@ namespace CSharpMinifier
 			if (resolveResult != null)
 			{
 				var findReferences = new FindReferences();
-				FoundReferenceCallback callback = delegate(AstNode matchNode, ResolveResult result)
+				FoundReferenceCallback callback = delegate (AstNode matchNode, ResolveResult result)
 				{
 					resolvedNodes.Add(matchNode);
 				};
@@ -771,7 +771,7 @@ namespace CSharpMinifier
 						(node is CSharpTokenNode && node.Role.ToString().All(c => !char.IsLetterOrDigit(c))) ||
 						node is NewLineNode ||
 						node is Comment)
-							indent = "";
+						indent = "";
 				}
 			}
 
@@ -825,6 +825,8 @@ namespace CSharpMinifier
 
 			if (node is ThisReferenceExpression)
 				return "this";
+			else if (node is BaseReferenceExpression)
+				return "base";
 			else if (node is NullReferenceExpression)
 				return "null";
 			else if (node is CSharpTokenNode || node is CSharpModifierToken)
@@ -833,8 +835,7 @@ namespace CSharpMinifier
 				return "";
 
 			return properties
-				.Where(p => NameKeys.Contains(p.Name))
-				.FirstOrDefault()
+				.FirstOrDefault(p => NameKeys.Contains(p.Name))
 				.GetValue(node, null)
 				.ToString();
 		}
