@@ -145,5 +145,29 @@ namespace CSharpMinifier.Tests
 			Assert.IsTrue(minified.Contains("unremovableComment"));
 			Assert.IsTrue(minified.Contains("/*unremovableComment1*/"));
 		}
+
+		[Test]
+		public void IncrementPlus()
+		{
+			var minifier = new Minifier(new MinifierOptions { LocalVarsCompressing = false });
+			var testCode =
+@"public class Test
+{
+	public void Main()
+	{
+		int x = 1;
+		int y = 2;
+		int z1 = y + ++x;
+		int z2 = y + --x;
+		int z3 = y - ++x;
+		int z4 = y - --x;
+	}
+}";
+			var minified = minifier.MinifyFromString(testCode);
+			Assert.IsTrue(minified.Contains("int z1=y+ ++x"));
+			Assert.IsTrue(minified.Contains("int z2=y+--x"));
+			Assert.IsTrue(minified.Contains("int z3=y-++x"));
+			Assert.IsTrue(minified.Contains("int z4=y- --x"));
+		}
 	}
 }

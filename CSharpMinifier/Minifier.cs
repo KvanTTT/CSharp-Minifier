@@ -748,10 +748,14 @@ namespace CSharpMinifier
 			string indent = " ";
 			char last = (char)0;
 			if (line.Length != 0)
+			{
 				last = line[line.Length - 1];
+			}
 
 			if (last == ' ' || last == '\r' || last == '\n' || _prevNode == null || node == null)
+			{
 				indent = "";
+			}
 			else
 			{
 				var prevComment = _prevNode as Comment;
@@ -763,15 +767,29 @@ namespace CSharpMinifier
 						indent = "";
 				}
 				else if (node is PreProcessorDirective || _prevNode is PreProcessorDirective)
+				{
 					indent = Environment.NewLine;
+				}
 				else
 				{
-					if ((_prevNode is CSharpTokenNode && _prevNode.Role.ToString().All(c => !char.IsLetterOrDigit(c))) ||
-						_prevNode is NewLineNode ||
-						(node is CSharpTokenNode && node.Role.ToString().All(c => !char.IsLetterOrDigit(c))) ||
+					string prevNodeString = _prevNode.Role.ToString();
+					string nodeString = node.Role.ToString();
+					if (_prevNode is CSharpTokenNode && prevNodeString.All(c => !char.IsLetterOrDigit(c)))
+					{
+						if ((prevNodeString == "+" && nodeString != "++") ||
+							(prevNodeString == "-" && nodeString != "--") ||
+							(prevNodeString != "+" && prevNodeString != "-"))
+						{
+							indent = "";
+						}
+					}
+					else if (_prevNode is NewLineNode ||
+						(node is CSharpTokenNode && nodeString.All(c => !char.IsLetterOrDigit(c))) ||
 						node is NewLineNode ||
 						node is Comment)
+					{
 						indent = "";
+					}
 				}
 			}
 
