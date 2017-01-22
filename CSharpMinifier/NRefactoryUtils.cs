@@ -1,10 +1,7 @@
 ﻿using ICSharpCode.NRefactory.CSharp;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CSharpMinifier
 {
@@ -18,15 +15,15 @@ namespace CSharpMinifier
 		public static string GetPropertyValue(this AstNode node, string propertyName)
 		{
 			return node.GetType()
-				   .GetProperties()
-				   .GetPropertyValue(node, propertyName);
+					.GetProperties()
+					.GetPropertyValue(node, propertyName);
 		}
 
 		public static T GetPropertyValueEnum<T>(this AstNode node, string propertyName)
 		{
 			return (T)node.GetType()
-				   .GetProperties()
-				   .GetPropertyValueEnum<T>(node, propertyName);
+					.GetProperties()
+					.GetPropertyValueEnum<T>(node, propertyName);
 		}
 
 		public static string GetPropertyValue(this PropertyInfo[] properties, AstNode node, string propertyName)
