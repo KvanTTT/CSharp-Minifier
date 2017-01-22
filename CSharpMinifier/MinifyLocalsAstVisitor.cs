@@ -1,16 +1,14 @@
 ﻿using ICSharpCode.NRefactory.CSharp;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CSharpMinifier
 {
 	public class MinifyLocalsAstVisitor : DepthFirstAstVisitor
 	{
 		private string _currentNamespace;
-		private string _currentType;
+		private List<string> _currentTypes;
 		private List<NameNode> _currentMethodVars;
 		private IEnumerable<string> _ignoredLocals;
 
@@ -31,6 +29,7 @@ namespace CSharpMinifier
 			NotLocalsIdNames = new HashSet<string>();
 			MethodVars = new Dictionary<string, List<NameNode>>();
 			_ignoredLocals = ignoredLocals ?? new List<string>();
+			_currentTypes = new List<string>();
 		}
 
 		public override void VisitNamespaceDeclaration(NamespaceDeclaration namespaceDeclaration)
@@ -41,8 +40,9 @@ namespace CSharpMinifier
 
 		public override void VisitTypeDeclaration(TypeDeclaration typeDeclaration)
 		{
-			_currentType = typeDeclaration.Name;
+			_currentTypes.Add(typeDeclaration.Name);
 			base.VisitTypeDeclaration(typeDeclaration);
+			_currentTypes.RemoveAt(_currentTypes.Count - 1);
 		}
 
 		#region Visit members with body declarations
@@ -96,7 +96,8 @@ namespace CSharpMinifier
 		private void VisitMember(string memberName, IEnumerable<string> parameters = null)
 		{
 			StringBuilder memberKey = new StringBuilder();
-			memberKey.AppendFormat("{0}.{1}.{2}", _currentNamespace, _currentType, memberName);
+			string prefix = string.IsNullOrEmpty(_currentNamespace) ? "" : "." + _currentNamespace;
+			memberKey.AppendFormat("{0}{1}.{2}", prefix, string.Join(".", _currentTypes), memberName);
 			if (parameters != null)
 			{
 				memberKey.Append('(');

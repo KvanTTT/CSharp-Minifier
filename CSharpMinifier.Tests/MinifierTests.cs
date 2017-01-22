@@ -80,7 +80,7 @@ namespace CSharpMinifier.Tests
 			Assert.IsFalse(minified.Contains("/*"));
 			Assert.IsFalse(minified.Contains("*/"));
 		}
-		
+
 		[Test]
 		public void RemoveRegions()
 		{
@@ -168,6 +168,31 @@ namespace CSharpMinifier.Tests
 			Assert.IsTrue(minified.Contains("int z2=y+--x"));
 			Assert.IsTrue(minified.Contains("int z3=y-++x"));
 			Assert.IsTrue(minified.Contains("int z4=y- --x"));
+		}
+
+		[Test]
+		public void NestedClassesWithSameInnterName()
+		{
+			var minifier = new Minifier();
+			var testCode =
+@"public static class A
+{
+    public static class One
+    {
+        public void foo() {}
+    }
+}
+
+public static class B
+{
+    public static class One
+    {
+        public void foo() {}
+    }
+}";
+
+			var minified = minifier.MinifyFromString(testCode);
+			Assert.AreEqual("public static class b{public static class c{public void a(){}}}public static class d{public static class c{public void a(){}}}", minified);
 		}
 	}
 }
