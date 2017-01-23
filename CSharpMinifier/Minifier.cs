@@ -462,15 +462,23 @@ namespace CSharpMinifier
 			foreach (var member in members)
 			{
 				var enumTypeRefs = GetResolvedNodes(ResolveResultType.Type, member.Key);
+				int currentEnumValue = 0;
 				foreach (var enumMember in member.Value)
 				{
-					var initExpr = ((EnumMemberDeclaration)enumMember.Node).Initializer;
+					Expression initExpr = ((EnumMemberDeclaration)enumMember.Node).Initializer;
+					if (initExpr is PrimitiveExpression)
+					{
+						int.TryParse(((PrimitiveExpression)initExpr).Value.ToString(), out currentEnumValue);
+					}
 					var enumMemberRefs = GetResolvedNodes(ResolveResultType.Member, enumMember.Node);
 					foreach (var node in enumMemberRefs)
 					{
 						if (!(node is EntityDeclaration))
-							node.ReplaceWith(initExpr.Clone());
+						{
+							node.ReplaceWith(new PrimitiveExpression(currentEnumValue));
+						}
 					}
+					currentEnumValue++;
 				}
 				foreach (var typeRef in enumTypeRefs)
 					if (typeRef is SimpleType)

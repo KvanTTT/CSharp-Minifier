@@ -192,5 +192,17 @@ public static class B
 			var minified = minifier.MinifyFromString(testCode);
 			Assert.AreEqual("public static class b{public static class c{public void a(){}}}public static class d{public static class c{public void a(){}}}", minified);
 		}
+
+		[Test]
+		public void ShouldProperlyConvertEnumWithoutInitializersToInt()
+		{
+			var minifier = new Minifier();
+			var minified = minifier.MinifyFromString(Samples["EnumToIntConversion"]);
+
+			Assert.IsTrue(CompileUtils.CanCompile(minified));
+			Assert.AreEqual(
+				"using System.Collections.Generic;class c{static int a=5;static Dictionary<int,Dictionary<char,int>>b=new Dictionary<int,Dictionary<char,int>>{{5,new Dictionary<char,int>{{' ',8}}},{6,new Dictionary<char,int>{{' ',24}}}};}",
+				minified);
+		}
 	}
 }
