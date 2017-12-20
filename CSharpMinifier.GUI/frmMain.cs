@@ -33,13 +33,13 @@ namespace CSharpMinifier.GUI
 			foreach (var fileName in fileNames)
 			{
 				var lbItem = new ListBoxItem(fileName, Path.GetFileName(fileName));
-                try
-                {
-                    Sources[lbItem.Key] = File.ReadAllText(lbItem.Key);
-                    lbInputFiles.Items.Add(lbItem);
-                }
-                catch(Exception e)
-                { }
+				try
+				{
+					Sources[lbItem.Key] = File.ReadAllText(lbItem.Key);
+					lbInputFiles.Items.Add(lbItem);
+				}
+				catch(Exception e)
+				{ }
                 
 			}
 		}
