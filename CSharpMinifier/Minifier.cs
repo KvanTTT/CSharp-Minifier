@@ -79,7 +79,8 @@ namespace CSharpMinifier
 			IgnoredIdentifiers = ignoredIdentifiers == null ? new List<string>() : ignoredIdentifiers.ToList();
 			IgnoredComments = new List<string>();
 			if (ignoredComments != null)
-				foreach (var comment in ignoredComments)
+			{
+				foreach (string comment in ignoredComments)
 				{
 					var str = comment;
 					if (str.StartsWith("//"))
@@ -89,6 +90,7 @@ namespace CSharpMinifier
 					if (!IgnoredComments.Contains(str))
 						IgnoredComments.Add(str);
 				}
+			}
 		}
 
 		public string MinifyFiles(string[] csFiles)
@@ -164,8 +166,8 @@ namespace CSharpMinifier
 			}
 			else if (node.Role.ToString() == "Member" && node.GetType().Name == "NamespaceDeclaration")
 			{
-				var parent = node.Parent;
-				foreach (var child in node.Children)
+				AstNode parent = node.Parent;
+				foreach (AstNode child in node.Children)
 				{
 					if (child.NodeType == NodeType.TypeDeclaration)
 					{
@@ -200,14 +202,14 @@ namespace CSharpMinifier
 
 		private void TraverseNodes(AstNode node)
 		{
-			foreach (var children in node.Children)
+			foreach (var child in node.Children)
 			{
-				if (Options.MiscCompressing && children is PrimitiveExpression)
+				if (Options.MiscCompressing && child is PrimitiveExpression)
 				{
-					var primitiveExpression = (PrimitiveExpression)children;
+					var primitiveExpression = (PrimitiveExpression)child;
 					if (IsIntegerNumber(primitiveExpression.Value))
 					{
-						var str = primitiveExpression.Value.ToString();
+						string str = primitiveExpression.Value.ToString();
 						long number;
 						if (long.TryParse(str, out number))
 						{
@@ -216,30 +218,30 @@ namespace CSharpMinifier
 						}
 					}
 				}
-				else if (Options.MiscCompressing && children is CSharpModifierToken)
+				else if (Options.MiscCompressing && child is CSharpModifierToken)
 				{
 					// private int a => int a
-					var modifier = ((CSharpModifierToken)children).Modifier;
+					var modifier = ((CSharpModifierToken)child).Modifier;
 					if (modifier.HasFlag(Modifiers.Private) && (modifier & ~Modifiers.Private) == 0)
-						children.Remove();
+						child.Remove();
 					else
 						modifier &= ~Modifiers.Private;
 				}
-				else if (Options.NamespacesRemoving && children is NamespaceDeclaration)
+				else if (Options.NamespacesRemoving && child is NamespaceDeclaration)
 				{
-					var childsToRemove = children.Children.TakeWhile(c => !(c is CSharpTokenNode && c.Role.ToString() == "{"));
-					foreach (var child in childsToRemove)
-						child.Remove();
-					if (children.Children.Count() > 0)
-						children.Children.First().Remove();
-					if (children.Children.Count() > 0)
-						children.Children.Last().Remove();
-					var namespaceChildrens = children.Children;
+					var childrenToRemove = child.Children.TakeWhile(c => !(c is CSharpTokenNode && c.Role.ToString() == "{"));
+					foreach (AstNode childToRemove in childrenToRemove)
+						childToRemove.Remove();
+					if (child.Children.Count() > 0)
+						child.Children.First().Remove();
+					if (child.Children.Count() > 0)
+						child.Children.Last().Remove();
+					var namespaceChildrens = child.Children;
 
-					var parent = children.Parent;
+					var parent = child.Parent;
 					foreach (var c in parent.Children)
 					{
-						if (c == children)
+						if (c == child)
 						{
 							foreach (var nsChildren in namespaceChildrens)
 								parent.InsertChildAfter(c, nsChildren.Clone(), new Role<AstNode>(nsChildren.Role.ToString()));
@@ -247,14 +249,14 @@ namespace CSharpMinifier
 							break;
 						}
 					}
-					foreach (var c in parent.Children)
+					foreach (AstNode c in parent.Children)
 						TraverseNodes(c);
 				}
-				else if (Options.MiscCompressing && children is VariableDeclarationStatement)
+				else if (Options.MiscCompressing && child is VariableDeclarationStatement)
 				{
 					// List<byte> a = new List<byte>() => var a = new List<byte>()
 					// var a = new b() => b a = new b()
-					var varDecExpr = (VariableDeclarationStatement)children;
+					var varDecExpr = (VariableDeclarationStatement)child;
 					if (!varDecExpr.Modifiers.HasFlag(Modifiers.Const))
 					{
 						var type = varDecExpr.Type.ToString().Replace(" ", "");
@@ -303,25 +305,25 @@ namespace CSharpMinifier
 						}
 					}
 					foreach (var variable in varDecExpr.Variables)
-						TraverseNodes(children);
+						TraverseNodes(child);
 				}
 				else
 				{
-					string role = children.Role.ToString();
-					if (Options.MiscCompressing && children is BlockStatement && role != "Body" && role != "TryBlock")
+					string role = child.Role.ToString();
+					if (Options.MiscCompressing && child is BlockStatement && role != "Body" && role != "TryBlock")
 					{
 						// if (a) { b; } => if (a) b;
-						var childrenCount = children.Children.Count(c => !(c is NewLineNode));
+						var childrenCount = child.Children.Count(c => !(c is NewLineNode));
 						if (childrenCount == 3)
-							children.ReplaceWith(children.Children.Skip(1).FirstOrDefault(c => !(c is NewLineNode)));
+							child.ReplaceWith(child.Children.Skip(1).FirstOrDefault(c => !(c is NewLineNode)));
 						else if (childrenCount < 3)
-							children.Remove();
+							child.Remove();
 					}
-					else if (Options.MiscCompressing && children is BinaryOperatorExpression)
+					else if (Options.MiscCompressing && child is BinaryOperatorExpression)
 					{
 						// if (a == true) => if (a)
 						// if (a == false) => if (!a)
-						var binaryExpression = (BinaryOperatorExpression)children;
+						var binaryExpression = (BinaryOperatorExpression)child;
 						var primitiveExpression = binaryExpression.Left as PrimitiveExpression;
 						var expression = binaryExpression.Right;
 						if (primitiveExpression == null)
@@ -334,12 +336,12 @@ namespace CSharpMinifier
 							var boolean = (bool)primitiveExpression.Value;
 							expression.Remove();
 							if (boolean)
-								children.ReplaceWith(expression);
+								child.ReplaceWith(expression);
 							else
-								children.ReplaceWith(new UnaryOperatorExpression(UnaryOperatorType.Not, expression));
+								child.ReplaceWith(new UnaryOperatorExpression(UnaryOperatorType.Not, expression));
 						}
 					}
-					TraverseNodes(children);
+					TraverseNodes(child);
 				}
 			}
 		}
@@ -362,7 +364,7 @@ namespace CSharpMinifier
 
 		private void RemoveCommentsAndRegions(AstNode node)
 		{
-			foreach (var children in node.Children)
+			foreach (AstNode children in node.Children)
 			{
 				if (Options.CommentsRemoving && children is Comment)
 				{
@@ -708,22 +710,22 @@ namespace CSharpMinifier
 			}
 			else
 			{
-				List<AstNode> childrens;
+				List<AstNode> children;
 				if (node is ArraySpecifier)
 				{
-					childrens = new List<AstNode>();
-					childrens.Add(node.Children.FirstOrDefault(c => c.Role.ToString() == "["));
-					childrens.AddRange(node.Children.Where(c => c.Role.ToString() != "[" && c.Role.ToString() != "]"));
-					childrens.AddRange(node.Children.Where(c => c.Role.ToString() == "]"));
+					children = new List<AstNode>();
+					children.Add(node.Children.FirstOrDefault(c => c.Role.ToString() == "["));
+					children.AddRange(node.Children.Where(c => c.Role.ToString() != "[" && c.Role.ToString() != "]"));
+					children.AddRange(node.Children.Where(c => c.Role.ToString() == "]"));
 				}
 				else if (node is ArrayInitializerExpression)
 				{
 					var arrayInitExpr = (ArrayInitializerExpression)node;
-					childrens = node.Children.ToList();
+					children = node.Children.ToList();
 					int exprNodeInd1 = -1, exprNodeInd2 = -1, commaInd1 = -1;
-					for (int i = 0; i < childrens.Count; i++)
+					for (int i = 0; i < children.Count; i++)
 					{
-						var c = childrens[i];
+						var c = children[i];
 						if (!(c is NewLineNode || c is CSharpTokenNode || c is Comment))
 						{
 							if (exprNodeInd1 == -1)
@@ -738,16 +740,16 @@ namespace CSharpMinifier
 							commaInd1 = i;
 					}
 					if (exprNodeInd1 != -1 && commaInd1 == -1 && exprNodeInd2 != -1)
-						childrens.Insert(exprNodeInd1 + 1,
+						children.Insert(exprNodeInd1 + 1,
 							new CSharpTokenNode(TextLocation.Empty, Roles.Comma) { Role = Roles.Comma });
 				}
 				else
-					childrens = node.Children.ToList();
-				foreach (AstNode children in childrens)
+					children = node.Children.ToList();
+				foreach (AstNode child in children)
 				{
-					RemoveSpacesAndAppend(children, line, result);
-					if (children.Children.Count() <= 1 && !(children is NewLineNode))
-						_prevNode = children;
+					RemoveSpacesAndAppend(child, line, result);
+					if (child.Children.Count() <= 1 && !(child is NewLineNode))
+						_prevNode = child;
 				}
 			}
 		}

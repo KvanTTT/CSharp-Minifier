@@ -38,9 +38,9 @@ namespace CSharpMinifier.GUI
 					Sources[lbItem.Key] = File.ReadAllText(lbItem.Key);
 					lbInputFiles.Items.Add(lbItem);
 				}
-				catch(Exception e)
-				{ }
-                
+				catch
+				{
+				}
 			}
 		}
 
@@ -133,7 +133,7 @@ namespace CSharpMinifier.GUI
 			if (!compileResult.Errors.HasErrors)
 			{
 				pbOutputCompilied.Image = Resources.Ok;
-				lblOutputCompilied.Text = "Compilied";                
+				lblOutputCompilied.Text = "Compilied";
 			}
 			else
 			{
@@ -146,7 +146,7 @@ namespace CSharpMinifier.GUI
 						error.ErrorText, "output");
 				}
 			}
-		}		
+		}
 
 		private void btnCopyToClipboard_Click(object sender, EventArgs e)
 		{
