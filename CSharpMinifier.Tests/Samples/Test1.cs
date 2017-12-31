@@ -115,6 +115,19 @@ namespace A
 		{
 		}
 
+		public void TryCatch()
+		{
+			string s;
+			try
+			{
+				s = "success";
+			}
+			catch (Exception e)
+			{
+				s = "fail";
+			}
+		}
+
 		public override string ToString()
 		{
 			return "C string";

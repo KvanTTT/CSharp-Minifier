@@ -307,7 +307,8 @@ namespace CSharpMinifier
 				}
 				else
 				{
-					if (Options.MiscCompressing && children is BlockStatement && children.Role.ToString() != "Body")
+					string role = children.Role.ToString();
+					if (Options.MiscCompressing && children is BlockStatement && role != "Body" && role != "TryBlock")
 					{
 						// if (a) { b; } => if (a) b;
 						var childrenCount = children.Children.Count(c => !(c is NewLineNode));
