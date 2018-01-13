@@ -86,6 +86,12 @@
 			set;
 		}
 
+		public bool Unsafe
+		{
+			get;
+			set;
+		}
+
 		public MinifierOptions(bool maxCompression = true)
 		{
 			if (maxCompression)
@@ -102,6 +108,7 @@
 				ToStringMethodsRemoving = true;
 				UselessMembersCompressing = true;
 				EnumToIntConversion = true;
+				Unsafe = true;
 			}
 		}
 	}

@@ -74,6 +74,7 @@ namespace CSharpMinifier.GUI
 			cbCompressPublic.Checked = Settings.Default.CompressPublic;
 			cbRemoveToStringMethods.Checked = Settings.Default.RemoveToStringMethods;
 			cbUselessMembersCompressing.Checked = Settings.Default.UselessMembersCompressing;
+			cbUnsafe.Checked = Settings.Default.Unsafe;
 		}
 
 		private void frmMain_FormClosed(object sender, FormClosedEventArgs e)
@@ -101,6 +102,7 @@ namespace CSharpMinifier.GUI
 			Settings.Default.CompressPublic = cbCompressPublic.Checked;
 			Settings.Default.RemoveToStringMethods = cbRemoveToStringMethods.Checked;
 			Settings.Default.UselessMembersCompressing = cbUselessMembersCompressing.Checked;
+			Settings.Default.Unsafe = cbUnsafe.Checked;
 			Settings.Default.Save();
 		}
 
@@ -120,7 +122,8 @@ namespace CSharpMinifier.GUI
 				LineLength = int.Parse(tbLineLength.Text),
 				ToStringMethodsRemoving = cbRemoveToStringMethods.Checked,
 				PublicCompressing = cbCompressPublic.Checked,
-				EnumToIntConversion = cbEnumToIntConversion.Checked
+				EnumToIntConversion = cbEnumToIntConversion.Checked,
+				Unsafe = cbUnsafe.Checked
 			};
 			Minifier minifier = new Minifier(minifierOptions);
 			tbOutput.Text = !cbMinifyFiles.Checked ? minifier.MinifyFromString(tbInput.Text) : minifier.MinifyFiles(Sources.Select(source => source.Value).ToArray());
