@@ -59,8 +59,6 @@ namespace A
 				Console.WriteLine(A);
 				Console.WriteLine(b);
 			}
-			{
-			}
 			Console.WriteLine(this.C);
 			Console.WriteLine(unminifiedId);
 		}
@@ -108,7 +106,7 @@ namespace A
 		const int a = 0/*comment*/;
 		const int b = 0xFF;
 		private const string s = "asdf";
-		
+
 		/*unremovableComment1*/
 		public C()
 			: base()
@@ -126,6 +124,16 @@ namespace A
 			{
 				s = "fail";
 			}
+		}
+
+		public void EmptyStatements()
+		{
+			int a = 1, b = 2;
+			if (a == b) { }
+			int c = 1, d = 2;
+			if (c == d) ;
+			{ }
+			;
 		}
 
 		public override string ToString()

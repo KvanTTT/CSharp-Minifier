@@ -307,6 +307,21 @@ namespace CSharpMinifier
 					foreach (var variable in varDecExpr.Variables)
 						TraverseNodes(child);
 				}
+				else if (child is EmptyStatement)
+				{
+					// { ; ; } => {}
+					if (!(child.Parent is BlockStatement))
+					{
+						if (Options.Unsafe)
+						{
+							node.Remove();
+						}
+					}
+					else
+					{
+						child.Remove();
+					}
+				}
 				else
 				{
 					string role = child.Role.ToString();
@@ -317,9 +332,25 @@ namespace CSharpMinifier
 						if (childrenCount == 3)
 							child.ReplaceWith(child.Children.Skip(1).FirstOrDefault(c => !(c is NewLineNode)));
 						else if (childrenCount < 3)
-							child.Remove();
+						{
+							if (!(child.Parent is BlockStatement))
+							{
+								if (Options.Unsafe)
+								{
+									node.Remove();
+								}
+								else
+								{
+									child.ReplaceWith(new EmptyStatement());
+								}
+							}
+							else
+							{
+								child.Remove();
+							}
+						}
 					}
-					else if (Options.MiscCompressing && child is BinaryOperatorExpression)
+					else if (Options.Unsafe && child is BinaryOperatorExpression)
 					{
 						// if (a == true) => if (a)
 						// if (a == false) => if (!a)
@@ -763,7 +794,7 @@ namespace CSharpMinifier
 				last = line[line.Length - 1];
 			}
 
-			if (last == ' ' || last == '\r' || last == '\n' || _prevNode == null || node == null)
+			if (last == ' ' || last == '\r' || last == '\n' || last == ';' || _prevNode == null || node == null)
 			{
 				indent = "";
 			}
@@ -795,6 +826,7 @@ namespace CSharpMinifier
 						}
 					}
 					else if (_prevNode is NewLineNode ||
+						_prevNode is EmptyStatement ||
 						(node is CSharpTokenNode && nodeString.All(c => !char.IsLetterOrDigit(c))) ||
 						node is NewLineNode ||
 						node is Comment)
@@ -864,6 +896,8 @@ namespace CSharpMinifier
 				return nodeRole;
 			else if (node is NewLineNode)
 				return "";
+			else if (node is EmptyStatement)
+				return ";";
 
 			return properties
 				.FirstOrDefault(p => NameKeys.Contains(p.Name))
