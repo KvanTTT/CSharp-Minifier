@@ -125,7 +125,7 @@ namespace CSharpMinifier.GUI
 				EnumToIntConversion = cbEnumToIntConversion.Checked,
 				Unsafe = cbUnsafe.Checked
 			};
-			Minifier minifier = new Minifier(minifierOptions);
+			IMinifier minifier = new RoslynMinifier(minifierOptions);
 			tbOutput.Text = !cbMinifyFiles.Checked ? minifier.MinifyFromString(tbInput.Text) : minifier.MinifyFiles(Sources.Select(source => source.Value).ToArray());
 
 			tbInputLength.Text = tbInput.Text.Length.ToString();

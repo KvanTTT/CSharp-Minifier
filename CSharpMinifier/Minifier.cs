@@ -4,6 +4,7 @@ using ICSharpCode.NRefactory.CSharp.Resolver;
 using ICSharpCode.NRefactory.CSharp.TypeSystem;
 using ICSharpCode.NRefactory.Semantics;
 using ICSharpCode.NRefactory.TypeSystem;
+using Microsoft.CodeAnalysis.CSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,10 +12,11 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ICSharpCode.NRefactory.Documentation;
 
 namespace CSharpMinifier
 {
-	public class Minifier
+	public class Minifier : IMinifier
 	{
 		private static string[] NameKeys = new string[] { "Name", "LiteralValue", "Keyword" };
 		private const string VarId = "var";
@@ -123,7 +125,6 @@ namespace CSharpMinifier
 		public string MinifyFromString(string csharpCode)
 		{
 			SyntaxTree = new CSharpParser().Parse(csharpCode, ParserTempFileName);
-
 			return Minify();
 		}
 
