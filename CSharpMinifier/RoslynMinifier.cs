@@ -48,7 +48,7 @@ namespace CSharpMinifier
         {
             if (Options.CommentsRemoving || Options.RegionsRemoving)
                 RemoveCommentsAndRegions();
-
+            return SyntaxTree.GetRoot().ToFullString();
             if (Options.LocalVarsCompressing || Options.UselessMembersCompressing)
                 CompressLocals();
             if (Options.MembersCompressing || Options.UselessMembersCompressing)
@@ -81,14 +81,15 @@ namespace CSharpMinifier
         private void CompressLocals()
         {
             var root = (CompilationUnitSyntax)SyntaxTree.GetRoot();
-            var locals = root.DescendantNodes().OfType<VariableDeclarationSyntax>();
-            foreach (var variables in locals.Select(l => l.Variables))
-            {
-                foreach (var variable in variables)
-                {
-                }
+            var methods = root.DescendantNodes()
+            .OfType<MethodDeclarationSyntax>().ToList();
+            var localSymbols = SemanticModel
+                .LookupSymbols(methods.First().Body.Span.Start)
+                .Where(sym => sym.Kind == SymbolKind.Local);
+            foreach(var localSymbol in localSymbols)
+            {                
             }
-            var localsCopy = locals;
+            var i = 1;
         }
 
         private string GetStringWithoutSpaces()
