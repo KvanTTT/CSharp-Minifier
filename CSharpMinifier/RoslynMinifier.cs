@@ -46,75 +46,11 @@ namespace CSharpMinifier
 
         public string Minify()
         {
-            if (Options.CommentsRemoving || Options.RegionsRemoving)
-                RemoveCommentsAndRegions();
-            return SyntaxTree.GetRoot().ToFullString();
-            if (Options.LocalVarsCompressing || Options.UselessMembersCompressing)
-                CompressLocals();
-            if (Options.MembersCompressing || Options.UselessMembersCompressing)
-                CompressMembers();
-            if (Options.TypesCompressing)
-                CompressTypes();
-            if (Options.EnumToIntConversion)
-                ConvertEnumToInts();
-            if (Options.MiscCompressing || Options.NamespacesRemoving)
-                CompressMixed();
-
-            string result;
-            if (Options.SpacesRemoving)
-                result = GetStringWithoutSpaces();
-            else
-                result = SyntaxTree.ToString();
-
-            return result;
-        }
-
-        private void RemoveCommentsAndRegions()
-        {
-            var rewriter = new CSharpRewriter(SemanticModel);
+            var rewriter = new CSharpRewriter(SemanticModel, Options);
             var root = SyntaxTree.GetRoot();
             root = rewriter.Visit(root);
             var newRoot = root.ReplaceTrivia(root.DescendantTrivia(), rewriter.CommentAndRegionsTriviaNodes);
-            SyntaxTree = CSharpSyntaxTree.Create((CSharpSyntaxNode)newRoot);
-        }
-
-        private void CompressLocals()
-        {
-            var root = (CompilationUnitSyntax)SyntaxTree.GetRoot();
-            var methods = root.DescendantNodes()
-            .OfType<MethodDeclarationSyntax>().ToList();
-            var localSymbols = SemanticModel
-                .LookupSymbols(methods.First().Body.Span.Start)
-                .Where(sym => sym.Kind == SymbolKind.Local);
-            foreach(var localSymbol in localSymbols)
-            {                
-            }
-            var i = 1;
-        }
-
-        private string GetStringWithoutSpaces()
-        {
-            throw new NotImplementedException();
-        }
-
-        private void CompressMixed()
-        {
-            throw new NotImplementedException();
-        }
-
-        private void ConvertEnumToInts()
-        {
-            throw new NotImplementedException();
-        }
-
-        private void CompressTypes()
-        {
-            throw new NotImplementedException();
-        }
-
-        private void CompressMembers()
-        {
-            throw new NotImplementedException();
+            return newRoot.ToFullString();
         }
     }
 }

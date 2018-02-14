@@ -1,6 +1,10 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Mono.CSharp;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpMinifier.Rewriters
@@ -8,13 +12,14 @@ namespace CSharpMinifier.Rewriters
     class CSharpRewriter : CSharpSyntaxRewriter
     {
         private readonly SemanticModel _semanticModel;
-        private readonly string[] _namesGenerator;
-        private int _currentIndex = 0;
+        private MinifierOptions _options;
+        private IdentifierGenerator _identifierGenerator; 
 
-        public CSharpRewriter(SemanticModel semanticModel,bool visitIntoStructuredTrivia = true) : base(visitIntoStructuredTrivia)
+        public CSharpRewriter(SemanticModel semanticModel, MinifierOptions options = null, bool visitIntoStructuredTrivia = true) : base(visitIntoStructuredTrivia)
         {
             _semanticModel = semanticModel;
-            _namesGenerator = new string[]{ "a","b","c","d","e","f","g","h","j","l","m","n"};
+            _options = options ?? new MinifierOptions();
+            _identifierGenerator = new IdentifierGenerator();
         }
         
         public override SyntaxNode VisitRegionDirectiveTrivia(RegionDirectiveTriviaSyntax node)
@@ -32,28 +37,40 @@ namespace CSharpMinifier.Rewriters
             return null;
         }
 
-        public override SyntaxNode VisitLocalDeclarationStatement(LocalDeclarationStatementSyntax node)
-        {
-            return base.VisitLocalDeclarationStatement(node);
-        }
-
         public override SyntaxNode VisitVariableDeclarator(VariableDeclaratorSyntax node)
         {
-            if (node.IsKind(SyntaxKind.VariableDeclarator))
+            if (_options.LocalVarsCompressing)
             {
-                var newNode= node.ReplaceToken(node.Identifier, Identifier(_namesGenerator[_currentIndex]));
-                _currentIndex++;
+                var name = _identifierGenerator.GetNextName(node);
+                var newNode = node.WithIdentifier(Identifier(name));
                 return newNode;
             }
             return base.VisitVariableDeclarator(node);
         }
+
+        public override SyntaxNode VisitIdentifierName(IdentifierNameSyntax node)
+        {
+            if(_options.LocalVarsCompressing && _identifierGenerator.RenamedVariables.Any(i => i.Key.Identifier.ValueText == node.Identifier.ValueText))
+            {
+                var newName = _identifierGenerator.RenamedVariables.First(i => i.Key.Identifier.ValueText == node.Identifier.ValueText && node.FullSpan.IntersectsWith(i.Key.Parent.Parent.Parent.FullSpan)).Value;
+                return node.WithIdentifier(Identifier(newName)
+                    .WithTriviaFrom(node.Identifier));
+            }
+            return base.VisitIdentifierName(node);
+        }
+
+        public override SyntaxNode VisitPropertyDeclaration(PropertyDeclarationSyntax node)
+        {
+            return base.VisitPropertyDeclaration(node);
+        }
+
 
         public SyntaxTrivia CommentAndRegionsTriviaNodes(SyntaxTrivia arg1, SyntaxTrivia arg2)
         {
             if (arg1.IsKind(SyntaxKind.SingleLineCommentTrivia) || arg1.IsKind(SyntaxKind.MultiLineCommentTrivia)
                 || arg1.IsKind(SyntaxKind.RegionDirectiveTrivia) || arg1.IsKind(SyntaxKind.EndRegionDirectiveTrivia))
             {
-                arg2 = SyntaxFactory.CarriageReturn;
+                arg2 = CarriageReturn;
             }
             else
             {

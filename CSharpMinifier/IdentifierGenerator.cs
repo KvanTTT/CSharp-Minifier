@@ -1,0 +1,92 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+namespace CSharpMinifier
+{
+    public class IdentifierGenerator
+    {
+        public Dictionary<VariableDeclaratorSyntax, string> RenamedVariables { get; private set; }
+
+        public Dictionary<MethodDeclarationSyntax, string> RenamedMethods { get; private set; }
+
+        public Dictionary<TypeDeclarationSyntax, string> RenamedTypes { get; private set; }
+
+        private List<string> _existingNames = new List<string>();
+
+        private const int FirstSymbolCode = 97;
+        private const int LastSymbolCode = 122;
+
+        private static string[] _cSharpKeywords = new string[]
+        {
+            "abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char",
+            "checked", "class", "const", "continue", "decimal", "default", "delegate", "do", "double",
+            "else", "enum", "event", "explicit", "extern", "false", "finally", "fixed", "float",
+            "for", "foreach", "goto", "if", "implicit", "in", "int", "interface", "internal",
+            "is", "lock", "long", "namespace", "new", "null", "object", "operator", "out",
+            "override", "params", "private", "protected", "public", "readonly", "ref", "return", "sbyte",
+            "sealed", "short", "sizeof", "stackalloc", "static", "string", "struct", "switch",
+            "this", "throw", "true", "try", "typeof", "uint", "ulong", "unchecked", "unsafe",
+            "ushort", "using", "virtual", "void", "volatile", "while"
+        };
+
+        public IdentifierGenerator()
+        {
+            RenamedVariables = new Dictionary<VariableDeclaratorSyntax, string>();
+            RenamedMethods = new Dictionary<MethodDeclarationSyntax, string>();
+            RenamedTypes = new Dictionary<TypeDeclarationSyntax, string>();
+        }
+
+        public string GetNextName(SyntaxNode node)
+        {
+            if (_existingNames.Count > 0)
+            {
+                string lastName = _existingNames[_existingNames.Count - 1];
+                string nextName = IncrementName(lastName);
+                _existingNames.Add(nextName);
+                AddToDictionary(node);
+                return nextName;
+            }
+            var firstSymbol = Char.ConvertFromUtf32(FirstSymbolCode);
+            _existingNames.Add(firstSymbol);
+            AddToDictionary(node);
+            return firstSymbol;
+        }
+
+        private void AddToDictionary(SyntaxNode node)
+        {
+            switch (node.Kind())
+            {
+                case SyntaxKind.MethodDeclaration:
+                    RenamedMethods.Add((MethodDeclarationSyntax)node, LastName);
+                    break;
+                case SyntaxKind.VariableDeclarator:
+                    RenamedVariables.Add((VariableDeclaratorSyntax)node, LastName);
+                    break;
+                case SyntaxKind.ClassDeclaration:
+                    RenamedTypes.Add((TypeDeclarationSyntax)node, LastName);
+                    break;
+            }
+        }
+
+
+        private string LastName => _existingNames.LastOrDefault();
+
+        private string IncrementName(string lastName)
+        {
+            char lastChar = lastName[lastName.Length - 1];
+            string fragment = lastName.Substring(0, lastName.Length - 1);
+            if (lastChar < LastSymbolCode)
+            {
+                lastChar++;
+                return fragment + lastChar;
+            }
+            return IncrementName(fragment) + Char.ConvertFromUtf32(FirstSymbolCode);
+        }
+    }
+}

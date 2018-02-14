@@ -146,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompileUtils.cs" />
+    <Compile Include="IdentifierGenerator.cs" />
     <Compile Include="IMinifier.cs" />
     <Compile Include="MinifyEnumsAstVisitor.cs" />
     <Compile Include="MinifyTypesAstVisitor.cs" />
