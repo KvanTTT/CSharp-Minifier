@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.FindSymbols;
 using Microsoft.CodeAnalysis.Rename;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -48,24 +45,19 @@ namespace CSharpMinifier.Rewriters
             {
                 var nodeToSearch = newNode.DescendantNodes()
                     .OfType<VariableDeclaratorSyntax>().FirstOrDefault(x => x.Identifier.ValueText.Equals(variable.Key.Identifier.ValueText));
-                newNode = Rename(document, nodeToSearch, variable.Value);
+                (newNode, document) = Rename(nodeToSearch, document, variable.Value);
             }
             foreach (var classToRename in _identifierGenerator.RenamedTypes)
             {
                 var nodeToSearch = newNode.DescendantNodes()
                     .OfType<ClassDeclarationSyntax>().FirstOrDefault(x => x.Identifier.ValueText.Equals(classToRename.Key.Identifier.ValueText));
-                newNode = Rename(document, nodeToSearch, classToRename.Value);
-            }
-            foreach (var fieldToRename in _identifierGenerator.RenamedFields)
-            {
-                
+                (newNode, document) = Rename(nodeToSearch, document, classToRename.Value);
             }
 
-            newNode = newSolution.Projects.First().Documents.First().GetSemanticModelAsync().Result.SyntaxTree.GetRoot();
             return newNode;
         }
 
-        private SyntaxNode Rename(Document document, SyntaxNode nodeToRename, string newName)
+        private (SyntaxNode node, Document document) Rename(SyntaxNode nodeToRename, Document document, string newName)
         {
             var symbolInfo = _semanticModel.GetSymbolInfo(nodeToRename).Symbol ?? _semanticModel.GetDeclaredSymbol(nodeToRename);
             var solution = Renamer.RenameSymbolAsync(document.Project.Solution, symbolInfo, newName,
@@ -73,7 +65,7 @@ namespace CSharpMinifier.Rewriters
             _workspace.TryApplyChanges(solution);
             document = _workspace.CurrentSolution.GetDocument(document.Id);
             _semanticModel = document.GetSemanticModelAsync().Result;
-            return _semanticModel.SyntaxTree.GetRoot();
+            return (_semanticModel.SyntaxTree.GetRoot(), document);
         }
 
         public override SyntaxNode VisitLocalDeclarationStatement(LocalDeclarationStatementSyntax node)
@@ -96,9 +88,13 @@ namespace CSharpMinifier.Rewriters
 
         public override SyntaxNode VisitFieldDeclaration(FieldDeclarationSyntax node)
         {
-            if (_options.PublicCompressing)
+            if(_options.LocalVarsCompressing && node.Modifiers.Any(m => m.Value.Equals("private")))
             {
-                _identifierGenerator.GetNextName(node);
+                _identifierGenerator.GetNextName(node.Declaration.Variables.First());
+            }
+            else if (_options.PublicCompressing && node.Modifiers.Any(m => m.Value.Equals("public")))
+            {
+                _identifierGenerator.GetNextName(node.Declaration.Variables.First());
             }
             return base.VisitFieldDeclaration(node);
         }

@@ -42,6 +42,7 @@ namespace CSharpMinifier
             RenamedVariables = new Dictionary<VariableDeclaratorSyntax, string>();
             RenamedMethods = new Dictionary<MethodDeclarationSyntax, string>();
             RenamedTypes = new Dictionary<ClassDeclarationSyntax, string>();
+            RenamedFields = new Dictionary<FieldDeclarationSyntax, string>();
         }
 
         public string GetNextName(SyntaxNode node)
