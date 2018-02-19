@@ -15,7 +15,9 @@ namespace CSharpMinifier
 
         public Dictionary<MethodDeclarationSyntax, string> RenamedMethods { get; private set; }
 
-        public Dictionary<TypeDeclarationSyntax, string> RenamedTypes { get; private set; }
+        public Dictionary<ClassDeclarationSyntax, string> RenamedTypes { get; private set; }
+
+        public Dictionary<FieldDeclarationSyntax, string> RenamedFields { get; set; }
 
         private List<string> _existingNames = new List<string>();
 
@@ -39,7 +41,7 @@ namespace CSharpMinifier
         {
             RenamedVariables = new Dictionary<VariableDeclaratorSyntax, string>();
             RenamedMethods = new Dictionary<MethodDeclarationSyntax, string>();
-            RenamedTypes = new Dictionary<TypeDeclarationSyntax, string>();
+            RenamedTypes = new Dictionary<ClassDeclarationSyntax, string>();
         }
 
         public string GetNextName(SyntaxNode node)
@@ -69,7 +71,10 @@ namespace CSharpMinifier
                     RenamedVariables.Add((VariableDeclaratorSyntax)node, LastName);
                     break;
                 case SyntaxKind.ClassDeclaration:
-                    RenamedTypes.Add((TypeDeclarationSyntax)node, LastName);
+                    RenamedTypes.Add((ClassDeclarationSyntax)node, LastName);
+                    break;
+                case SyntaxKind.FieldDeclaration:
+                    RenamedFields.Add((FieldDeclarationSyntax)node, LastName);
                     break;
             }
         }

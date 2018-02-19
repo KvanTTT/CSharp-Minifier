@@ -1,67 +1,106 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Mono.CSharp;
+using Microsoft.CodeAnalysis.FindSymbols;
+using Microsoft.CodeAnalysis.Rename;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpMinifier.Rewriters
 {
     class CSharpRewriter : CSharpSyntaxRewriter
     {
-        private readonly SemanticModel _semanticModel;
+        private SemanticModel _semanticModel;
+        private AdhocWorkspace _workspace;
         private MinifierOptions _options;
         private IdentifierGenerator _identifierGenerator; 
 
-        public CSharpRewriter(SemanticModel semanticModel, MinifierOptions options = null, bool visitIntoStructuredTrivia = true) : base(visitIntoStructuredTrivia)
+        public CSharpRewriter(MinifierOptions options = null, bool visitIntoStructuredTrivia = true) : base(visitIntoStructuredTrivia)
         {
-            _semanticModel = semanticModel;
             _options = options ?? new MinifierOptions();
             _identifierGenerator = new IdentifierGenerator();
-        }
-        
-        public override SyntaxNode VisitRegionDirectiveTrivia(RegionDirectiveTriviaSyntax node)
-        {
-            return null;
+            //Add cause MSBuild does not work without it
+            var _ = typeof(Microsoft.CodeAnalysis.CSharp.Formatting.CSharpFormattingOptions);
         }
 
-        public override SyntaxNode VisitEndRegionDirectiveTrivia(EndRegionDirectiveTriviaSyntax node)
+        public SyntaxNode VisitAndRename(SyntaxNode node)
         {
-            return null;
+            node = Visit(node);
+            return RenameAll(node);
         }
 
-        public override SyntaxNode VisitEmptyStatement(EmptyStatementSyntax node)
+        private SyntaxNode RenameAll(SyntaxNode node)
         {
-            return null;
+            var mscorlib = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
+            _workspace = new AdhocWorkspace();
+            var project = _workspace.AddProject("MinifierProject", LanguageNames.CSharp);
+            project = project.AddMetadataReference(mscorlib);
+            _workspace.TryApplyChanges(project.Solution);
+            var source = node.GetText();
+            var document = _workspace.AddDocument(project.Id, "Doc", source);
+            _semanticModel = document.GetSemanticModelAsync().Result;
+            var newNode = _semanticModel.SyntaxTree.GetRoot();
+            var newSolution = document.Project.Solution;
+            foreach (KeyValuePair<VariableDeclaratorSyntax, string> variable in _identifierGenerator.RenamedVariables)
+            {
+                var nodeToSearch = newNode.DescendantNodes()
+                    .OfType<VariableDeclaratorSyntax>().FirstOrDefault(x => x.Identifier.ValueText.Equals(variable.Key.Identifier.ValueText));
+                newNode = Rename(document, nodeToSearch, variable.Value);
+            }
+            foreach (var classToRename in _identifierGenerator.RenamedTypes)
+            {
+                var nodeToSearch = newNode.DescendantNodes()
+                    .OfType<ClassDeclarationSyntax>().FirstOrDefault(x => x.Identifier.ValueText.Equals(classToRename.Key.Identifier.ValueText));
+                newNode = Rename(document, nodeToSearch, classToRename.Value);
+            }
+            foreach (var fieldToRename in _identifierGenerator.RenamedFields)
+            {
+                
+            }
+
+            newNode = newSolution.Projects.First().Documents.First().GetSemanticModelAsync().Result.SyntaxTree.GetRoot();
+            return newNode;
         }
 
-        public override SyntaxNode VisitVariableDeclarator(VariableDeclaratorSyntax node)
+        private SyntaxNode Rename(Document document, SyntaxNode nodeToRename, string newName)
+        {
+            var symbolInfo = _semanticModel.GetSymbolInfo(nodeToRename).Symbol ?? _semanticModel.GetDeclaredSymbol(nodeToRename);
+            var solution = Renamer.RenameSymbolAsync(document.Project.Solution, symbolInfo, newName,
+                _workspace.Options).Result;
+            _workspace.TryApplyChanges(solution);
+            document = _workspace.CurrentSolution.GetDocument(document.Id);
+            _semanticModel = document.GetSemanticModelAsync().Result;
+            return _semanticModel.SyntaxTree.GetRoot();
+        }
+
+        public override SyntaxNode VisitLocalDeclarationStatement(LocalDeclarationStatementSyntax node)
         {
             if (_options.LocalVarsCompressing)
             {
-                var name = _identifierGenerator.GetNextName(node);
-                var newNode = node.WithIdentifier(Identifier(name));
-                return newNode;
+                _identifierGenerator.GetNextName(node.Declaration.Variables.First());
             }
-            return base.VisitVariableDeclarator(node);
+            return base.VisitLocalDeclarationStatement(node);
         }
 
-        public override SyntaxNode VisitIdentifierName(IdentifierNameSyntax node)
+        public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            if(_options.LocalVarsCompressing && _identifierGenerator.RenamedVariables.Any(i => i.Key.Identifier.ValueText == node.Identifier.ValueText))
+            if (_options.PublicCompressing)
             {
-                var newName = _identifierGenerator.RenamedVariables.First(i => i.Key.Identifier.ValueText == node.Identifier.ValueText && node.FullSpan.IntersectsWith(i.Key.Parent.Parent.Parent.FullSpan)).Value;
-                return node.WithIdentifier(Identifier(newName)
-                    .WithTriviaFrom(node.Identifier));
+                _identifierGenerator.GetNextName(node);
             }
-            return base.VisitIdentifierName(node);
+            return base.VisitClassDeclaration(node);
         }
 
-        public override SyntaxNode VisitPropertyDeclaration(PropertyDeclarationSyntax node)
+        public override SyntaxNode VisitFieldDeclaration(FieldDeclarationSyntax node)
         {
-            return base.VisitPropertyDeclaration(node);
+            if (_options.PublicCompressing)
+            {
+                _identifierGenerator.GetNextName(node);
+            }
+            return base.VisitFieldDeclaration(node);
         }
 
 

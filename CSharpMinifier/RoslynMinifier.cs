@@ -14,9 +14,7 @@ namespace CSharpMinifier
     public class RoslynMinifier : IMinifier
     {
         public SyntaxTree SyntaxTree { get; private set; }
-
-        public SemanticModel SemanticModel { get; private set; }
-
+        
         public MinifierOptions Options { get; private set; }
 
         public List<string> IgnoredIdentifiers { get; private set; }
@@ -38,17 +36,14 @@ namespace CSharpMinifier
         public string MinifyFromString(string csharpCode)
         {
             SyntaxTree = CSharpSyntaxTree.ParseText(csharpCode);
-            var Mscorlib = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
-            var compilation = CSharpCompilation.Create("MyCompilation", new[] { SyntaxTree }, new[] { Mscorlib });
-            SemanticModel = compilation.GetSemanticModel(SyntaxTree);
             return Minify();
         }
 
         public string Minify()
         {
-            var rewriter = new CSharpRewriter(SemanticModel, Options);
+            var rewriter = new CSharpRewriter(Options);
             var root = SyntaxTree.GetRoot();
-            root = rewriter.Visit(root);
+            root = rewriter.VisitAndRename(root);
             var newRoot = root.ReplaceTrivia(root.DescendantTrivia(), rewriter.CommentAndRegionsTriviaNodes);
             return newRoot.ToFullString();
         }
