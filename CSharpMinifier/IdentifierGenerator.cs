@@ -17,7 +17,7 @@ namespace CSharpMinifier
 
         public Dictionary<ClassDeclarationSyntax, string> RenamedTypes { get; private set; }
 
-        public Dictionary<FieldDeclarationSyntax, string> RenamedFields { get; set; }
+        public Dictionary<PropertyDeclarationSyntax, string> RenamedProperties { get; set; }
 
         private List<string> _existingNames = new List<string>();
 
@@ -42,7 +42,7 @@ namespace CSharpMinifier
             RenamedVariables = new Dictionary<VariableDeclaratorSyntax, string>();
             RenamedMethods = new Dictionary<MethodDeclarationSyntax, string>();
             RenamedTypes = new Dictionary<ClassDeclarationSyntax, string>();
-            RenamedFields = new Dictionary<FieldDeclarationSyntax, string>();
+            RenamedProperties = new Dictionary<PropertyDeclarationSyntax, string>();
         }
 
         public string GetNextName(SyntaxNode node)
@@ -74,8 +74,8 @@ namespace CSharpMinifier
                 case SyntaxKind.ClassDeclaration:
                     RenamedTypes.Add((ClassDeclarationSyntax)node, LastName);
                     break;
-                case SyntaxKind.FieldDeclaration:
-                    RenamedFields.Add((FieldDeclarationSyntax)node, LastName);
+                case SyntaxKind.PropertyDeclaration:
+                    RenamedProperties.Add((PropertyDeclarationSyntax)node, LastName);
                     break;
             }
         }
@@ -85,11 +85,15 @@ namespace CSharpMinifier
 
         private string IncrementName(string lastName)
         {
+            if (lastName.Length <= 0)
+                lastName = "a";
             char lastChar = lastName[lastName.Length - 1];
             string fragment = lastName.Substring(0, lastName.Length - 1);
-            if (lastChar < LastSymbolCode)
+            while (lastChar < LastSymbolCode)
             {
                 lastChar++;
+                if (_cSharpKeywords.Contains(fragment + lastChar))
+                    continue;
                 return fragment + lastChar;
             }
             return IncrementName(fragment) + Char.ConvertFromUtf32(FirstSymbolCode);

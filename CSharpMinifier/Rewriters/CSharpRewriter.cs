@@ -40,7 +40,6 @@ namespace CSharpMinifier.Rewriters
             var document = _workspace.AddDocument(project.Id, "Doc", source);
             _semanticModel = document.GetSemanticModelAsync().Result;
             var newNode = _semanticModel.SyntaxTree.GetRoot();
-            var newSolution = document.Project.Solution;
             foreach (KeyValuePair<VariableDeclaratorSyntax, string> variable in _identifierGenerator.RenamedVariables)
             {
                 var nodeToSearch = newNode.DescendantNodes()
@@ -52,6 +51,12 @@ namespace CSharpMinifier.Rewriters
                 var nodeToSearch = newNode.DescendantNodes()
                     .OfType<ClassDeclarationSyntax>().FirstOrDefault(x => x.Identifier.ValueText.Equals(classToRename.Key.Identifier.ValueText));
                 (newNode, document) = Rename(nodeToSearch, document, classToRename.Value);
+            }
+            foreach (var propertyToRename in _identifierGenerator.RenamedProperties)
+            {
+                var nodeToSearch = newNode.DescendantNodes()
+                    .OfType<PropertyDeclarationSyntax>().FirstOrDefault(x => x.Identifier.ValueText.Equals(propertyToRename.Key.Identifier.ValueText));
+                (newNode, document) = Rename(nodeToSearch, document, propertyToRename.Value);
             }
 
             return newNode;
@@ -97,6 +102,19 @@ namespace CSharpMinifier.Rewriters
                 _identifierGenerator.GetNextName(node.Declaration.Variables.First());
             }
             return base.VisitFieldDeclaration(node);
+        }
+
+        public override SyntaxNode VisitPropertyDeclaration(PropertyDeclarationSyntax node)
+        {
+            if (_options.PublicCompressing && node.Modifiers.Any(m => m.Value.Equals("public")))
+            {
+                _identifierGenerator.GetNextName(node);
+            }
+            else if (_options.LocalVarsCompressing && node.Modifiers.Any(m => m.Value.Equals("private")))
+            {
+                _identifierGenerator.GetNextName(node);
+            }
+            return base.VisitPropertyDeclaration(node);
         }
 
 
