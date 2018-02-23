@@ -8,53 +8,65 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CSharpMinifier.Rewriters
 {
-    class CSharpRewriter : CSharpSyntaxRewriter
+    class TokensMinifier : CSharpSyntaxRewriter
     {
         private SemanticModel _semanticModel;
         private AdhocWorkspace _workspace;
         private MinifierOptions _options;
         private IdentifierGenerator _identifierGenerator; 
 
-        public CSharpRewriter(MinifierOptions options = null, bool visitIntoStructuredTrivia = true) : base(visitIntoStructuredTrivia)
+        public TokensMinifier(AdhocWorkspace workspace, MinifierOptions options = null, bool visitIntoStructuredTrivia = true) : base(visitIntoStructuredTrivia)
         {
             _options = options ?? new MinifierOptions();
             _identifierGenerator = new IdentifierGenerator();
-            //Add cause MSBuild does not work without it
+            _workspace = workspace;
+            //Add cause MSBuild does not copy Charp.Workspace.dll
             var _ = typeof(Microsoft.CodeAnalysis.CSharp.Formatting.CSharpFormattingOptions);
         }
 
-        public SyntaxNode VisitAndRename(SyntaxNode node)
+        public AdhocWorkspace VisitAndRename()
         {
-            node = Visit(node);
-            return RenameAll(node);
+            foreach(var project in _workspace.CurrentSolution.Projects)
+            {
+                foreach(var document in project.Documents)
+                {
+                    _semanticModel = document.GetSemanticModelAsync().Result;
+                    var node = _semanticModel.SyntaxTree.GetRoot();
+                    node = Visit(node);
+                    node = node.ReplaceTrivia(node.DescendantTrivia(), ReplaceTriviaNodes);
+                    RenameAll(document.WithSyntaxRoot(node));
+                }
+            }
+
+            return _workspace;
         }
 
-        private SyntaxNode RenameAll(SyntaxNode node)
-        {
-            var mscorlib = MetadataReference.CreateFromFile(typeof(object).Assembly.Location);
-            _workspace = new AdhocWorkspace();
-            var project = _workspace.AddProject("MinifierProject", LanguageNames.CSharp);
-            project = project.AddMetadataReference(mscorlib);
-            _workspace.TryApplyChanges(project.Solution);
-            var source = node.GetText();
-            var document = _workspace.AddDocument(project.Id, "Doc", source);
+        private void RenameAll(Document document)
+        {           
             _semanticModel = document.GetSemanticModelAsync().Result;
             var newNode = _semanticModel.SyntaxTree.GetRoot();
-            var newSolution = document.Project.Solution;
+
             foreach (KeyValuePair<VariableDeclaratorSyntax, string> variable in _identifierGenerator.RenamedVariables)
             {
                 var nodeToSearch = newNode.DescendantNodes()
                     .OfType<VariableDeclaratorSyntax>().FirstOrDefault(x => x.Identifier.ValueText.Equals(variable.Key.Identifier.ValueText));
                 (newNode, document) = Rename(nodeToSearch, document, variable.Value);
             }
+
+            foreach(var method in _identifierGenerator.RenamedMethods)
+            {
+                var nodeToSearch = newNode.DescendantNodes()
+                    .OfType<MethodDeclarationSyntax>().FirstOrDefault(x => x.Identifier.ValueText.Equals(method.Key.Identifier.ValueText));
+                (newNode, document) = Rename(nodeToSearch, document, method.Value);
+            }
+
             foreach (var classToRename in _identifierGenerator.RenamedTypes)
             {
                 var nodeToSearch = newNode.DescendantNodes()
                     .OfType<ClassDeclarationSyntax>().FirstOrDefault(x => x.Identifier.ValueText.Equals(classToRename.Key.Identifier.ValueText));
                 (newNode, document) = Rename(nodeToSearch, document, classToRename.Value);
             }
-
-            return newNode;
+            
         }
 
         private (SyntaxNode node, Document document) Rename(SyntaxNode nodeToRename, Document document, string newName)
@@ -99,17 +111,45 @@ namespace CSharpMinifier.Rewriters
             return base.VisitFieldDeclaration(node);
         }
 
-
-        public SyntaxTrivia CommentAndRegionsTriviaNodes(SyntaxTrivia arg1, SyntaxTrivia arg2)
+        public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
-            if (arg1.IsKind(SyntaxKind.SingleLineCommentTrivia) || arg1.IsKind(SyntaxKind.MultiLineCommentTrivia)
-                || arg1.IsKind(SyntaxKind.RegionDirectiveTrivia) || arg1.IsKind(SyntaxKind.EndRegionDirectiveTrivia))
+            if (_options.LocalVarsCompressing && node.Modifiers.Any(m => m.Value.Equals("private")))
             {
-                arg2 = CarriageReturn;
+                _identifierGenerator.GetNextName(node);
             }
-            else
+            else if (_options.PublicCompressing && node.Modifiers.Any(m => m.Value.Equals("public")))
             {
-                arg2 = arg1;
+                _identifierGenerator.GetNextName(node);
+            }
+            return base.VisitMethodDeclaration(node);
+        }
+
+
+        public SyntaxTrivia ReplaceTriviaNodes(SyntaxTrivia arg1, SyntaxTrivia arg2)
+        {
+            if(_options.CommentsRemoving || _options.RegionsRemoving)
+            {
+                if (arg1.IsKind(SyntaxKind.SingleLineCommentTrivia) || arg1.IsKind(SyntaxKind.MultiLineCommentTrivia)
+                || arg1.IsKind(SyntaxKind.RegionDirectiveTrivia) || arg1.IsKind(SyntaxKind.EndRegionDirectiveTrivia))
+                {
+                    arg2 = CarriageReturn;
+                }
+                else
+                {
+                    arg2 = arg1;
+                }
+            }
+            if (_options.SpacesRemoving)
+            {
+                if (arg1.IsKind(SyntaxKind.WhitespaceTrivia) || arg1.IsKind(SyntaxKind.EndOfLineTrivia))
+                {
+                    arg2 = CarriageReturn;
+                }
+                else
+                {
+                    arg2 = arg1;
+                }
+                
             }
             return arg2;
         }
