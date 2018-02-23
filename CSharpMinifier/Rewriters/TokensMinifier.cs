@@ -45,7 +45,10 @@ namespace CSharpMinifier.Rewriters
         {           
             _semanticModel = document.GetSemanticModelAsync().Result;
             var newNode = _semanticModel.SyntaxTree.GetRoot();
+<<<<<<< HEAD:CSharpMinifier/Rewriters/TokensMinifier.cs
 
+=======
+>>>>>>> 5abeb53995ac7760de4ef050808dc751ceb38a2d:CSharpMinifier/Rewriters/CSharpRewriter.cs
             foreach (KeyValuePair<VariableDeclaratorSyntax, string> variable in _identifierGenerator.RenamedVariables)
             {
                 var nodeToSearch = newNode.DescendantNodes()
@@ -66,7 +69,18 @@ namespace CSharpMinifier.Rewriters
                     .OfType<ClassDeclarationSyntax>().FirstOrDefault(x => x.Identifier.ValueText.Equals(classToRename.Key.Identifier.ValueText));
                 (newNode, document) = Rename(nodeToSearch, document, classToRename.Value);
             }
+<<<<<<< HEAD:CSharpMinifier/Rewriters/TokensMinifier.cs
             
+=======
+            foreach (var propertyToRename in _identifierGenerator.RenamedProperties)
+            {
+                var nodeToSearch = newNode.DescendantNodes()
+                    .OfType<PropertyDeclarationSyntax>().FirstOrDefault(x => x.Identifier.ValueText.Equals(propertyToRename.Key.Identifier.ValueText));
+                (newNode, document) = Rename(nodeToSearch, document, propertyToRename.Value);
+            }
+
+            return newNode;
+>>>>>>> 5abeb53995ac7760de4ef050808dc751ceb38a2d:CSharpMinifier/Rewriters/CSharpRewriter.cs
         }
 
         private (SyntaxNode node, Document document) Rename(SyntaxNode nodeToRename, Document document, string newName)
@@ -111,6 +125,7 @@ namespace CSharpMinifier.Rewriters
             return base.VisitFieldDeclaration(node);
         }
 
+<<<<<<< HEAD:CSharpMinifier/Rewriters/TokensMinifier.cs
         public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
             if (_options.LocalVarsCompressing && node.Modifiers.Any(m => m.Value.Equals("private")))
@@ -122,6 +137,19 @@ namespace CSharpMinifier.Rewriters
                 _identifierGenerator.GetNextName(node);
             }
             return base.VisitMethodDeclaration(node);
+=======
+        public override SyntaxNode VisitPropertyDeclaration(PropertyDeclarationSyntax node)
+        {
+            if (_options.PublicCompressing && node.Modifiers.Any(m => m.Value.Equals("public")))
+            {
+                _identifierGenerator.GetNextName(node);
+            }
+            else if (_options.LocalVarsCompressing && node.Modifiers.Any(m => m.Value.Equals("private")))
+            {
+                _identifierGenerator.GetNextName(node);
+            }
+            return base.VisitPropertyDeclaration(node);
+>>>>>>> 5abeb53995ac7760de4ef050808dc751ceb38a2d:CSharpMinifier/Rewriters/CSharpRewriter.cs
         }
 
 
