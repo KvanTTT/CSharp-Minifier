@@ -66,7 +66,7 @@ namespace CSharpMinifier
         private AdhocWorkspace Minify(AdhocWorkspace workspace)
         {
             var rewriter = new TokensMinifier(workspace, Options);
-            return rewriter.VisitAndRename();
+            return rewriter.MinifyIdentifiers();
         }        
     }
 }

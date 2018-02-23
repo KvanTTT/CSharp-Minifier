@@ -21,8 +21,8 @@ namespace CSharpMinifier
 
         private List<string> _existingNames = new List<string>();
 
-        private const int FirstSymbolCode = 'a';
-        private const int LastSymbolCode = 'z';
+        private const char FirstSymbolCode = 'a';
+        private const char LastSymbolCode = 'z';
 
         private static string[] _cSharpKeywords = new string[]
         {
@@ -54,11 +54,10 @@ namespace CSharpMinifier
                 _existingNames.Add(nextName);
                 AddToDictionary(node);
                 return nextName;
-            }
-            char firstSymbol = (char)FirstSymbolCode;
-            _existingNames.Add(firstSymbol.ToString());
+            }            
+            _existingNames.Add(FirstSymbolCode.ToString());
             AddToDictionary(node);
-            return firstSymbol.ToString();
+            return FirstSymbolCode.ToString();
         }
 
         private void AddToDictionary(SyntaxNode node)
@@ -85,7 +84,7 @@ namespace CSharpMinifier
 
         private string IncrementName(string lastName)
         {
-            if(lastName.Length == 0)
+            if (lastName.Length == 0)
             {
                 return "a";
             }
@@ -96,7 +95,7 @@ namespace CSharpMinifier
                 lastChar++;
                 return fragment + lastChar;
             }
-            return IncrementName(fragment) + Char.ConvertFromUtf32(FirstSymbolCode);
+            return IncrementName(fragment) + FirstSymbolCode;
         }
     }
 }

@@ -24,7 +24,7 @@ namespace CSharpMinifier.Rewriters
             var _ = typeof(Microsoft.CodeAnalysis.CSharp.Formatting.CSharpFormattingOptions);
         }
 
-        public AdhocWorkspace VisitAndRename()
+        public AdhocWorkspace MinifyIdentifiers()
         {
             foreach(var project in _workspace.CurrentSolution.Projects)
             {
@@ -100,7 +100,7 @@ namespace CSharpMinifier.Rewriters
 
         public override SyntaxNode VisitFieldDeclaration(FieldDeclarationSyntax node)
         {
-            if(_options.LocalVarsCompressing && node.Modifiers.Any(m => m.Value.Equals("private")))
+            if (_options.LocalVarsCompressing && node.Modifiers.Any(m => m.Value.Equals("private")))
             {
                 _identifierGenerator.GetNextName(node.Declaration.Variables.First());
             }
@@ -127,7 +127,7 @@ namespace CSharpMinifier.Rewriters
 
         public SyntaxTrivia ReplaceTriviaNodes(SyntaxTrivia arg1, SyntaxTrivia arg2)
         {
-            if(_options.CommentsRemoving || _options.RegionsRemoving)
+            if (_options.CommentsRemoving || _options.RegionsRemoving)
             {
                 if (arg1.IsKind(SyntaxKind.SingleLineCommentTrivia) || arg1.IsKind(SyntaxKind.MultiLineCommentTrivia)
                 || arg1.IsKind(SyntaxKind.RegionDirectiveTrivia) || arg1.IsKind(SyntaxKind.EndRegionDirectiveTrivia))
