@@ -79,7 +79,6 @@ namespace CSharpMinifier
             }
         }
 
-
         private string LastName => _existingNames.LastOrDefault();
 
         private string IncrementName(string lastName)
