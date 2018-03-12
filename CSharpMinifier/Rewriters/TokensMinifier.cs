@@ -32,8 +32,9 @@ namespace CSharpMinifier.Rewriters
                 {
                     _semanticModel = document.GetSemanticModelAsync().Result;
                     var node = _semanticModel.SyntaxTree.GetRoot();
+                    node = node.ReplaceTrivia(node.DescendantTrivia(), ReplaceSpaces);
+                    node = node.ReplaceTrivia(node.DescendantTrivia(), ReplaceCommentsAndRegions);
                     node = Visit(node);
-                    node = node.ReplaceTrivia(node.DescendantTrivia(), ReplaceTriviaNodes);
                     RenameAll(document.WithSyntaxRoot(node));
                 }
             }
@@ -138,7 +139,24 @@ namespace CSharpMinifier.Rewriters
         }
 
 
-        public SyntaxTrivia ReplaceTriviaNodes(SyntaxTrivia arg1, SyntaxTrivia arg2)
+        public SyntaxTrivia ReplaceSpaces(SyntaxTrivia arg1, SyntaxTrivia arg2)
+        {            
+            if (_options.SpacesRemoving)
+            {
+                if (arg1.IsKind(SyntaxKind.WhitespaceTrivia) || arg1.IsKind(SyntaxKind.EndOfLineTrivia))
+                {
+                    arg2 = CarriageReturn;
+                }
+                else
+                {
+                    arg2 = arg1;
+                }
+                
+            }
+            return arg2;
+        }
+        
+        public SyntaxTrivia ReplaceCommentsAndRegions(SyntaxTrivia arg1, SyntaxTrivia arg2)
         {
             if (_options.CommentsRemoving || _options.RegionsRemoving)
             {
@@ -151,18 +169,6 @@ namespace CSharpMinifier.Rewriters
                 {
                     arg2 = arg1;
                 }
-            }
-            if (_options.SpacesRemoving)
-            {
-                if (arg1.IsKind(SyntaxKind.WhitespaceTrivia) || arg1.IsKind(SyntaxKind.EndOfLineTrivia))
-                {
-                    arg2 = CarriageReturn;
-                }
-                else
-                {
-                    arg2 = arg1;
-                }
-                
             }
             return arg2;
         }

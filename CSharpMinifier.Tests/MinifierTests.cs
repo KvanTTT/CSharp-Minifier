@@ -31,7 +31,7 @@ namespace CSharpMinifier.Tests
 			{
 				SpacesRemoving = true
 			};
-			var minifier = new Minifier(minifierOptions);
+			var minifier = new RoslynMinifier(minifierOptions);
 			foreach (var sample in Samples)
 			{
 				var minified = minifier.MinifyFromString(sample.Value);
@@ -51,7 +51,7 @@ namespace CSharpMinifier.Tests
 				LineLength = 80,
 				RegionsRemoving = true
 			};
-			var minifier = new Minifier(minifierOptions);
+			var minifier = new RoslynMinifier(minifierOptions);
 			foreach (var sample in Samples)
 			{
 				var minified = minifier.MinifyFromString(sample.Value);
@@ -67,7 +67,7 @@ namespace CSharpMinifier.Tests
 				SpacesRemoving = true,
 				CommentsRemoving = true
 			};
-			var minifier = new Minifier(minifierOptions);
+			var minifier = new RoslynMinifier(minifierOptions);
 
 			var test = Samples["Test1"];
 			if (!test.Contains("//") || !test.Contains("/*") || !test.Contains("*/"))
@@ -87,7 +87,7 @@ namespace CSharpMinifier.Tests
 				SpacesRemoving = true,
 				RegionsRemoving = true
 			};
-			var minifier = new Minifier(minifierOptions);
+			var minifier = new RoslynMinifier(minifierOptions);
 
 			var test = Samples["Test1"];
 			if (!test.Contains("#region") || !test.Contains("#endregion"))
@@ -107,7 +107,7 @@ namespace CSharpMinifier.Tests
 				MembersCompressing = true,
 				TypesCompressing = true
 			};
-			var minifier = new Minifier(minifierOptions);
+			var minifier = new RoslynMinifier(minifierOptions);
 			foreach (var sample in Samples)
 			{
 				var minified = minifier.MinifyFromString(sample.Value);
@@ -122,7 +122,7 @@ namespace CSharpMinifier.Tests
 			{
 				MiscCompressing = true
 			};
-			var minifier = new Minifier(minifierOptions);
+			var minifier = new RoslynMinifier(minifierOptions);
 			var minified = minifier.MinifyFromString(Samples["MiscCompression"]);
 			Assert.IsTrue(minified.Contains("255"));
 			Assert.IsTrue(minified.Contains("0x7048860F9180"));
@@ -134,7 +134,7 @@ namespace CSharpMinifier.Tests
 		[Test]
 		public void IgnoredIdAndComments()
 		{
-			var minifier = new Minifier(null, new string[] { "unminifiedId" }, new string[] { "unremovableComment", "/*unremovableComment1*/" });
+			var minifier = new RoslynMinifier(null, new string[] { "unminifiedId" }, new string[] { "unremovableComment", "/*unremovableComment1*/" });
 			var test = Samples["Test1"];
 			if (!test.Contains("unminifiedId") || !test.Contains("unremovableComment") || !test.Contains("/*unremovableComment1*/"))
 				Assert.Inconclusive("Invalid test sample for IgnoredIdAndComments test");
@@ -147,7 +147,7 @@ namespace CSharpMinifier.Tests
 		[Test]
 		public void IncrementPlus()
 		{
-			var minifier = new Minifier(new MinifierOptions { LocalVarsCompressing = false });
+			var minifier = new RoslynMinifier(new MinifierOptions { LocalVarsCompressing = false });
 			var testCode =
 @"public class Test
 {
@@ -171,7 +171,7 @@ namespace CSharpMinifier.Tests
 		[Test]
 		public void NestedClassesWithSameInnterName()
 		{
-			var minifier = new Minifier();
+			var minifier = new RoslynMinifier();
 			var testCode =
 @"public static class A
 {
@@ -196,7 +196,7 @@ public static class B
 		[Test]
 		public void ShouldProperlyConvertEnumWithoutInitializersToInt()
 		{
-			var minifier = new Minifier();
+			var minifier = new RoslynMinifier();
 			var minified = minifier.MinifyFromString(Samples["EnumToIntConversion"]);
 
 			Assert.IsTrue(CompileUtils.CanCompile(minified));
