@@ -34,9 +34,9 @@ namespace CSharpMinifier
             _workspace.TryApplyChanges(project.Solution);
             var tempName = "tempFile";
 
-            for(int i = 0; i < csFiles.Length; i++)
+            for (int i = 0; i < csFiles.Length; i++)
             {
-                var syntaxTree = CSharpSyntaxTree.ParseText(csFiles[i]);                
+                var syntaxTree = CSharpSyntaxTree.ParseText(csFiles[i]);
                 _workspace.AddDocument(project.Id, tempName + i, syntaxTree.GetText());
             }
 
@@ -53,20 +53,29 @@ namespace CSharpMinifier
         public string MinifyFromString(string csharpCode)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(csharpCode);
-            var project = _workspace.AddProject("MinifierProject", LanguageNames.CSharp);
-            project = project.AddMetadataReference(_mscorlib);
-            _workspace.TryApplyChanges(project.Solution);
+            Project project;
+            if (_workspace.CurrentSolution.Projects.Any())
+            {
+                project = _workspace.AddProject("MinifierProject", LanguageNames.CSharp);
+                project = project.AddMetadataReference(_mscorlib);
+                _workspace.TryApplyChanges(project.Solution);
+            }
+            else
+            {
+                project = _workspace.CurrentSolution.Projects.First();
+            }
             var document = _workspace.AddDocument(project.Id, "Doc", syntaxTree.GetText());
             _workspace = Minify(_workspace);
-
-            return _workspace.CurrentSolution.Projects.First()
-                .Documents.First().GetTextAsync().Result.ToString();
+            var resultCode = _workspace.CurrentSolution.Projects.First().Documents.First().GetTextAsync().Result.ToString();
+            project = _workspace.CurrentSolution.Projects.First().RemoveDocument(document.Id);
+            _workspace.TryApplyChanges(project.Solution);
+            return resultCode;
         }
 
         private AdhocWorkspace Minify(AdhocWorkspace workspace)
         {
             var rewriter = new TokensMinifier(workspace, Options);
             return rewriter.MinifyIdentifiers();
-        }        
+        }
     }
 }

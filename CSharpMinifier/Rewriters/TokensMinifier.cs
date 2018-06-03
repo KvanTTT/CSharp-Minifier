@@ -11,9 +11,11 @@ namespace CSharpMinifier.Rewriters
     class TokensMinifier : CSharpSyntaxRewriter
     {
         private SemanticModel _semanticModel;
-        private AdhocWorkspace _workspace;
-        private MinifierOptions _options;
-        private IdentifierGenerator _identifierGenerator; 
+        private readonly AdhocWorkspace _workspace;
+        private readonly MinifierOptions _options;
+        private readonly IdentifierGenerator _identifierGenerator;
+        readonly string PublicModifier = "public";
+        readonly string PrivateModifier = "private";
 
         public TokensMinifier(AdhocWorkspace workspace, MinifierOptions options = null, bool visitIntoStructuredTrivia = true) : base(visitIntoStructuredTrivia)
         {
@@ -26,9 +28,9 @@ namespace CSharpMinifier.Rewriters
 
         public AdhocWorkspace MinifyIdentifiers()
         {
-            foreach(var project in _workspace.CurrentSolution.Projects)
+            foreach (var project in _workspace.CurrentSolution.Projects)
             {
-                foreach(var document in project.Documents)
+                foreach (var document in project.Documents)
                 {
                     _semanticModel = document.GetSemanticModelAsync().Result;
                     var node = _semanticModel.SyntaxTree.GetRoot();
@@ -43,36 +45,43 @@ namespace CSharpMinifier.Rewriters
         }
 
         private void RenameAll(Document document)
-        {           
+        {
             _semanticModel = document.GetSemanticModelAsync().Result;
             var newNode = _semanticModel.SyntaxTree.GetRoot();
 
             foreach (KeyValuePair<VariableDeclaratorSyntax, string> variable in _identifierGenerator.RenamedVariables)
             {
                 var nodeToSearch = newNode.DescendantNodes()
-                    .OfType<VariableDeclaratorSyntax>().FirstOrDefault(x => x.Identifier.ValueText.Equals(variable.Key.Identifier.ValueText));
+                    .OfType<VariableDeclaratorSyntax>()
+                    .FirstOrDefault(x =>
+                        x.Identifier.ValueText.Equals(variable.Key.Identifier.ValueText));
                 (newNode, document) = Rename(nodeToSearch, document, variable.Value);
             }
 
-            foreach(var method in _identifierGenerator.RenamedMethods)
+            foreach (var method in _identifierGenerator.RenamedMethods)
             {
                 var nodeToSearch = newNode.DescendantNodes()
-                    .OfType<MethodDeclarationSyntax>().FirstOrDefault(x => x.Identifier.ValueText.Equals(method.Key.Identifier.ValueText));
+                    .OfType<MethodDeclarationSyntax>()
+                    .FirstOrDefault(x =>
+                        x.Identifier.ValueText.Equals(method.Key.Identifier.ValueText));
                 (newNode, document) = Rename(nodeToSearch, document, method.Value);
             }
 
             foreach (var classToRename in _identifierGenerator.RenamedTypes)
             {
                 var nodeToSearch = newNode.DescendantNodes()
-                    .OfType<ClassDeclarationSyntax>().FirstOrDefault(x => x.Identifier.ValueText.Equals(classToRename.Key.Identifier.ValueText));
+                    .OfType<ClassDeclarationSyntax>()
+                    .FirstOrDefault(x =>
+                        x.Identifier.ValueText.Equals(classToRename.Key.Identifier.ValueText));
                 (newNode, document) = Rename(nodeToSearch, document, classToRename.Value);
             }
-            
+
         }
 
         private (SyntaxNode node, Document document) Rename(SyntaxNode nodeToRename, Document document, string newName)
         {
-            var symbolInfo = _semanticModel.GetSymbolInfo(nodeToRename).Symbol ?? _semanticModel.GetDeclaredSymbol(nodeToRename);
+            var symbolInfo = _semanticModel.GetSymbolInfo(nodeToRename).Symbol ??
+                _semanticModel.GetDeclaredSymbol(nodeToRename);
             var solution = Renamer.RenameSymbolAsync(document.Project.Solution, symbolInfo, newName,
                 _workspace.Options).Result;
             _workspace.TryApplyChanges(solution);
@@ -101,11 +110,11 @@ namespace CSharpMinifier.Rewriters
 
         public override SyntaxNode VisitFieldDeclaration(FieldDeclarationSyntax node)
         {
-            if (_options.LocalVarsCompressing && node.Modifiers.Any(m => m.Value.Equals("private")))
+            if (_options.LocalVarsCompressing && node.Modifiers.Any(m => m.Value.Equals(PrivateModifier)))
             {
                 _identifierGenerator.GetNextName(node.Declaration.Variables.First());
             }
-            else if (_options.PublicCompressing && node.Modifiers.Any(m => m.Value.Equals("public")))
+            else if (_options.PublicCompressing && node.Modifiers.Any(m => m.Value.Equals(PublicModifier)))
             {
                 _identifierGenerator.GetNextName(node.Declaration.Variables.First());
             }
@@ -114,11 +123,11 @@ namespace CSharpMinifier.Rewriters
 
         public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
-            if (_options.LocalVarsCompressing && node.Modifiers.Any(m => m.Value.Equals("private")))
+            if (_options.LocalVarsCompressing && node.Modifiers.Any(m => m.Value.Equals(PrivateModifier)))
             {
                 _identifierGenerator.GetNextName(node);
             }
-            else if (_options.PublicCompressing && node.Modifiers.Any(m => m.Value.Equals("public")))
+            else if (_options.PublicCompressing && node.Modifiers.Any(m => m.Value.Equals(PublicModifier)))
             {
                 _identifierGenerator.GetNextName(node);
             }
@@ -127,11 +136,11 @@ namespace CSharpMinifier.Rewriters
 
         public override SyntaxNode VisitPropertyDeclaration(PropertyDeclarationSyntax node)
         {
-            if (_options.PublicCompressing && node.Modifiers.Any(m => m.Value.Equals("public")))
+            if (_options.PublicCompressing && node.Modifiers.Any(m => m.Value.Equals(PublicModifier)))
             {
                 _identifierGenerator.GetNextName(node);
             }
-            else if (_options.LocalVarsCompressing && node.Modifiers.Any(m => m.Value.Equals("private")))
+            else if (_options.LocalVarsCompressing && node.Modifiers.Any(m => m.Value.Equals(PublicModifier)))
             {
                 _identifierGenerator.GetNextName(node);
             }
@@ -140,22 +149,22 @@ namespace CSharpMinifier.Rewriters
 
 
         public SyntaxTrivia ReplaceSpaces(SyntaxTrivia arg1, SyntaxTrivia arg2)
-        {            
+        {
             if (_options.SpacesRemoving)
             {
-                if (arg1.IsKind(SyntaxKind.WhitespaceTrivia) || arg1.IsKind(SyntaxKind.EndOfLineTrivia))
+                if (arg1.IsKind(SyntaxKind.WhitespaceTrivia) || (arg1.IsKind(SyntaxKind.EndOfLineTrivia)
+                    && arg1.Span.Length > 1))
                 {
-                    arg2 = CarriageReturn;
+                    arg2 = Space;
                 }
                 else
                 {
                     arg2 = arg1;
                 }
-                
             }
             return arg2;
         }
-        
+
         public SyntaxTrivia ReplaceCommentsAndRegions(SyntaxTrivia arg1, SyntaxTrivia arg2)
         {
             if (_options.CommentsRemoving || _options.RegionsRemoving)
@@ -163,7 +172,7 @@ namespace CSharpMinifier.Rewriters
                 if (arg1.IsKind(SyntaxKind.SingleLineCommentTrivia) || arg1.IsKind(SyntaxKind.MultiLineCommentTrivia)
                 || arg1.IsKind(SyntaxKind.RegionDirectiveTrivia) || arg1.IsKind(SyntaxKind.EndRegionDirectiveTrivia))
                 {
-                    arg2 = CarriageReturn;
+                    arg2 = Space;
                 }
                 else
                 {

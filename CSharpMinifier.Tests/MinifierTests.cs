@@ -14,7 +14,7 @@ namespace CSharpMinifier.Tests
 		public void Init()
 		{
 			Samples = new Dictionary<string, string>();
-			var sampleFiles = Directory.GetFiles(@"..\..\Samples");
+			var sampleFiles = Directory.GetFiles($"{System.AppDomain.CurrentDomain.BaseDirectory}..\\..\\Samples");
 			foreach (var file in sampleFiles)
 			{
 				var code = File.ReadAllText(file);
@@ -46,7 +46,7 @@ namespace CSharpMinifier.Tests
 		{
 			var minifierOptions = new MinifierOptions
 			{
-				SpacesRemoving = true,
+				SpacesRemoving = false,
 				CommentsRemoving = true,
 				LineLength = 80,
 				RegionsRemoving = true

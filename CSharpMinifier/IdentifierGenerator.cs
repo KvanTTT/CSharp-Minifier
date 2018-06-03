@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -11,15 +9,15 @@ namespace CSharpMinifier
 {
     public class IdentifierGenerator
     {
-        public Dictionary<VariableDeclaratorSyntax, string> RenamedVariables { get; private set; }
+        public Dictionary<VariableDeclaratorSyntax, string> RenamedVariables { get; }
 
-        public Dictionary<MethodDeclarationSyntax, string> RenamedMethods { get; private set; }
+        public Dictionary<MethodDeclarationSyntax, string> RenamedMethods { get; }
 
-        public Dictionary<ClassDeclarationSyntax, string> RenamedTypes { get; private set; }
+        public Dictionary<ClassDeclarationSyntax, string> RenamedTypes { get; }
 
         public Dictionary<PropertyDeclarationSyntax, string> RenamedProperties { get; set; }
 
-        private List<string> _existingNames = new List<string>();
+        private List<string> _existingNames = new List<string> { FirstSymbolCode.ToString() };
 
         private const char FirstSymbolCode = 'a';
         private const char LastSymbolCode = 'z';
@@ -54,7 +52,7 @@ namespace CSharpMinifier
                 _existingNames.Add(nextName);
                 AddToDictionary(node);
                 return nextName;
-            }            
+            }
             _existingNames.Add(FirstSymbolCode.ToString());
             AddToDictionary(node);
             return FirstSymbolCode.ToString();
@@ -65,26 +63,22 @@ namespace CSharpMinifier
             switch (node.Kind())
             {
                 case SyntaxKind.MethodDeclaration:
-                    RenamedMethods.Add((MethodDeclarationSyntax)node, LastName);
+                    RenamedMethods.Add((MethodDeclarationSyntax)node, String.Empty);
                     break;
                 case SyntaxKind.VariableDeclarator:
-                    RenamedVariables.Add((VariableDeclaratorSyntax)node, LastName);
+                    RenamedVariables.Add((VariableDeclaratorSyntax)node, String.Empty);
                     break;
                 case SyntaxKind.ClassDeclaration:
-                    RenamedTypes.Add((ClassDeclarationSyntax)node, LastName);
+                    RenamedTypes.Add((ClassDeclarationSyntax)node, String.Empty);
                     break;
                 case SyntaxKind.PropertyDeclaration:
-                    RenamedProperties.Add((PropertyDeclarationSyntax)node, LastName);
+                    RenamedProperties.Add((PropertyDeclarationSyntax)node, String.Empty);
                     break;
             }
         }
 
-        private string LastName => _existingNames.LastOrDefault();
-
         private string IncrementName(string lastName)
         {
-            if (lastName.Length <= 0)
-                lastName = "a";
             char lastChar = lastName[lastName.Length - 1];
             string fragment = lastName.Substring(0, lastName.Length - 1);
             while (lastChar < LastSymbolCode)
