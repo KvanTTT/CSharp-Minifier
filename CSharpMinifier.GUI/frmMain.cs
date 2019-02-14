@@ -131,7 +131,8 @@ namespace CSharpMinifier.GUI
 			tbInputLength.Text = tbInput.Text.Length.ToString();
 			tbOutputLength.Text = tbOutput.Text.Length.ToString();
 			tbOutputInputRatio.Text = ((double)tbOutput.Text.Length / tbInput.Text.Length).ToString("0.000000");
-			var compileResult = CompileUtils.Compile(tbOutput.Text);
+            var cscPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "tools", "Microsoft.Net.Compilers", "tools", "csc.exe");
+			var compileResult = CompileUtils.Compile(tbOutput.Text, cscPath);
 			dgvErrors.Rows.Clear();
 			if (!compileResult.Errors.HasErrors)
 			{

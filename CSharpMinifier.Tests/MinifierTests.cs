@@ -10,16 +10,24 @@ namespace CSharpMinifier.Tests
 	{
 		Dictionary<string, string> Samples;
 
+        string _cscPath;
+
+        bool CanCompile(string program) =>
+            CompileUtils.CanCompile(program, _cscPath);
+
 		[SetUp]
 		public void Init()
 		{
+            var baseDirectory = System.AppDomain.CurrentDomain.BaseDirectory;
+            _cscPath = Path.Combine(baseDirectory, "..", "..", "..", "..", "tools", "Microsoft.Net.Compilers", "tools", "csc.exe");
+
 			Samples = new Dictionary<string, string>();
-			var sampleFiles = Directory.GetFiles($"{System.AppDomain.CurrentDomain.BaseDirectory}..\\..\\Samples");
+            var sampleFiles = Directory.GetFiles(Path.Combine(baseDirectory, "..", "..", "..", "Samples"));
 			foreach (var file in sampleFiles)
 			{
 				var code = File.ReadAllText(file);
 				Samples.Add(Path.GetFileNameWithoutExtension(file), code);
-				if (!CompileUtils.CanCompile(code))
+				if (!CanCompile(code))
 					Assert.Inconclusive("All input code should be compilied");
 			}
 		}
@@ -35,7 +43,7 @@ namespace CSharpMinifier.Tests
 			foreach (var sample in Samples)
 			{
 				var minified = minifier.MinifyFromString(sample.Value);
-				Assert.IsTrue(CompileUtils.CanCompile(minified));
+				Assert.IsTrue(CanCompile(minified));
 				if (sample.Key == "Test1")
 					Assert.IsFalse(minified.Contains(" /*"));
 			}
@@ -55,7 +63,7 @@ namespace CSharpMinifier.Tests
 			foreach (var sample in Samples)
 			{
 				var minified = minifier.MinifyFromString(sample.Value);
-				Assert.IsTrue(CompileUtils.CanCompile(minified));
+				Assert.IsTrue(CanCompile(minified));
 			}
 		}
 
@@ -73,7 +81,7 @@ namespace CSharpMinifier.Tests
 			if (!test.Contains("//") || !test.Contains("/*") || !test.Contains("*/"))
 				Assert.Inconclusive("Invalid test sample for RemoveComments test");
 			var minified = minifier.MinifyFromString(test);
-			Assert.IsTrue(CompileUtils.CanCompile(minified));
+			Assert.IsTrue(CanCompile(minified));
 			Assert.IsFalse(minified.Contains("//"));
 			Assert.IsFalse(minified.Contains("/*"));
 			Assert.IsFalse(minified.Contains("*/"));
@@ -93,7 +101,7 @@ namespace CSharpMinifier.Tests
 			if (!test.Contains("#region") || !test.Contains("#endregion"))
 				Assert.Inconclusive("Invalid test sample for RemoveRegions test");
 			var minified = minifier.MinifyFromString(test);
-			Assert.IsTrue(CompileUtils.CanCompile(minified));
+			Assert.IsTrue(CanCompile(minified));
 			Assert.IsFalse(minified.Contains("#region"));
 			Assert.IsFalse(minified.Contains("#endregion"));
 		}
@@ -111,7 +119,7 @@ namespace CSharpMinifier.Tests
 			foreach (var sample in Samples)
 			{
 				var minified = minifier.MinifyFromString(sample.Value);
-				Assert.IsTrue(CompileUtils.CanCompile(minified));
+				Assert.IsTrue(CanCompile(minified));
 			}
 		}
 
@@ -199,7 +207,7 @@ public static class B
 			var minifier = new RoslynMinifier();
 			var minified = minifier.MinifyFromString(Samples["EnumToIntConversion"]);
 
-			Assert.IsTrue(CompileUtils.CanCompile(minified));
+			Assert.IsTrue(CanCompile(minified));
 			Assert.AreEqual(
 				"using System.Collections.Generic;class c{static int a=5;static Dictionary<int,Dictionary<char,int>>b=new Dictionary<int,Dictionary<char,int>>{{5,new Dictionary<char,int>{{' ',8}}},{6,new Dictionary<char,int>{{' ',24}}}};}",
 				minified);

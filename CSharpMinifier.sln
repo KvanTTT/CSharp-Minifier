@@ -1,13 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpMinifier", "CSharpMinifier\CSharpMinifier.csproj", "{A26C936C-846B-4165-9574-42C74075D4CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSharpMinifier", "CSharpMinifier\CSharpMinifier.csproj", "{A26C936C-846B-4165-9574-42C74075D4CD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpMinifier.GUI", "CSharpMinifier.GUI\CSharpMinifier.GUI.csproj", "{1E6C7AB5-3E2F-4F5E-B5BD-B24E2258D0E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpMinifier.Tests", "CSharpMinifier.Tests\CSharpMinifier.Tests.csproj", "{24A6BB34-4BE9-4504-926D-16D52FE5AC41}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSharpMinifier.Tests", "CSharpMinifier.Tests\CSharpMinifier.Tests.csproj", "{24A6BB34-4BE9-4504-926D-16D52FE5AC41}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D6B4D5F0-B989-40F3-9F60-0D96701A1103}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,5 +35,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A1AE996D-FA41-4FA8-B2F4-5AA1AF1719F4}
 	EndGlobalSection
 EndGlobal
